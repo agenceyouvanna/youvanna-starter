@@ -11,8 +11,15 @@ if (!defined('ABSPATH')) exit;
 // ============================================
 add_action('wp_enqueue_scripts', function() {
     wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css', [], '6.5.1');
-    wp_enqueue_style('youvanna-main', get_stylesheet_directory_uri() . '/assets/css/main.css', [], '2.2.0');
-    wp_enqueue_script('youvanna-main', get_stylesheet_directory_uri() . '/assets/js/main.js', [], '2.2.0', true);
+    // Make FA non-render-blocking
+    add_filter('style_loader_tag', function($html, $handle) {
+        if ($handle === 'font-awesome') {
+            return str_replace("rel='stylesheet'", "rel='preload' as='style' onload=\"this.onload=null;this.rel='stylesheet'\"", $html) . '<noscript>' . $html . '</noscript>';
+        }
+        return $html;
+    }, 10, 2);
+    wp_enqueue_style('youvanna-main', get_stylesheet_directory_uri() . '/assets/css/main.css', [], filemtime(get_stylesheet_directory() . '/assets/css/main.css'));
+    wp_enqueue_script('youvanna-main', get_stylesheet_directory_uri() . '/assets/js/main.js', [], filemtime(get_stylesheet_directory() . '/assets/js/main.js'), true);
 });
 
 // ============================================
@@ -62,6 +69,9 @@ remove_action('wp_head', 'wp_generator');
 remove_action('wp_head', 'wlwmanifest_link');
 remove_action('wp_head', 'rsd_link');
 remove_action('wp_head', 'wp_shortlink_wp_head');
+remove_action('wp_head', 'rest_output_link_wp_head', 10);
+remove_action('wp_head', 'wp_oembed_add_discovery_links');
+remove_action('wp_head', 'wp_oembed_add_host_js');
 remove_action('wp_head', 'print_emoji_detection_script', 7);
 remove_action('wp_print_styles', 'print_emoji_styles');
 
@@ -289,7 +299,7 @@ function yv_render_card($args = []) {
         <div class="card-body">
             <h3><?php echo esc_html($a['title']); ?></h3>
             <p><?php echo esc_html($a['text']); ?></p>
-            <?php if ($a['link']): ?>
+            <?php if ($a['link'] && is_array($a['link'])): ?>
                 <a href="<?php echo esc_url($a['link']['url']); ?>" class="card-link"><?php echo esc_html($a['link']['title'] ?? 'En savoir plus'); ?> &rarr;</a>
             <?php endif; ?>
         </div>
@@ -297,31 +307,7 @@ function yv_render_card($args = []) {
     <?php
 }
 
-/**
- * Render un témoignage (réutilisé dans front-page + section-testimonials)
- * Appeler dans un while(have_rows()) — utilise get_sub_field()
- */
-function yv_render_testimonial() {
-    ?>
-    <div class="testimonial-card">
-        <div class="testimonial-stars" aria-label="<?php echo (int)get_sub_field('rating'); ?> sur 5" role="img">
-            <?php for ($i = 0; $i < (int)get_sub_field('rating'); $i++) echo '&#9733;'; ?>
-        </div>
-        <blockquote><?php echo esc_html(get_sub_field('text')); ?></blockquote>
-        <div class="testimonial-author">
-            <?php $photo = get_sub_field('photo'); if ($photo): ?>
-                <img src="<?php echo esc_url($photo['sizes']['thumbnail']); ?>" alt="<?php echo esc_attr(get_sub_field('name')); ?>">
-            <?php endif; ?>
-            <div>
-                <strong><?php echo esc_html(get_sub_field('name')); ?></strong>
-                <?php if ($role = get_sub_field('role')): ?>
-                    <span><?php echo esc_html($role); ?></span>
-                <?php endif; ?>
-            </div>
-        </div>
-    </div>
-    <?php
-}
+
 
 /**
  * Render une grille de stats (réutilisé dans front-page about + section-numbers)
@@ -382,6 +368,7 @@ function yv_settings_fields() {
                 ['name' => 'address', 'label' => 'Adresse', 'type' => 'textarea'],
                 ['name' => 'opening_hours', 'label' => "Horaires d'ouverture", 'type' => 'textarea'],
                 ['name' => 'maps_embed_url', 'label' => 'URL Google Maps Embed', 'type' => 'url', 'desc' => "Copier l'URL src de l'iframe Google Maps"],
+                ['name' => 'business_type', 'label' => 'Type d\'activite (schema.org)', 'type' => 'text', 'desc' => 'Ex: Dentist, Restaurant, LegalService, HomeAndConstructionBusiness. Defaut: LocalBusiness'],
             ],
         ],
         'brand' => [
@@ -590,7 +577,27 @@ add_action('acf/include_fields', function() {
                     ['key' => 'yv_fl_map_url', 'label' => 'URL iframe Google Maps', 'name' => 'map_url', 'type' => 'url'],
                     ['key' => 'yv_fl_map_h', 'label' => 'Hauteur (px)', 'name' => 'height', 'type' => 'number', 'default_value' => 450],
                 ]],
-                ['key' => 'yv_fl_numbers', 'name' => 'numbers', 'label' => 'Chiffres clés', 'sub_fields' => [
+ ['key' => 'yv_fl_text', 'name' => 'text', 'label' => 'Bloc de texte', 'sub_fields' => [
+                    ['key' => 'yv_fl_txt_t', 'label' => 'Titre (optionnel)', 'name' => 'title', 'type' => 'text'],
+                    ['key' => 'yv_fl_txt_content', 'label' => 'Contenu', 'name' => 'content', 'type' => 'wysiwyg', 'media_upload' => 1, 'toolbar' => 'full'],
+                    ['key' => 'yv_fl_txt_narrow', 'label' => 'Largeur reduite', 'name' => 'narrow', 'type' => 'true_false', 'default_value' => 1, 'ui' => 1],
+                ]],
+                ['key' => 'yv_fl_video', 'name' => 'video', 'label' => 'Video', 'sub_fields' => [
+                    ['key' => 'yv_fl_vid_t', 'label' => 'Titre (optionnel)', 'name' => 'title', 'type' => 'text'],
+                    ['key' => 'yv_fl_vid_url', 'label' => 'URL YouTube ou Vimeo', 'name' => 'video_url', 'type' => 'url'],
+                ]],
+                ['key' => 'yv_fl_team', 'name' => 'team', 'label' => 'Equipe', 'sub_fields' => [
+                    ['key' => 'yv_fl_team_t', 'label' => 'Titre', 'name' => 'title', 'type' => 'text'],
+                    ['key' => 'yv_fl_team_sub', 'label' => 'Sous-titre', 'name' => 'subtitle', 'type' => 'textarea', 'rows' => 2],
+                    ['key' => 'yv_fl_team_cols', 'label' => 'Colonnes', 'name' => 'columns', 'type' => 'select', 'choices' => ['3' => '3', '4' => '4'], 'default_value' => '3'],
+                    ['key' => 'yv_fl_team_rpt', 'label' => 'Membres', 'name' => 'members', 'type' => 'repeater', 'layout' => 'block', 'sub_fields' => [
+                        ['key' => 'yv_fl_team_photo', 'label' => 'Photo', 'name' => 'photo', 'type' => 'image', 'return_format' => 'array', 'preview_size' => 'thumbnail'],
+                        ['key' => 'yv_fl_team_name', 'label' => 'Nom', 'name' => 'name', 'type' => 'text'],
+                        ['key' => 'yv_fl_team_role', 'label' => 'Poste', 'name' => 'role', 'type' => 'text'],
+                        ['key' => 'yv_fl_team_bio', 'label' => 'Bio courte', 'name' => 'bio', 'type' => 'textarea', 'rows' => 2],
+                    ]],
+                ]],
+               ['key' => 'yv_fl_numbers', 'name' => 'numbers', 'label' => 'Chiffres clés', 'sub_fields' => [
                     ['key' => 'yv_fl_num_t', 'label' => 'Titre', 'name' => 'title', 'type' => 'text'],
                     ['key' => 'yv_fl_num_bg', 'label' => 'Couleur de fond', 'name' => 'bg_color', 'type' => 'select', 'choices' => ['light' => 'Clair', 'primary' => 'Couleur principale', 'dark' => 'Sombre'], 'default_value' => 'light'],
                     ['key' => 'yv_fl_num_rpt', 'label' => 'Chiffres', 'name' => 'items', 'type' => 'repeater', 'layout' => 'table', 'sub_fields' => [
@@ -694,9 +701,11 @@ add_action('wp_head', function() {
 // LocalBusiness schema (homepage)
 add_action('wp_head', function() {
     if (!is_front_page()) return;
+    $biz_type = yv_option('business_type', 'LocalBusiness');
     $schema = [
         '@context' => 'https://schema.org',
-        '@type' => 'LocalBusiness',
+        '@type' => $biz_type,
+        '@id' => home_url('/#organization'),
         'name' => get_bloginfo('name'),
         'description' => get_bloginfo('description'),
         'url' => home_url('/'),
@@ -708,7 +717,21 @@ add_action('wp_head', function() {
     $address = yv_option('address');
     if ($address) $schema['address'] = ['@type' => 'PostalAddress', 'streetAddress' => $address];
     $logo_id = get_theme_mod('custom_logo');
-    $logo_url = $logo_id ? wp_get_attachment_image_url($logo_id, "full") : false; if ($logo_url) $schema["logo"] = $logo_url;
+    $logo_url = $logo_id ? wp_get_attachment_image_url($logo_id, 'full') : false;
+    if ($logo_url) {
+        $schema['logo'] = $logo_url;
+        $schema['image'] = $logo_url;
+    }
+    // Opening hours
+    $hours = yv_option('opening_hours');
+    if ($hours) $schema['openingHours'] = array_filter(array_map('trim', explode("\n", $hours)));
+    // Social profiles (sameAs)
+    $same_as = [];
+    foreach (['social_facebook','social_instagram','social_linkedin','social_youtube','social_tiktok'] as $key) {
+        $url = yv_option($key);
+        if ($url) $same_as[] = $url;
+    }
+    if ($same_as) $schema['sameAs'] = $same_as;
     echo '<script type="application/ld+json">' . wp_json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "</script>\n";
 }, 5);
 
@@ -728,7 +751,7 @@ add_action('wp_head', function() {
         'description' => get_the_excerpt(),
     ];
     $thumb = get_the_post_thumbnail_url(null, 'large');
-    if ($thumb) $schema['image'] = $thumb;
+    $schema['image'] = $thumb ?: home_url('/wp-includes/images/blank.gif');
     $logo_id = get_theme_mod('custom_logo');
     if ($logo_id) $schema['publisher']['logo'] = ['@type' => 'ImageObject', 'url' => wp_get_attachment_image_url($logo_id, 'full')];
     echo '<script type="application/ld+json">' . wp_json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "</script>\n";
@@ -764,18 +787,29 @@ add_action('wp_head', function() {
 add_action('wp_head', function() {
     if (is_front_page()) {
         $hero_img = yv_image('hero_image', 'hero');
+    } elseif (is_singular('post')) {
+        $hero_img = get_the_post_thumbnail_url(null, 'hero');
+    } elseif (is_home()) {
+        $blog_id = get_option('page_for_posts');
+        $hero_img = $blog_id ? yv_image('page_hero_image', 'hero', $blog_id) : '';
     } elseif (is_page()) {
         $hero_img = yv_image('page_hero_image', 'hero');
     } else {
         $hero_img = '';
     }
     if ($hero_img) {
-        echo '<link rel="preload" as="image" href="' . esc_url($hero_img) . '">' . "\n";
+        echo '<link rel="preload" as="image" href="' . esc_url($hero_img) . '" fetchpriority="high">' . "\n";
     }
 }, 1);
 
-// Preconnect GTM/GA
+// Noscript fallback: show content if JS disabled
 add_action('wp_head', function() {
+    echo '<noscript><style>.reveal{opacity:1!important;transform:none!important}.reveal .card,.reveal .faq-item,.reveal .stat,.reveal .testimonial-card{opacity:1!important;transform:none!important}</style></noscript>' . "\n";
+}, 2);
+
+// Preconnect CDN + GTM/GA
+add_action('wp_head', function() {
+    echo '<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>' . "\n";
     if (yv_option('gtm_id') || yv_option('ga_id')) {
         echo '<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>' . "\n";
         echo '<link rel="dns-prefetch" href="https://www.googletagmanager.com">' . "\n";

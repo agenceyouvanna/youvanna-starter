@@ -76,6 +76,9 @@ h1, h2, h3, h4, h5, h6 {
 h1 { font-size: clamp(2.2rem, 5vw, 3.5rem); }
 h2 { font-size: clamp(1.6rem, 3.5vw, 2.5rem); }
 h3 { font-size: clamp(1.2rem, 2.5vw, 1.5rem); }
+h4 { font-size: 1.1rem; }
+h5 { font-size: 1rem; }
+h6 { font-size: 0.9rem; }
 
 /* ============================================
    LAYOUT — Réutilisable partout
@@ -103,12 +106,15 @@ h3 { font-size: clamp(1.2rem, 2.5vw, 1.5rem); }
     text-decoration: none;
 }
 .btn-sm { padding: 10px 20px; font-size: 14px; }
+.btn:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
 .btn-primary { background: var(--color-primary); color: #fff; border-color: var(--color-primary); }
 .btn-primary:hover { background: var(--color-primary-dark); border-color: var(--color-primary-dark); transform: translateY(-2px); box-shadow: var(--shadow-md); color: #fff; }
 .btn-secondary { background: transparent; color: #fff; border-color: rgba(255,255,255,.6); }
 .btn-secondary:hover { background: #fff; color: var(--color-secondary); transform: translateY(-2px); }
 .btn-outline { background: transparent; color: var(--color-primary); border-color: var(--color-primary); }
 .btn-outline:hover { background: var(--color-primary); color: #fff; transform: translateY(-2px); }
+.btn-secondary-light { background: transparent; color: var(--color-secondary); border-color: var(--color-border); }
+.btn-secondary-light:hover { background: var(--color-secondary); color: #fff; transform: translateY(-2px); }
 
 /* ============================================
    HEADER / NAV
@@ -139,7 +145,10 @@ h3 { font-size: clamp(1.2rem, 2.5vw, 1.5rem); }
 .nav-cta { display: flex; align-items: center; gap: 16px; }
 .nav-phone { font-size: 14px; font-weight: 600; color: var(--color-text); }
 .nav-toggle { display: none; background: none; border: none; cursor: pointer; padding: 8px; }
-.nav-toggle span { display: block; width: 24px; height: 2px; background: var(--color-secondary); margin: 5px 0; transition: all var(--transition); }
+.nav-toggle span { display: block; width: 24px; height: 2px; background: var(--color-secondary); margin: 5px 0; transition: all var(--transition); transform-origin: center; }
+.nav-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+.nav-toggle.active span:nth-child(2) { opacity: 0; }
+.nav-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
 
 /* ============================================
    HERO — Composant réutilisable (homepage + pages)
@@ -173,6 +182,8 @@ h3 { font-size: clamp(1.2rem, 2.5vw, 1.5rem); }
 .card-body p { color: var(--color-text-light); font-size: 15px; }
 .card-link { display: inline-block; margin-top: 12px; font-size: 14px; font-weight: 600; color: var(--color-primary); }
 .card-link:hover { color: var(--color-primary-dark); }
+.card-link:hover::after { transform: translateX(4px); }
+.card-link::after { content: ''; display: inline-block; transition: transform var(--transition); }
 .card-date { display: block; font-size: 13px; color: var(--color-text-light); margin-bottom: 8px; }
 
 /* ============================================
@@ -228,11 +239,15 @@ h3 { font-size: clamp(1.2rem, 2.5vw, 1.5rem); }
 .numbers-primary .stat-number { color: #fff; }
 .numbers-primary .stat-label { color: rgba(255,255,255,.8); }
 .numbers-primary .section-title { color: #fff; }
+.numbers-primary .section-subtitle { color: rgba(255,255,255,.8); }
+.numbers-primary .section-badge { color: #fff; background: rgba(255,255,255,.15); border-color: rgba(255,255,255,.2); }
 .numbers-dark { background: var(--color-secondary) !important; }
 .numbers-dark .stat { background: rgba(255,255,255,.08); }
 .numbers-dark .stat-number { color: var(--color-primary); }
 .numbers-dark .stat-label { color: rgba(255,255,255,.7); }
 .numbers-dark .section-title { color: #fff; }
+.numbers-dark .section-subtitle { color: rgba(255,255,255,.7); }
+.numbers-dark .section-badge { color: rgba(255,255,255,.9); background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.15); }
 
 /* ============================================
    TESTIMONIALS — Basé sur --color-primary
@@ -283,7 +298,9 @@ h3 { font-size: clamp(1.2rem, 2.5vw, 1.5rem); }
     border-radius: var(--radius); overflow: hidden;
     transition: all var(--transition);
 }
-.gallery-item:hover { transform: scale(1.02); box-shadow: var(--shadow-lg); }
+.gallery-item:hover { box-shadow: var(--shadow-lg); }
+.gallery-item img { transition: transform .5s cubic-bezier(.16,1,.3,1); }
+.gallery-item:hover img { transform: scale(1.05); }
 .gallery-item img { width: 100%; height: 250px; object-fit: cover; }
 
 /* ============================================
@@ -462,6 +479,7 @@ h3 { font-size: clamp(1.2rem, 2.5vw, 1.5rem); }
    RESPONSIVE
    ============================================ */
 @media (max-width: 960px) {
+    .grid-2 { grid-template-columns: 1fr; }
     .nav-menu, .nav-cta { display: none; }
     .nav-toggle { display: block; }
     .nav-menu.active {
@@ -513,7 +531,7 @@ h3 { font-size: clamp(1.2rem, 2.5vw, 1.5rem); }
 /* Cards — more polished */
 .card { border: 1px solid var(--color-border); box-shadow: none; }
 .card:hover { box-shadow: var(--shadow-lg); border-color: transparent; }
-.card img { height: 240px; }
+.card img { height: 240px; object-fit: cover; }
 .card-body { padding: 28px; }
 .card-body h3 { font-size: 1.2rem; margin-bottom: 12px; }
 .card-body p { font-size: 15px; line-height: 1.7; }
@@ -602,7 +620,7 @@ h3 { font-size: clamp(1.2rem, 2.5vw, 1.5rem); }
 /* FAQ — better interactions */
 .faq-item { border-radius: 12px; }
 .faq-item summary { font-size: 17px; padding: 22px 28px; }
-.faq-answer { padding: 0 28px 24px; font-size: 16px; }
+.faq-answer { padding: 0 28px 24px; font-size: 16px; overflow: hidden; transition: max-height .3s ease, opacity .3s ease; }
 .faq-answer p { margin-bottom: 12px; }
 
 /* Page hero — more dramatic for interior pages */
@@ -670,3 +688,56 @@ h3 { font-size: clamp(1.2rem, 2.5vw, 1.5rem); }
 /* Badge + title centering for all sections */
 .cards-section .container, .services-section .container, .testimonials-section .container, .faq-section .container, .numbers-section .container { text-align: center; }
 .cards-section .grid, .services-section .grid, .faq-section .faq-list { text-align: left; }
+
+/* 404 page */
+.error-404-section { min-height: 60vh; display: flex; align-items: center; margin-top: var(--header-height); }
+.error-404 { text-align: center; }
+.error-404-code { font-size: 6rem; color: var(--color-primary); line-height: 1; margin-bottom: 8px; }
+.error-404-text { font-size: 1.2rem; color: var(--color-text-light); margin: 16px 0 32px; }
+
+/* Back to top */
+.back-to-top {
+    position: fixed; bottom: 32px; right: 32px;
+    width: 44px; height: 44px;
+    background: var(--color-primary); color: #fff;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 16px; box-shadow: var(--shadow-md);
+    opacity: 0; pointer-events: none;
+    transition: all var(--transition); z-index: 900;
+}
+.back-to-top.visible { opacity: 1; pointer-events: auto; }
+.back-to-top:hover { background: var(--color-primary-dark); transform: translateY(-2px); color: #fff; }
+@media (max-width: 768px) { .back-to-top { bottom: 20px; right: 20px; width: 40px; height: 40px; } }
+
+/* Video section */
+.video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: var(--radius); box-shadow: var(--shadow-lg); }
+.video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+
+/* Team section */
+.team-member { text-align: center; }
+.team-member img { width: 100%; height: 280px; object-fit: cover; border-radius: var(--radius); margin-bottom: 16px; }
+.team-member-info h3 { margin-bottom: 4px; }
+.team-role { display: block; color: var(--color-primary); font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+.team-member-info p { font-size: 14px; color: var(--color-text-light); }
+
+/* Text section (WYSIWYG) */
+.text-section-content { line-height: 1.8; font-size: 17px; }
+.text-section-content p { margin-bottom: 16px; }
+.text-section-content h2 { margin: 32px 0 16px; }
+.text-section-content h3 { margin: 24px 0 12px; }
+.text-section-content ul, .text-section-content ol { margin: 16px 0; padding-left: 24px; }
+.text-section-content li { margin-bottom: 8px; }
+.text-section-content img { border-radius: var(--radius); margin: 24px 0; max-width: 100%; height: auto; }
+.text-section-content blockquote { border-left: 4px solid var(--color-primary); padding: 16px 24px; margin: 24px 0; background: var(--color-bg-alt); border-radius: 0 var(--radius) var(--radius) 0; }
+
+/* Footer social icons */
+.footer-social a i { font-size: 15px; }
+.footer-social .screen-reader-text { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+/* CF7 form states */
+.wpcf7 .wpcf7-not-valid { border-color: #ef4444 !important; }
+.wpcf7 .wpcf7-not-valid:focus { box-shadow: 0 0 0 3px rgba(239,68,68,.15); }
+.wpcf7 .wpcf7-response-output { border-radius: var(--radius); padding: 16px 20px; font-size: 14px; margin-top: 16px; }
+.wpcf7 .wpcf7-mail-sent-ok, .wpcf7 .wpcf7-response-output.wpcf7-mail-sent-ok { border-color: #10b981; color: #065f46; background: #ecfdf5; }
+.wpcf7 .wpcf7-validation-errors { border-color: #ef4444; color: #991b1b; background: #fef2f2; }
+.wpcf7 label { display: block; font-size: 14px; font-weight: 600; color: var(--color-text); margin-bottom: 6px; }

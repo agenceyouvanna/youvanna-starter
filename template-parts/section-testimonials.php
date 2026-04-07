@@ -11,7 +11,7 @@ if (have_rows('items')) {
         ];
     }
 }
-if (empty($items)) return;
+if (empty($items)) { return; }
 // Determine rows: 1 row if <= 4, 2 rows if > 4
 $use_marquee = count($items) > 3;
 $rows = $use_marquee && count($items) > 6 ? 2 : 1;
@@ -40,7 +40,7 @@ $rows = $use_marquee && count($items) > 6 ? 2 : 1;
                         <blockquote><?php echo esc_html($t['text']); ?></blockquote>
                         <div class="testimonial-author">
                             <?php if ($t['photo']): ?>
-                                <img src="<?php echo esc_url($t['photo']['sizes']['thumbnail']); ?>" alt="<?php echo esc_attr($t['name']); ?>">
+                                <img src="<?php echo esc_url($t['photo']['sizes']['thumbnail']); ?>" alt="<?php echo esc_attr($t['name']); ?>" loading="lazy">
                             <?php endif; ?>
                             <div>
                                 <strong><?php echo esc_html($t['name']); ?></strong>
@@ -58,7 +58,7 @@ $rows = $use_marquee && count($items) > 6 ? 2 : 1;
                             <blockquote><?php echo esc_html($t['text']); ?></blockquote>
                             <div class="testimonial-author">
                                 <?php if ($t['photo']): ?>
-                                    <img src="<?php echo esc_url($t['photo']['sizes']['thumbnail']); ?>" alt="<?php echo esc_attr($t['name']); ?>">
+                                    <img src="<?php echo esc_url($t['photo']['sizes']['thumbnail']); ?>" alt="<?php echo esc_attr($t['name']); ?>" loading="lazy">
                                 <?php endif; ?>
                                 <div>
                                     <strong><?php echo esc_html($t['name']); ?></strong>
@@ -79,7 +79,7 @@ $rows = $use_marquee && count($items) > 6 ? 2 : 1;
                         <blockquote><?php echo esc_html($t['text']); ?></blockquote>
                         <div class="testimonial-author">
                             <?php if ($t['photo']): ?>
-                                <img src="<?php echo esc_url($t['photo']['sizes']['thumbnail']); ?>" alt="<?php echo esc_attr($t['name']); ?>">
+                                <img src="<?php echo esc_url($t['photo']['sizes']['thumbnail']); ?>" alt="<?php echo esc_attr($t['name']); ?>" loading="lazy">
                             <?php endif; ?>
                             <div>
                                 <strong><?php echo esc_html($t['name']); ?></strong>

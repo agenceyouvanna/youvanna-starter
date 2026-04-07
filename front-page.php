@@ -86,7 +86,7 @@ yv_render_hero([
                         <div class="testimonial-stars"><?php for ($i = 0; $i < $t['rating']; $i++) echo '&#9733;'; ?></div>
                         <blockquote><?php echo esc_html($t['text']); ?></blockquote>
                         <div class="testimonial-author">
-                            <?php if ($t['photo']): ?><img src="<?php echo esc_url($t['photo']['sizes']['thumbnail']); ?>" alt="<?php echo esc_attr($t['name']); ?>"><?php endif; ?>
+                            <?php if ($t['photo']): ?><img src="<?php echo esc_url($t['photo']['sizes']['thumbnail']); ?>" alt="<?php echo esc_attr($t['name']); ?>" loading="lazy"><?php endif; ?>
                             <div><strong><?php echo esc_html($t['name']); ?></strong><?php if ($t['role']): ?><span><?php echo esc_html($t['role']); ?></span><?php endif; ?></div>
                         </div>
                     </div>
@@ -101,7 +101,7 @@ yv_render_hero([
                         <div class="testimonial-stars"><?php for ($i = 0; $i < $t['rating']; $i++) echo '&#9733;'; ?></div>
                         <blockquote><?php echo esc_html($t['text']); ?></blockquote>
                         <div class="testimonial-author">
-                            <?php if ($t['photo']): ?><img src="<?php echo esc_url($t['photo']['sizes']['thumbnail']); ?>" alt="<?php echo esc_attr($t['name']); ?>"><?php endif; ?>
+                            <?php if ($t['photo']): ?><img src="<?php echo esc_url($t['photo']['sizes']['thumbnail']); ?>" alt="<?php echo esc_attr($t['name']); ?>" loading="lazy"><?php endif; ?>
                             <div><strong><?php echo esc_html($t['name']); ?></strong><?php if ($t['role']): ?><span><?php echo esc_html($t['role']); ?></span><?php endif; ?></div>
                         </div>
                     </div>

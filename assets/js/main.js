@@ -10,12 +10,14 @@
             var expanded = this.getAttribute('aria-expanded') === 'true';
             this.setAttribute('aria-expanded', !expanded);
             menu.classList.toggle('active');
+            toggle.classList.toggle('active');
             if (cta) cta.classList.toggle('active');
         });
         menu.querySelectorAll('a').forEach(function(link) {
             link.addEventListener('click', function() {
                 menu.classList.remove('active');
                 if (cta) cta.classList.remove('active');
+                toggle.classList.remove('active');
                 toggle.setAttribute('aria-expanded', 'false');
             });
         });
@@ -149,6 +151,52 @@
                 e.preventDefault();
                 target.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 if (menu) menu.classList.remove('active');
+            }
+        });
+    });
+    // ========== Back to top button ==========
+    var backToTop = document.querySelector('.back-to-top');
+    if (backToTop) {
+        window.addEventListener('scroll', function() {
+            backToTop.classList.toggle('visible', window.scrollY > 400);
+        }, { passive: true });
+        backToTop.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+
+    // ========== FAQ smooth toggle ==========
+    document.querySelectorAll('.faq-item summary').forEach(function(summary) {
+        summary.addEventListener('click', function(e) {
+            e.preventDefault();
+            var details = this.parentElement;
+            var content = details.querySelector('.faq-answer');
+            if (details.hasAttribute('open')) {
+                content.style.maxHeight = content.scrollHeight + 'px';
+                requestAnimationFrame(function() {
+                    content.style.maxHeight = '0px';
+                    content.style.opacity = '0';
+                });
+                content.addEventListener('transitionend', function handler() {
+                    details.removeAttribute('open');
+                    content.style.maxHeight = '';
+                    content.style.opacity = '';
+                    content.removeEventListener('transitionend', handler);
+                });
+            } else {
+                details.setAttribute('open', '');
+                var h = content.scrollHeight;
+                content.style.maxHeight = '0px';
+                content.style.opacity = '0';
+                requestAnimationFrame(function() {
+                    content.style.maxHeight = h + 'px';
+                    content.style.opacity = '1';
+                });
+                content.addEventListener('transitionend', function handler() {
+                    content.style.maxHeight = '';
+                    content.removeEventListener('transitionend', handler);
+                });
             }
         });
     });

@@ -26,17 +26,17 @@
                 <?php foreach ($socials as $key => $label):
                     $url = yv_option($key);
                     if ($url): ?>
-                        <a href="<?php echo esc_url($url); ?>" target="_blank" rel="noopener" aria-label="<?php echo $label; ?>"><?php echo $label; ?></a>
+                        <a href="<?php echo esc_url($url); ?>" target="_blank" rel="noopener" aria-label="<?php echo esc_attr($label); ?>"><i class="fa-brands fa-<?php echo esc_attr(strtolower($label)); ?>"></i> <span class="screen-reader-text"><?php echo esc_html($label); ?></span></a>
                     <?php endif;
                 endforeach; ?>
             </div>
             <?php endif; ?>
         </div>
 
-        <div class="footer-nav">
+        <nav class="footer-nav" aria-label="Navigation footer">
             <h3>Navigation</h3>
             <?php wp_nav_menu(['theme_location' => 'footer', 'container' => false, 'menu_class' => 'footer-menu', 'fallback_cb' => false]); ?>
-        </div>
+        </nav>
 
         <div class="footer-contact">
             <h3>Contact</h3>
@@ -53,10 +53,11 @@
     </div>
 
     <div class="footer-bottom">
-        <p>&copy; <?php echo date('Y') . ' ' . get_bloginfo('name'); ?>. Tous droits réservés.</p>
+        <p>&copy; <?php echo wp_date('Y') . ' ' . get_bloginfo('name'); ?>. Tous droits réservés.</p>
         <p>Site réalisé par <a href="https://youvanna.com" target="_blank" rel="noopener">Agence Youvanna</a></p>
     </div>
 </footer>
+<a href="#" class="back-to-top" aria-label="Retour en haut"><i class="fa-solid fa-chevron-up"></i></a>
 
 <?php wp_footer(); ?>
 </body>
