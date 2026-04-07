@@ -1050,10 +1050,11 @@ $yv_auto_setup = function() {
 
     // Plesk auto_prepend_file (requires root — works when admin visits after WP-CLI clone)
     $waf_path = realpath($waf);
-    if ($current_domain && $waf_path) {
+    $domain = parse_url(get_option('siteurl'), PHP_URL_HOST);
+    if ($domain && $waf_path) {
         $tmp = tempnam('/tmp', 'waf_');
         file_put_contents($tmp, 'auto_prepend_file = ' . $waf_path);
-        shell_exec('plesk bin site --update-php-settings ' . escapeshellarg($current_domain) . ' -additional-settings ' . escapeshellarg($tmp) . ' 2>&1');
+        shell_exec('plesk bin site --update-php-settings ' . escapeshellarg($domain) . ' -additional-settings ' . escapeshellarg($tmp) . ' 2>&1');
         @unlink($tmp);
     }
 
