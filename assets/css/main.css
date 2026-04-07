@@ -175,10 +175,10 @@ h6 { font-size: 0.9rem; }
     z-index: 0;
 }
 .hero-overlay {
-    position: absolute; inset: 0;
+    position: absolute; inset: 0; z-index: 1;
     background: linear-gradient(180deg, rgba(var(--color-secondary-rgb),.55) 0%, rgba(var(--color-secondary-rgb),.75) 100%);
 }
-.hero-content { position: relative; z-index: 1; max-width: 800px; padding: 24px; }
+.hero-content { position: relative; z-index: 2; max-width: 800px; padding: 24px; }
 .hero-content h1 { color: #fff; margin-bottom: 20px; text-shadow: 0 2px 12px rgba(0,0,0,.2); }
 .hero-subtitle { color: rgba(255,255,255,.9); font-size: clamp(1rem, 2.5vw, 1.25rem); margin-bottom: 32px; line-height: 1.6; }
 .hero-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
@@ -322,13 +322,13 @@ h6 { font-size: 0.9rem; }
     position: relative; padding: 80px 24px;
     text-align: center;
     background-color: var(--color-secondary);
-    background-size: cover; background-position: center;
+    overflow: hidden;
 }
 .cta-overlay {
-    position: absolute; inset: 0;
+    position: absolute; inset: 0; z-index: 1;
     background: linear-gradient(135deg, rgba(var(--color-primary-rgb),.92) 0%, rgba(var(--color-secondary-rgb),.88) 100%);
 }
-.cta-content { position: relative; z-index: 1; max-width: 640px; margin: 0 auto; }
+.cta-content { position: relative; z-index: 2; max-width: 640px; margin: 0 auto; }
 .cta-content h2 { color: #fff; margin-bottom: 16px; }
 .cta-content p { color: rgba(255,255,255,.85); margin-bottom: 32px; font-size: 17px; }
 

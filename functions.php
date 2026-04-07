@@ -15,8 +15,10 @@ add_action('wp_enqueue_scripts', function() {
     wp_enqueue_style('fa-solid', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/solid.min.css', ['fa-fontfaces'], '6.5.1');
     wp_enqueue_style('fa-brands', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/brands.min.css', ['fa-fontfaces'], '6.5.1');
 
-    wp_enqueue_style('youvanna-main', get_stylesheet_directory_uri() . '/assets/css/main.css', [], filemtime(get_stylesheet_directory() . '/assets/css/main.css'));
-    wp_enqueue_script('youvanna-main', get_stylesheet_directory_uri() . '/assets/js/main.js', [], filemtime(get_stylesheet_directory() . '/assets/js/main.js'), true);
+    $css = get_stylesheet_directory() . '/assets/css/main.css';
+    $js  = get_stylesheet_directory() . '/assets/js/main.js';
+    wp_enqueue_style('youvanna-main', get_stylesheet_directory_uri() . '/assets/css/main.css', [], file_exists($css) ? filemtime($css) : '2.6.0');
+    wp_enqueue_script('youvanna-main', get_stylesheet_directory_uri() . '/assets/js/main.js', [], file_exists($js) ? filemtime($js) : '2.6.0', true);
 });
 
 // Make Font Awesome non-render-blocking (preload + swap for all FA subsets)
@@ -823,8 +825,8 @@ add_action('wp_head', function() {
         'datePublished' => get_the_date('c'),
         'dateModified' => get_the_modified_date('c'),
         'author' => ['@type' => 'Person', 'name' => get_the_author() ?: get_bloginfo('name')],
-        'publisher' => ['@type' => 'Organization', 'name' => get_bloginfo('name')],
-        'description' => get_the_excerpt(),
+        'publisher' => ['@type' => 'Organization', 'name' => get_bloginfo('name'), 'url' => home_url('/')],
+        'description' => wp_strip_all_tags(get_the_excerpt()),
     ];
     $schema['wordCount'] = str_word_count(wp_strip_all_tags(get_post_field('post_content', get_the_ID())));
     $thumb = get_the_post_thumbnail_url(null, 'large');
@@ -832,7 +834,7 @@ add_action('wp_head', function() {
         $schema['image'] = $thumb;
     } else {
         $logo_id = get_theme_mod('custom_logo');
-        $schema['image'] = $logo_id ? wp_get_attachment_image_url($logo_id, 'full') : home_url('/wp-includes/images/blank.gif');
+        if ($logo_id) $schema['image'] = wp_get_attachment_image_url($logo_id, 'full');
     }
     $logo_id = get_theme_mod('custom_logo');
     if ($logo_id) $schema['publisher']['logo'] = ['@type' => 'ImageObject', 'url' => wp_get_attachment_image_url($logo_id, 'full')];
@@ -897,8 +899,8 @@ add_action('wp_head', function() {
     } elseif (is_singular()) {
         $url = get_permalink();
     } else {
-        // Archive, search, etc — use current URL
-        $url = home_url(add_query_arg([], false));
+        // Archive, search, etc — path only, strip query params (utm, fbclid…)
+        $url = home_url(parse_url(add_query_arg([], false), PHP_URL_PATH));
     }
     $type = is_single() ? 'article' : 'website';
     $img = '';

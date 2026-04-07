@@ -87,7 +87,8 @@ yv_option($name, $fallback)              // wp_options avec prefixe yv_
 yv_field($name, $fallback, $post_id)     // Champ SCF (gere 0 et valeurs falsy correctement)
 yv_image($name, $size, $post_id)         // URL image SCF (retourne string URL)
 yv_img($name, $size, $post_id, $attrs)   // Image SCF avec wp_get_attachment_image (width/height/srcset auto)
-yv_render_hero($args)                     // Bandeau hero (background-image + preload auto)
+yv_image_id($name, $post_id)              // Attachment ID from SCF image field (int)
+yv_render_hero($args)                     // Bandeau hero (<img fetchpriority="high"> + overlay)
 yv_section_header($title, $sub, $badge)  // H2 + subtitle + badge pill. $title supporte <mark>
 yv_render_card($args)                     // Carte (image_id > image > icon). link verifie is_array()
 yv_render_stats($rows, $class)           // Grille de chiffres (counter animation auto)
@@ -233,7 +234,7 @@ Puis mettre a jour : `update_field('contact_form_id', $form_id, $contact_page_id
 
 ## Dependances
 
-- Font Awesome 6.5 (CDN avec SRI, charge en async non-bloquant via preload+onload)
+- Font Awesome 6.5 subsets (fontawesome + solid + brands, CDN async via preload+onload, ~50KB vs 300KB)
 - SCF (Secure Custom Fields - plugin officiel WordPress, fork gratuit d'ACF avec Repeater + Flex Content integres)
 - Contact Form 7
 - Yoast SEO (gere OG meta quand actif, sinon fallback auto dans functions.php)
@@ -242,8 +243,10 @@ Puis mettre a jour : `update_field('contact_form_id', $form_id, $contact_page_id
 ## Performance
 
 - Cache busting automatique via `filemtime()`
-- Font Awesome async (preload + onload swap + SRI hash, non-render-blocking)
-- Hero image preload avec `fetchpriority="high"` (homepage, pages, blog posts, blog listing)
+- Font Awesome subsets async (fontawesome + solid + brands, preload + onload swap, ~50KB)
+- System font stack par defaut (0 requete font). Custom via @font-face + variables CSS
+- Hero LCP : vrai `<img class="hero-bg-img" fetchpriority="high">` avec `wp_get_attachment_image()` (srcset/sizes auto, pas de background-image)
+- CTA banners : meme pattern `<img class="hero-bg-img">` (lazy loaded)
 - Preconnect cdnjs + GTM/GA
 - `wp_get_attachment_image()` partout (width/height/srcset/sizes automatiques, 0 CLS)
 - Lazy loading sur toutes les images below-fold + photos temoignages

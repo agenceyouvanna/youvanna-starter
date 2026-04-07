@@ -83,7 +83,7 @@ yv_render_hero([
             <div class="marquee-track" data-direction="left">
                 <?php foreach (array_merge($testi_items, $testi_items) as $t): ?>
                     <div class="testimonial-card">
-                        <div class="testimonial-stars" aria-label="<?php echo $t['rating']; ?> sur 5" role="img"><?php for ($i = 0; $i < $t['rating']; $i++) echo '&#9733;'; ?></div>
+                        <div class="testimonial-stars" aria-label="<?php echo esc_attr($t['rating']); ?> sur 5" role="img"><?php for ($i = 0; $i < $t['rating']; $i++) echo '&#9733;'; ?></div>
                         <blockquote><?php echo esc_html($t['text']); ?></blockquote>
                         <div class="testimonial-author">
                             <?php if ($t['photo'] && !empty($t['photo']['ID'])): ?><?php echo wp_get_attachment_image($t['photo']['ID'], 'thumbnail', false, ['loading' => 'lazy', 'alt' => esc_attr($t['name'])]); ?><?php endif; ?>
@@ -98,7 +98,7 @@ yv_render_hero([
             <div class="grid grid-3">
                 <?php foreach ($testi_items as $t): ?>
                     <div class="testimonial-card">
-                        <div class="testimonial-stars" aria-label="<?php echo $t['rating']; ?> sur 5" role="img"><?php for ($i = 0; $i < $t['rating']; $i++) echo '&#9733;'; ?></div>
+                        <div class="testimonial-stars" aria-label="<?php echo esc_attr($t['rating']); ?> sur 5" role="img"><?php for ($i = 0; $i < $t['rating']; $i++) echo '&#9733;'; ?></div>
                         <blockquote><?php echo esc_html($t['text']); ?></blockquote>
                         <div class="testimonial-author">
                             <?php if ($t['photo'] && !empty($t['photo']['ID'])): ?><?php echo wp_get_attachment_image($t['photo']['ID'], 'thumbnail', false, ['loading' => 'lazy', 'alt' => esc_attr($t['name'])]); ?><?php endif; ?>
