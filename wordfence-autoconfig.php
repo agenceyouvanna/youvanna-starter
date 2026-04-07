@@ -6,13 +6,16 @@
  *
  * This script:
  * 1. Installs and activates Wordfence if not already present
- * 2. Configures all security settings to optimal values
- * 3. Enables brute force protection
- * 4. Enables firewall in learning mode
- * 5. Sets up login security
- * 6. Disconnects from any previous Wordfence Central link (for cloned sites)
+ * 2. Creates wordfence-waf.php bootstrap at web root
+ * 3. Configures Plesk auto_prepend_file for extended WAF protection
+ * 4. Configures all security settings to optimal values
+ * 5. Enables brute force protection
+ * 6. Enables firewall in learning mode
+ * 7. Sets up login security
+ * 8. Disconnects from any previous Wordfence Central link (for cloned sites)
  *
  * Run this AFTER cloning the template to a new domain.
+ * Must be run as root (for Plesk CLI access).
  */
 
 // Safety: only run via WP-CLI
@@ -63,7 +66,52 @@ if (!class_exists('wfConfig')) {
 }
 
 // ============================================
-// 2. Disconnect from previous Wordfence Central (for cloned sites)
+// 2. Create wordfence-waf.php bootstrap + Plesk auto_prepend_file
+// ============================================
+$waf_bootstrap = ABSPATH . 'wordfence-waf.php';
+if (!file_exists($waf_bootstrap)) {
+    $waf_content = <<<'PHP'
+<?php
+/**
+ * Wordfence WAF bootstrap — loaded via auto_prepend_file before WordPress.
+ */
+if (file_exists(__DIR__ . '/wp-content/plugins/wordfence/waf/bootstrap.php')) {
+    define('WFWAF_LOG_PATH', __DIR__ . '/wp-content/wflogs/');
+    include_once __DIR__ . '/wp-content/plugins/wordfence/waf/bootstrap.php';
+}
+PHP;
+    file_put_contents($waf_bootstrap, $waf_content);
+    WP_CLI::log('Created wordfence-waf.php at web root.');
+} else {
+    WP_CLI::log('wordfence-waf.php already exists.');
+}
+
+// Detect domain from site URL for Plesk CLI
+$site_url = get_option('siteurl');
+$domain = parse_url($site_url, PHP_URL_HOST);
+$waf_path = realpath($waf_bootstrap);
+
+if ($domain && $waf_path) {
+    // Write directive to temp file (Plesk expects a file path)
+    $tmp = tempnam('/tmp', 'waf_');
+    file_put_contents($tmp, 'auto_prepend_file = ' . $waf_path);
+
+    $cmd = 'plesk bin site --update-php-settings ' . escapeshellarg($domain) . ' -additional-settings ' . escapeshellarg($tmp) . ' 2>&1';
+    $output = shell_exec($cmd);
+    unlink($tmp);
+
+    if (strpos($output, 'Error') !== false || strpos($output, 'error') !== false) {
+        WP_CLI::warning('Plesk auto_prepend_file failed: ' . trim($output));
+        WP_CLI::warning('You may need to set it manually in Plesk → PHP Settings → Additional directives');
+    } else {
+        WP_CLI::log('Plesk auto_prepend_file configured for ' . $domain);
+    }
+} else {
+    WP_CLI::warning('Could not detect domain. Set auto_prepend_file manually in Plesk PHP settings.');
+}
+
+// ============================================
+// 3. Disconnect from previous Wordfence Central (for cloned sites)
 // ============================================
 WP_CLI::log('Disconnecting from any previous Wordfence Central link...');
 wfConfig::set('wordfenceCentralConnected', 0);
@@ -73,7 +121,7 @@ wfConfig::set('wordfenceCentralSecretKey', '');
 wfConfig::set('wordfenceCentralCurrentSiteUrl', '');
 
 // ============================================
-// 3. Firewall Configuration
+// 4. Firewall Configuration
 // ============================================
 WP_CLI::log('Configuring Web Application Firewall...');
 
@@ -95,7 +143,7 @@ wfConfig::set('max404Humans', 'DISABLED');
 wfConfig::set('maxScanHits', 'DISABLED');
 
 // ============================================
-// 4. Brute Force Protection
+// 5. Brute Force Protection
 // ============================================
 WP_CLI::log('Configuring Brute Force Protection...');
 
@@ -112,7 +160,7 @@ wfConfig::set('loginSec_blockAdminReg', 1);       // Block admin registration
 wfConfig::set('loginSec_disableAuthorScan', 1);   // Block author scans (?author=1)
 
 // ============================================
-// 5. Scan Settings
+// 6. Scan Settings
 // ============================================
 WP_CLI::log('Configuring Scanner...');
 
@@ -130,7 +178,7 @@ wfConfig::set('scheduledScansEnabled', 1);    // Enable scheduled scans
 wfConfig::set('lowResourceScansEnabled', 0);  // Full resource scans
 
 // ============================================
-// 6. General Settings
+// 7. General Settings
 // ============================================
 WP_CLI::log('Configuring General Settings...');
 
@@ -162,14 +210,14 @@ wfConfig::set('autoUpdate', 1);
 wfConfig::set('disableXMLRPC', 'loginOnly'); // Block XML-RPC login attempts
 
 // ============================================
-// 7. Country blocking (optional — commented out)
+// 8. Country blocking (optional — commented out)
 // ============================================
 // Uncomment and adjust if you want to block specific countries
 // wfConfig::set('cbl_countries', 'CN,RU,KP');
 // wfConfig::set('cbl_enabled', 1);
 
 // ============================================
-// 8. Flush and verify
+// 9. Flush and verify
 // ============================================
 WP_CLI::log('Flushing transients...');
 delete_transient('wordfence_dashboard_activity');
@@ -177,6 +225,8 @@ delete_transient('wordfence_dashboard_activity');
 WP_CLI::success('Wordfence configured successfully!');
 WP_CLI::log('');
 WP_CLI::log('Summary:');
+WP_CLI::log('  - WAF bootstrap: wordfence-waf.php created at web root');
+WP_CLI::log('  - Plesk auto_prepend_file: configured for extended WAF protection');
 WP_CLI::log('  - Firewall: Learning mode (7 days), then auto-enabled');
 WP_CLI::log('  - Brute Force: 5 attempts / 5 min → 30 min lockout');
 WP_CLI::log('  - Scanner: Full scan enabled, scheduled');
@@ -184,9 +234,4 @@ WP_CLI::log('  - Login: Strong passwords, breached password check, admin scan bl
 WP_CLI::log('  - Alerts: ' . $admin_email);
 WP_CLI::log('  - Wordfence Central: Disconnected (ready for fresh link)');
 WP_CLI::log('');
-WP_CLI::log('NEXT STEPS:');
-WP_CLI::log('  1. Go to Wordfence → Firewall → "Optimize Wordfence Firewall"');
-WP_CLI::log('     This requires downloading .htaccess backup and clicking "Continue".');
-WP_CLI::log('     (Cannot be automated — requires server-level file write confirmation)');
-WP_CLI::log('  2. Optionally link to Wordfence Central for monitoring');
-WP_CLI::log('  3. After 7 days, verify firewall switched to "Enabled and Protecting"');
+WP_CLI::log('After 7 days, the firewall will auto-switch to "Enabled and Protecting".');

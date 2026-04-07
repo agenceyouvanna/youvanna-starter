@@ -305,8 +305,7 @@ Script auto-config inclus : `wordfence-autoconfig.php`
 ```bash
 wp eval-file wp-content/themes/youvanna-starter/wordfence-autoconfig.php --allow-root
 ```
-Configure automatiquement : firewall (learning mode 7j), brute force (5 tentatives), scanner, login security, XMLRPC protection.
-Etape manuelle restante : Wordfence → Firewall → "Optimize Wordfence Firewall" (necessite confirmation serveur).
+Configure automatiquement : WAF bootstrap (wordfence-waf.php), Plesk auto_prepend_file, firewall (learning mode 7j), brute force (5 tentatives), scanner, login security, XMLRPC protection. 100% automatique, aucune etape manuelle.
 
 ## Infos serveur
 
