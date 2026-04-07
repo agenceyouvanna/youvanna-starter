@@ -945,7 +945,195 @@ add_action('wp_head', function() {
 }, 1);
 
 // ============================================
-// 10. BLOG — Excerpt
+// 10. AUTO-SETUP — Runs once after cloning to a new domain
+// ============================================
+add_action('admin_init', function() {
+    if (!current_user_can('manage_options')) return;
+
+    $current_domain = parse_url(get_option('siteurl'), PHP_URL_HOST);
+    $setup_domain = get_option('yv_setup_domain', '');
+
+    // If domain matches, setup already ran for this site
+    if ($setup_domain === $current_domain) return;
+
+    // Mark as done FIRST to prevent re-entry
+    update_option('yv_setup_domain', $current_domain, true);
+
+    // --- Youvanna Languages ---
+    $yvl_source = get_stylesheet_directory() . '/plugins/youvanna-languages';
+    $yvl_dest = WP_PLUGIN_DIR . '/youvanna-languages';
+    if (is_dir($yvl_source) && !is_dir($yvl_dest)) {
+        shell_exec('cp -r ' . escapeshellarg($yvl_source) . ' ' . escapeshellarg($yvl_dest));
+    }
+    if (is_dir($yvl_dest) && !is_plugin_active('youvanna-languages/youvanna-languages.php')) {
+        activate_plugin('youvanna-languages/youvanna-languages.php');
+    }
+
+    // --- Redis Object Cache ---
+    $redis_ok = false;
+    if (class_exists('Redis')) {
+        try {
+            $r = new Redis();
+            $r->connect('127.0.0.1', 6379, 2);
+            $r->ping();
+            $redis_ok = true;
+            $r->close();
+        } catch (Exception $e) {}
+    }
+    if ($redis_ok) {
+        if (!is_dir(WP_PLUGIN_DIR . '/redis-cache')) {
+            require_once ABSPATH . 'wp-admin/includes/plugin-install.php';
+            require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+            require_once ABSPATH . 'wp-admin/includes/file.php';
+            $api = plugins_api('plugin_information', ['slug' => 'redis-cache', 'fields' => ['sections' => false]]);
+            if (!is_wp_error($api)) {
+                $upgrader = new Plugin_Upgrader(new Quiet_Skin());
+                $upgrader->install($api->download_link);
+            }
+        }
+        if (!is_plugin_active('redis-cache/redis-cache.php')) {
+            activate_plugin('redis-cache/redis-cache.php');
+        }
+        // Enable object cache drop-in
+        $dropin_src = WP_PLUGIN_DIR . '/redis-cache/includes/object-cache.php';
+        $dropin_dst = WP_CONTENT_DIR . '/object-cache.php';
+        if (file_exists($dropin_src) && !file_exists($dropin_dst)) {
+            copy($dropin_src, $dropin_dst);
+        }
+    }
+
+    // --- WP Super Cache ---
+    if (!is_dir(WP_PLUGIN_DIR . '/wp-super-cache')) {
+        require_once ABSPATH . 'wp-admin/includes/plugin-install.php';
+        require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+        require_once ABSPATH . 'wp-admin/includes/file.php';
+        $api = plugins_api('plugin_information', ['slug' => 'wp-super-cache', 'fields' => ['sections' => false]]);
+        if (!is_wp_error($api)) {
+            $upgrader = new Plugin_Upgrader(new Quiet_Skin());
+            $upgrader->install($api->download_link);
+        }
+    }
+    if (!is_plugin_active('wp-super-cache/wp-cache.php')) {
+        activate_plugin('wp-super-cache/wp-cache.php');
+    }
+    // Enable caching
+    $cache_config = WP_CONTENT_DIR . '/wp-cache-config.php';
+    if (file_exists($cache_config)) {
+        $c = file_get_contents($cache_config);
+        if (strpos($c, '$cache_enabled = false') !== false) {
+            file_put_contents($cache_config, str_replace('$cache_enabled = false', '$cache_enabled = true', $c));
+        }
+    }
+    wp_mkdir_p(WP_CONTENT_DIR . '/cache/supercache');
+
+    // --- Wordfence ---
+    if (!is_dir(WP_PLUGIN_DIR . '/wordfence')) {
+        require_once ABSPATH . 'wp-admin/includes/plugin-install.php';
+        require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+        require_once ABSPATH . 'wp-admin/includes/file.php';
+        $api = plugins_api('plugin_information', ['slug' => 'wordfence', 'fields' => ['sections' => false]]);
+        if (!is_wp_error($api)) {
+            $upgrader = new Plugin_Upgrader(new Quiet_Skin());
+            $upgrader->install($api->download_link);
+        }
+    }
+    if (!is_plugin_active('wordfence/wordfence.php')) {
+        activate_plugin('wordfence/wordfence.php');
+    }
+
+    // WAF bootstrap
+    $waf = ABSPATH . 'wordfence-waf.php';
+    if (!file_exists($waf)) {
+        file_put_contents($waf, "<?php\nif (file_exists(__DIR__.'/wp-content/plugins/wordfence/waf/bootstrap.php')){\ndefine('WFWAF_LOG_PATH',__DIR__.'/wp-content/wflogs/');\ninclude_once __DIR__.'/wp-content/plugins/wordfence/waf/bootstrap.php';\n}\n");
+    }
+
+    // Plesk auto_prepend_file (requires root — works when admin visits after WP-CLI clone)
+    $waf_path = realpath($waf);
+    if ($current_domain && $waf_path) {
+        $tmp = tempnam('/tmp', 'waf_');
+        file_put_contents($tmp, 'auto_prepend_file = ' . $waf_path);
+        shell_exec('plesk bin site --update-php-settings ' . escapeshellarg($current_domain) . ' -additional-settings ' . escapeshellarg($tmp) . ' 2>&1');
+        @unlink($tmp);
+    }
+
+    // Wordfence config (if classes available)
+    if (!class_exists('wfConfig')) {
+        $wf_main = WP_PLUGIN_DIR . '/wordfence/wordfence.php';
+        if (file_exists($wf_main)) include_once $wf_main;
+    }
+    if (class_exists('wfConfig')) {
+        // Central disconnect
+        wfConfig::set('wordfenceCentralConnected', 0);
+        wfConfig::set('wordfenceCentralSiteID', '');
+        wfConfig::set('wordfenceCentralPK', '');
+        wfConfig::set('wordfenceCentralSecretKey', '');
+        wfConfig::set('wordfenceCentralCurrentSiteUrl', '');
+        // Firewall
+        wfConfig::set('firewallEnabled', 1);
+        wfConfig::set('wafStatus', 'learning-mode');
+        wfConfig::set('learningModeGracePeriodEnabled', 1);
+        wfConfig::set('learningModeGracePeriod', time() + (7 * 24 * 3600));
+        wfConfig::set('disableWAFBlacklistBlocking', 0);
+        wfConfig::set('wafAlertOnAttacks', 1);
+        // Brute force
+        wfConfig::set('loginSecurityEnabled', 1);
+        wfConfig::set('loginSec_lockInvalidUsers', 1);
+        wfConfig::set('loginSec_maxFailures', 5);
+        wfConfig::set('loginSec_maxForgotPasswd', 3);
+        wfConfig::set('loginSec_countFailMins', 5);
+        wfConfig::set('loginSec_lockoutMins', 30);
+        wfConfig::set('loginSec_strongPasswds_enabled', 1);
+        wfConfig::set('loginSec_breachPasswds_enabled', 1);
+        wfConfig::set('loginSec_maskLoginErrors', 1);
+        wfConfig::set('loginSec_blockAdminReg', 1);
+        wfConfig::set('loginSec_disableAuthorScan', 1);
+        // Scanner
+        wfConfig::set('scansEnabled_core', 1);
+        wfConfig::set('scansEnabled_themes', 1);
+        wfConfig::set('scansEnabled_plugins', 1);
+        wfConfig::set('scansEnabled_malware', 1);
+        wfConfig::set('scansEnabled_fileContents', 1);
+        wfConfig::set('scheduledScansEnabled', 1);
+        wfConfig::set('lowResourceScansEnabled', 0);
+        // General
+        wfConfig::set('hideWPVersion', 1);
+        wfConfig::set('alertEmails', get_option('admin_email'));
+        wfConfig::set('alertOn_critical', 1);
+        wfConfig::set('alertOn_update', 0);
+        wfConfig::set('alertOn_block', 0);
+        wfConfig::set('alertOn_loginLockout', 1);
+        wfConfig::set('blockFakeBots', 1);
+        wfConfig::set('liveTrafficEnabled', 0);
+        wfConfig::set('autoUpdate', 1);
+        wfConfig::set('disableXMLRPC', 'loginOnly');
+    }
+
+    // Flush rewrite rules
+    flush_rewrite_rules();
+
+    // Admin notice
+    set_transient('yv_setup_done_notice', true, 60);
+});
+
+// Quiet skin for silent plugin installs
+if (!class_exists('Quiet_Skin')) {
+    require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+    class Quiet_Skin extends WP_Upgrader_Skin {
+        public function feedback($feedback, ...$args) {}
+        public function header() {}
+        public function footer() {}
+    }
+}
+
+// Show success notice after auto-setup
+add_action('admin_notices', function() {
+    if (!get_transient('yv_setup_done_notice')) return;
+    delete_transient('yv_setup_done_notice');
+    echo '<div class="notice notice-success is-dismissible"><p><strong>Youvanna Setup</strong> — Plugins, cache et sécurité configurés automatiquement pour ce domaine.</p></div>';
+});
+
+// ============================================
+// 11. BLOG — Excerpt
 // ============================================
 add_filter('excerpt_length', function() { return 25; });
 add_filter('excerpt_more', function() { return '&hellip;'; });
