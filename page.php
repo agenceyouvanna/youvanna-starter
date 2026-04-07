@@ -1,5 +1,7 @@
 <?php get_header(); ?>
 
+<?php while (have_posts()): the_post(); ?>
+
 <?php
 yv_render_hero([
     'image_id' => yv_image_id('page_hero_image') ?: get_post_thumbnail_id(),
@@ -17,10 +19,12 @@ yv_render_hero([
 </section>
 <?php endif; ?>
 
-<?php if (have_rows('sections')): ?>
+<?php if (function_exists('have_rows') && have_rows('sections')): ?>
     <?php while (have_rows('sections')): the_row(); ?>
         <?php get_template_part('template-parts/section', get_row_layout()); ?>
     <?php endwhile; ?>
 <?php endif; ?>
+
+<?php endwhile; ?>
 
 <?php get_footer(); ?>

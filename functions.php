@@ -25,7 +25,7 @@ add_action('wp_enqueue_scripts', function() {
 add_filter('style_loader_tag', function($html, $handle) {
     if (in_array($handle, ['fa-fontfaces', 'fa-solid', 'fa-brands'], true)) {
         $noscript_html = $html;
-        $html = str_replace("rel='stylesheet'", "rel='preload' as='style' onload=\"this.onload=null;this.rel='stylesheet'\" crossorigin='anonymous'", $html);
+        $html = str_replace("rel='stylesheet'", "rel='preload' as='style' onload=\"this.onload=null;this.rel='stylesheet'\"", $html);
         return $html . '<noscript>' . $noscript_html . '</noscript>';
     }
     return $html;
@@ -883,7 +883,7 @@ add_action('wp_head', function() {
         $desc = get_bloginfo('description');
     } elseif (is_category() || is_tag() || is_tax()) {
         $title = single_term_title('', false) . ' - ' . get_bloginfo('name');
-        $desc = term_description() ?: get_bloginfo('description');
+        $desc = wp_strip_all_tags(term_description()) ?: get_bloginfo('description');
     } elseif (is_search()) {
         $title = 'Recherche - ' . get_bloginfo('name');
         $desc = get_bloginfo('description');

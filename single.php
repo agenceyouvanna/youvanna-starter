@@ -1,5 +1,7 @@
 <?php get_header(); ?>
 
+<?php while (have_posts()): the_post(); ?>
+
 <?php
 yv_render_hero([
     'image_id' => get_post_thumbnail_id(),
@@ -35,5 +37,7 @@ yv_render_hero([
         </div>
     </div>
 </article>
+
+<?php endwhile; ?>
 
 <?php get_footer(); ?>

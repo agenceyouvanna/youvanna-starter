@@ -229,7 +229,8 @@ Puis mettre a jour : `update_field('contact_form_id', $form_id, $contact_page_id
 --color-primary-rgb: R, G, B; /* MEME couleur en RGB - TOUJOURS sync avec primary ! */
 --color-primary-dark: #hex;   /* Hover */
 --color-accent: #hex;         /* Accent secondaire */
---font-heading / --font-body  /* Polices */
+--color-secondary: #hex;      /* Footer, hero fallback */
+--font-heading / --font-body  /* System font stack par defaut, custom via @font-face */
 ```
 
 ## Dependances

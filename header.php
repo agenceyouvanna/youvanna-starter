@@ -23,7 +23,7 @@
             'theme_location' => 'primary',
             'container'      => false,
             'menu_class'     => 'nav-menu',
-            'fallback_cb'    => false,
+            'fallback_cb'    => function() { echo '<ul class="nav-menu"></ul>'; },
         ]); ?>
 
         <div class="nav-cta">

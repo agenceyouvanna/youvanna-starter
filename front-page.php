@@ -20,7 +20,7 @@ yv_render_hero([
 ?>
 
 <!-- SERVICES -->
-<?php if (have_rows('services')): ?>
+<?php if (function_exists('have_rows') && have_rows('services')): ?>
 <section class="section services-section reveal">
     <div class="container">
         <?php yv_section_header(yv_field('services_title', 'Nos Services'), yv_field('services_subtitle')); ?>
@@ -51,17 +51,17 @@ yv_render_hero([
         <div class="about-content">
             <h2><?php echo esc_html(yv_field('about_title', 'À propos')); ?></h2>
             <div><?php echo wp_kses_post(yv_field('about_text')); ?></div>
-            <?php $btn = get_field('about_button'); if (is_array($btn) && !empty($btn['url'])): ?>
+            <?php $btn = function_exists('get_field') ? get_field('about_button') : null; if (is_array($btn) && !empty($btn['url'])): ?>
                 <a href="<?php echo esc_url($btn['url']); ?>" class="btn btn-primary"><?php echo esc_html($btn['title'] ?? 'En savoir plus'); ?></a>
             <?php endif; ?>
-            <?php yv_render_stats(get_field('stats')); ?>
+            <?php yv_render_stats(function_exists('get_field') ? get_field('stats') : null); ?>
         </div>
     </div>
 </section>
 <?php endif; ?>
 
 <!-- TESTIMONIALS — marquee horizontal -->
-<?php if (have_rows('testimonials')):
+<?php if (function_exists('have_rows') && have_rows('testimonials')):
     $testi_items = [];
     while (have_rows('testimonials')) { the_row();
         $testi_items[] = [

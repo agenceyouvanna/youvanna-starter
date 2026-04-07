@@ -331,6 +331,8 @@ h6 { font-size: 0.9rem; }
 .cta-content { position: relative; z-index: 2; max-width: 640px; margin: 0 auto; }
 .cta-content h2 { color: #fff; margin-bottom: 16px; }
 .cta-content p { color: rgba(255,255,255,.85); margin-bottom: 32px; font-size: 17px; }
+.cta-banner .btn-primary { background: #fff; color: var(--color-primary); }
+.cta-banner .btn-primary:hover { background: var(--color-bg-alt); }
 
 /* ============================================
    CONTACT FORM (CF7) — Basé sur --color-primary
