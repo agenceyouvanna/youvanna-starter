@@ -15,7 +15,16 @@
                 <div class="video-wrapper">
                     <iframe src="<?php echo esc_url($embed_url); ?>" width="100%" height="450" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy" title="Video"></iframe>
                 </div>
-            <?php endif;
+            <?php elseif (preg_match('/\.(mp4|webm|ogg)$/i', $url)): ?>
+                <video controls preload="metadata" style="width:100%;border-radius:var(--radius);">
+                    <source src="<?php echo esc_url($url); ?>" type="video/<?php echo esc_attr(pathinfo($url, PATHINFO_EXTENSION)); ?>">
+                </video>
+            <?php else:
+                $oembed = wp_oembed_get($url);
+                if ($oembed): ?>
+                    <div class="video-wrapper"><?php echo $oembed; ?></div>
+                <?php endif;
+            endif;
         endif; ?>
     </div>
 </section>

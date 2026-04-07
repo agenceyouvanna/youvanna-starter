@@ -9,7 +9,7 @@
         </div>
         <div class="ti-image">
             <?php $img = get_sub_field('image'); if ($img): ?>
-                <img src="<?php echo esc_url($img['sizes']['large']); ?>" alt="<?php echo esc_attr(get_sub_field('title')); ?>" loading="lazy">
+                <img src="<?php echo esc_url(($img['sizes']['large'] ?? $img['url'])); ?>" alt="<?php echo esc_attr(get_sub_field('title')); ?>" loading="lazy">
             <?php endif; ?>
         </div>
     </div>

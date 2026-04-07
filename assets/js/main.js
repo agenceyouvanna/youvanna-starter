@@ -23,6 +23,19 @@
         });
     }
 
+    // ========== Reset mobile menu on resize to desktop ==========
+    var mql960 = window.matchMedia('(min-width: 961px)');
+    mql960.addEventListener('change', function(e) {
+        if (e.matches && menu) {
+            menu.classList.remove('active');
+            if (cta) cta.classList.remove('active');
+            if (toggle) {
+                toggle.classList.remove('active');
+                toggle.setAttribute('aria-expanded', 'false');
+            }
+        }
+    });
+
     // ========== Header scroll ==========
     var header = document.getElementById('site-header');
     if (header) {
@@ -38,7 +51,7 @@
                 if (!entry.isIntersecting) return;
                 var el = entry.target;
                 // Stagger children (cards in grids)
-                var children = el.querySelectorAll('.card, .faq-item, .stat, .testimonial-card');
+                var children = el.querySelectorAll('.card, .faq-item, .stat, .testimonial-card, .team-member');
                 if (children.length > 1) {
                     children.forEach(function(child, i) {
                         child.style.transitionDelay = (i * 0.1) + 's';
@@ -178,7 +191,8 @@
                     content.style.maxHeight = '0px';
                     content.style.opacity = '0';
                 });
-                content.addEventListener('transitionend', function handler() {
+                content.addEventListener('transitionend', function handler(e) {
+                    if (e.propertyName !== 'max-height') return;
                     details.removeAttribute('open');
                     content.style.maxHeight = '';
                     content.style.opacity = '';
@@ -193,7 +207,8 @@
                     content.style.maxHeight = h + 'px';
                     content.style.opacity = '1';
                 });
-                content.addEventListener('transitionend', function handler() {
+                content.addEventListener('transitionend', function handler(e) {
+                    if (e.propertyName !== 'max-height') return;
                     content.style.maxHeight = '';
                     content.removeEventListener('transitionend', handler);
                 });

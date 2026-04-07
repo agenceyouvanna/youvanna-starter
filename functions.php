@@ -1,6 +1,6 @@
 <?php
 /**
- * Youvanna Starter — functions.php v2.0
+ * Youvanna Starter — functions.php v2.4.0
  * Thème Youvanna avec ACF pour sites vitrines
  * Architecture propre, 0 duplication, full automatisable
  */
@@ -11,16 +11,18 @@ if (!defined('ABSPATH')) exit;
 // ============================================
 add_action('wp_enqueue_scripts', function() {
     wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css', [], '6.5.1');
-    // Make FA non-render-blocking
-    add_filter('style_loader_tag', function($html, $handle) {
-        if ($handle === 'font-awesome') {
-            return str_replace("rel='stylesheet'", "rel='preload' as='style' onload=\"this.onload=null;this.rel='stylesheet'\"", $html) . '<noscript>' . $html . '</noscript>';
-        }
-        return $html;
-    }, 10, 2);
+
     wp_enqueue_style('youvanna-main', get_stylesheet_directory_uri() . '/assets/css/main.css', [], filemtime(get_stylesheet_directory() . '/assets/css/main.css'));
     wp_enqueue_script('youvanna-main', get_stylesheet_directory_uri() . '/assets/js/main.js', [], filemtime(get_stylesheet_directory() . '/assets/js/main.js'), true);
 });
+
+// Make Font Awesome non-render-blocking (top-level filter, runs once)
+add_filter('style_loader_tag', function($html, $handle) {
+    if ($handle === 'font-awesome') {
+        return str_replace("rel='stylesheet'", "rel='preload' as='style' onload=\"this.onload=null;this.rel='stylesheet'\"", $html) . '<noscript>' . $html . '</noscript>';
+    }
+    return $html;
+}, 10, 2);
 
 // ============================================
 // 2. THEME SUPPORT
@@ -671,6 +673,11 @@ add_action('wp_head', function() {
         'name' => get_bloginfo('name'),
         'url' => home_url('/'),
         'description' => get_bloginfo('description'),
+        'potentialAction' => [
+            '@type' => 'SearchAction',
+            'target' => ['@type' => 'EntryPoint', 'urlTemplate' => home_url('/?s={search_term_string}')],
+            'query-input' => 'required name=search_term_string',
+        ],
     ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "</script>\n";
 }, 4);
 
@@ -715,7 +722,7 @@ add_action('wp_head', function() {
     $email = yv_option('email');
     if ($email) $schema['email'] = $email;
     $address = yv_option('address');
-    if ($address) $schema['address'] = ['@type' => 'PostalAddress', 'streetAddress' => $address];
+    if ($address) $schema['address'] = ['@type' => 'PostalAddress', 'streetAddress' => $address, 'addressCountry' => 'FR'];
     $logo_id = get_theme_mod('custom_logo');
     $logo_url = $logo_id ? wp_get_attachment_image_url($logo_id, 'full') : false;
     if ($logo_url) {
@@ -750,8 +757,14 @@ add_action('wp_head', function() {
         'publisher' => ['@type' => 'Organization', 'name' => get_bloginfo('name')],
         'description' => get_the_excerpt(),
     ];
+    $schema['wordCount'] = str_word_count(wp_strip_all_tags(get_the_content()));
     $thumb = get_the_post_thumbnail_url(null, 'large');
-    $schema['image'] = $thumb ?: home_url('/wp-includes/images/blank.gif');
+    if ($thumb) {
+        $schema['image'] = $thumb;
+    } else {
+        $logo_id = get_theme_mod('custom_logo');
+        $schema['image'] = $logo_id ? wp_get_attachment_image_url($logo_id, 'full') : home_url('/wp-includes/images/blank.gif');
+    }
     $logo_id = get_theme_mod('custom_logo');
     if ($logo_id) $schema['publisher']['logo'] = ['@type' => 'ImageObject', 'url' => wp_get_attachment_image_url($logo_id, 'full')];
     echo '<script type="application/ld+json">' . wp_json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "</script>\n";
@@ -783,6 +796,32 @@ add_action('wp_head', function() {
     ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "</script>\n";
 }, 5);
 
+// Open Graph & Twitter Card meta tags (skip if Yoast/RankMath handles it)
+add_action('wp_head', function() {
+    if (defined('WPSEO_VERSION') || class_exists('RankMath')) return;
+    $title = is_front_page() ? get_bloginfo('name') . ' - ' . get_bloginfo('description') : get_the_title() . ' - ' . get_bloginfo('name');
+    $desc = is_front_page() ? get_bloginfo('description') : (has_excerpt() ? get_the_excerpt() : get_bloginfo('description'));
+    $url = is_front_page() ? home_url('/') : get_permalink();
+    $type = is_single() ? 'article' : 'website';
+    $img = '';
+    if (is_singular() && has_post_thumbnail()) {
+        $img = get_the_post_thumbnail_url(null, 'large');
+    } else {
+        $logo_id = get_theme_mod('custom_logo');
+        if ($logo_id) $img = wp_get_attachment_image_url($logo_id, 'full');
+    }
+    echo '<meta property="og:title" content="' . esc_attr($title) . '">' . "\n";
+    echo '<meta property="og:description" content="' . esc_attr($desc) . '">' . "\n";
+    echo '<meta property="og:url" content="' . esc_url($url) . '">' . "\n";
+    echo '<meta property="og:type" content="' . esc_attr($type) . '">' . "\n";
+    echo '<meta property="og:site_name" content="' . esc_attr(get_bloginfo('name')) . '">' . "\n";
+    if ($img) echo '<meta property="og:image" content="' . esc_url($img) . '">' . "\n";
+    echo '<meta name="twitter:card" content="summary_large_image">' . "\n";
+    echo '<meta name="twitter:title" content="' . esc_attr($title) . '">' . "\n";
+    echo '<meta name="twitter:description" content="' . esc_attr($desc) . '">' . "\n";
+    if ($img) echo '<meta name="twitter:image" content="' . esc_url($img) . '">' . "\n";
+}, 3);
+
 // Preload hero image for LCP performance
 add_action('wp_head', function() {
     if (is_front_page()) {
@@ -804,7 +843,7 @@ add_action('wp_head', function() {
 
 // Noscript fallback: show content if JS disabled
 add_action('wp_head', function() {
-    echo '<noscript><style>.reveal{opacity:1!important;transform:none!important}.reveal .card,.reveal .faq-item,.reveal .stat,.reveal .testimonial-card{opacity:1!important;transform:none!important}</style></noscript>' . "\n";
+    echo '<noscript><style>.reveal{opacity:1!important;transform:none!important}.reveal .card,.reveal .faq-item,.reveal .stat,.reveal .testimonial-card,.reveal .team-member{opacity:1!important;transform:none!important}</style></noscript>' . "\n";
 }, 2);
 
 // Preconnect CDN + GTM/GA

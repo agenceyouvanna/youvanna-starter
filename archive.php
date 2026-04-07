@@ -30,7 +30,7 @@ yv_render_hero([
                                         <span class="blog-card-cat"><?php echo esc_html($cats[0]->name); ?></span>
                                     <?php endif; ?>
                                 </div>
-                                <h3><?php the_title(); ?></h3>
+                                <h3><?php echo esc_html(get_the_title()); ?></h3>
                                 <p><?php echo esc_html(wp_trim_words(get_the_excerpt(), 20)); ?></p>
                                 <span class="card-link">Lire la suite &rarr;</span>
                             </div>

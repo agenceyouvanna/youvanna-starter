@@ -68,7 +68,7 @@ yv_render_hero([
             'text' => get_sub_field('text'),
             'name' => get_sub_field('name'),
             'role' => get_sub_field('role'),
-            'rating' => (int) get_sub_field('rating'),
+            'rating' => max(0, min(5, (int) get_sub_field('rating'))),
             'photo' => get_sub_field('photo'),
         ];
     }

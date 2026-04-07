@@ -1,4 +1,4 @@
-# Youvanna Starter v2.3.0 - Guide Claude Code
+# Youvanna Starter v2.4.0 - Guide Claude Code
 
 Ce fichier est lu automatiquement par Claude Code. Il contient toutes les regles, conventions, feedbacks et contexte pour travailler sur les sites Youvanna.
 
@@ -15,11 +15,12 @@ Ce fichier est lu automatiquement par Claude Code. Il contient toutes les regles
 7. **TOUJOURS des images Gemini sur les cartes** - Pas d'icones quand on peut mettre une image. Icones FA en fallback uniquement si 6+ cartes.
 8. **JAMAIS de texte sur les images Gemini** - Toujours inclure "no text, no words, no letters, no logos, no watermarks" dans les prompts.
 9. **Ratio d'image = reflechir au contenu** - Le ratio depend de la quantite de texte a cote. Rediger le contenu AVANT de generer les images. Texte court -> 4:3, texte moyen -> 1:1 ou 4:5, texte long -> 3:4 portrait. Heroes toujours 16:9.
-10. **Schema.org = automatique** - LocalBusiness, WebSite, BreadcrumbList, FAQPage, BlogPosting. JAMAIS ecrire de schema manuellement.
-11. **Animations = automatiques** - Counter, stagger, parallax, marquee, FAQ smooth, back-to-top. Ne rien ajouter.
+10. **Schema.org = automatique** - LocalBusiness, WebSite (avec SearchAction), BreadcrumbList, FAQPage, BlogPosting. JAMAIS ecrire de schema manuellement.
+11. **Animations = automatiques** - Counter, stagger (cards, faq, stats, testimonials, team), parallax, marquee, FAQ smooth, back-to-top. Ne rien ajouter.
 12. **TOUJOURS des FAQ pour le SEO** - Ajouter une section FAQ sur chaque page pertinente.
 13. **Section headers style Framer** - `<mark>` pour highlight, badge pill en 3e argument de `yv_section_header()`.
 14. **TOUJOURS sync --color-primary-rgb** - Quand on change `--color-primary`, mettre a jour `--color-primary-rgb` avec les valeurs R, G, B.
+15. **OG Meta = automatique** - Open Graph + Twitter Card generes automatiquement si Yoast/RankMath n'est pas actif.
 
 ---
 
@@ -46,7 +47,7 @@ JAMAIS de faux avis, faux chiffres ("500+ clients", "98% satisfaction"), fausses
 
 ```
 youvanna-starter/
-|-- functions.php          # Helpers, SCF fields, admin UX, GTM/GA, Schema.org
+|-- functions.php          # Helpers, SCF fields, admin UX, GTM/GA, Schema.org, OG meta
 |-- header.php / footer.php
 |-- front-page.php         # Homepage (hero, services, about, testimonials, CTA)
 |-- page.php               # Pages interieures (hero + flexible content)
@@ -66,8 +67,8 @@ youvanna-starter/
     |-- section-gallery.php
     |-- section-map.php
     |-- section-numbers.php (counter animation)
-    |-- section-text.php (WYSIWYG pleine largeur — mentions legales, CGV, etc.)
-    |-- section-video.php (YouTube/Vimeo embed responsive)
+    |-- section-text.php (WYSIWYG pleine largeur - mentions legales, CGV, etc.)
+    |-- section-video.php (YouTube/Vimeo/MP4/oEmbed responsive)
     |-- section-team.php (grille equipe avec photo/nom/role/bio)
 ```
 
@@ -100,9 +101,9 @@ yv_render_stats($rows, $class)           // Grille de chiffres (counter animatio
 
 ## Champs SCF par page
 
-**Homepage** : hero_title, hero_subtitle, hero_cta1_text/link, hero_cta2_text/link, hero_image, services_title, services_subtitle, services (repeater: icon, title, description, image, link), about_title, about_text, about_image, about_button, stats (repeater: number, label), testimonials_title, testimonials (repeater: text, name, role, rating, photo), cta_title, cta_text_home, cta_background, cta_button_text/link
+**Homepage** : hero_title, hero_subtitle, hero_cta1_text/link, hero_cta2_text/link, hero_image, services_title, services_subtitle, services (repeater: icon, title, description, image, link), about_title, about_text, about_image, about_button (type link), stats (repeater: number, label), testimonials_title, testimonials (repeater: text, name, role, rating, photo), cta_title, cta_text_home, cta_background, cta_button_text/link
 
-**Pages interieures** : page_hero_title, page_hero_subtitle, page_hero_image, sections (flexible content — 11 layouts)
+**Pages interieures** : page_hero_title, page_hero_subtitle, page_hero_image, sections (flexible content - 11 layouts)
 
 **Page contact** : contact_form_title, contact_form_id, show_map
 
@@ -110,11 +111,13 @@ yv_render_stats($rows, $class)           // Grille de chiffres (counter animatio
 
 `text_image`, `cards`, `cta`, `testimonials`, `faq`, `gallery`, `map`, `numbers`, `text`, `video`, `team`
 
+**Note link fields** : Les CTA homepage utilisent des champs text separees (hero_cta1_text + hero_cta1_link). Les boutons flex content (section-cta, section-text_image) et about_button utilisent le type `link` ACF qui retourne `['url' => '...', 'title' => '...', 'target' => '']`.
+
 ## CSS Variables (dans :root)
 
 ```css
 --color-primary: #hex;        /* Couleur principale */
---color-primary-rgb: R, G, B; /* MEME couleur en RGB — TOUJOURS sync avec primary ! */
+--color-primary-rgb: R, G, B; /* MEME couleur en RGB - TOUJOURS sync avec primary ! */
 --color-primary-dark: #hex;   /* Hover */
 --color-accent: #hex;         /* Accent secondaire */
 --font-heading / --font-body  /* Polices */
@@ -123,9 +126,9 @@ yv_render_stats($rows, $class)           // Grille de chiffres (counter animatio
 ## Dependances
 
 - Font Awesome 6.5 (CDN, charge en async non-bloquant via preload+onload)
-- SCF (Secure Custom Fields — fork gratuit d'ACF avec Repeater + Flex Content)
+- SCF (Secure Custom Fields - fork gratuit d'ACF avec Repeater + Flex Content)
 - Contact Form 7
-- Yoast SEO
+- Yoast SEO (gere OG meta quand actif, sinon fallback auto dans functions.php)
 - Plugin youvanna-cookies (bandeau RGPD auto)
 
 ## Performance
@@ -135,8 +138,20 @@ yv_render_stats($rows, $class)           // Grille de chiffres (counter animatio
 - Hero image preload avec `fetchpriority="high"` (homepage, pages, blog posts, blog listing)
 - Preconnect cdnjs + GTM/GA
 - Lazy loading sur toutes les images below-fold + photos temoignages
-- `<noscript>` fallback pour animations `.reveal`
+- `<noscript>` fallback pour animations `.reveal` (cards, faq, stats, testimonials, team)
 - Bloat WP supprime (block CSS, emoji, oEmbed, REST link, jquery-migrate)
+- `scroll-padding-top` pour offset header fixe sur ancres
+- Nav link underline animation CSS
+- Team members hover + stagger reveal animation
+
+## SEO
+
+- Open Graph + Twitter Card meta automatiques (fallback si Yoast/RankMath absent)
+- WebSite schema avec SearchAction
+- LocalBusiness schema complet (address avec addressCountry FR, openingHours, sameAs, image, logo)
+- BlogPosting avec wordCount, mainEntityOfPage, image fallback logo
+- FAQPage schema automatique sur pages avec section FAQ
+- BreadcrumbList sur toutes les pages sauf homepage
 
 ## Infos serveur
 
