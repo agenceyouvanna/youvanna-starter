@@ -947,8 +947,14 @@ add_action('wp_head', function() {
 // ============================================
 // 10. AUTO-SETUP — Runs once after cloning to a new domain
 // ============================================
-add_action('admin_init', function() {
-    if (!current_user_can('manage_options')) return;
+// Hook into both admin_init (browser) and wp_loaded (WP-CLI)
+$yv_auto_setup = function() {
+    static $ran = false;
+    if ($ran) return;
+
+    $is_cli = defined('WP_CLI') && WP_CLI;
+    if (!$is_cli && !current_user_can('manage_options')) return;
+    if (!$is_cli && !is_admin()) return;
 
     $current_domain = parse_url(get_option('siteurl'), PHP_URL_HOST);
     $setup_domain = get_option('yv_setup_domain', '');
@@ -1113,7 +1119,10 @@ add_action('admin_init', function() {
 
     // Admin notice
     set_transient('yv_setup_done_notice', true, 60);
-});
+    $ran = true;
+};
+add_action('admin_init', $yv_auto_setup);
+add_action('wp_loaded', $yv_auto_setup);
 
 // Quiet skin for silent plugin installs
 if (!class_exists('Quiet_Skin')) {
