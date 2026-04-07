@@ -20,9 +20,11 @@
     --color-bg-alt: #f8fafc;
     --color-border: #e2e8f0;
 
-    /* Typo — modifier ICI pour changer toutes les polices */
-    --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    /* Typo — modifier ICI pour changer toutes les polices
+       Par défaut : system font stack (0 requête, rendu instantané)
+       Pour une police custom : ajouter @font-face AVANT :root, puis changer ces variables */
+    --font-heading: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
     /* Layout */
     --max-width: 1200px;
@@ -163,8 +165,14 @@ h6 { font-size: 0.9rem; }
     display: flex; align-items: center; justify-content: center;
     text-align: center;
     background-color: var(--color-secondary);
-    background-size: cover; background-position: center;
     margin-top: var(--header-height);
+    overflow: hidden;
+}
+.hero-bg-img {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover; object-position: center;
+    z-index: 0;
 }
 .hero-overlay {
     position: absolute; inset: 0;

@@ -10,18 +10,20 @@ if (!defined('ABSPATH')) exit;
 // 1. ASSETS — CSS & JS
 // ============================================
 add_action('wp_enqueue_scripts', function() {
-    wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css', [], '6.5.1');
-    // SRI integrity check added via style_loader_tag filter below
+    // FA subsets only (solid + brands) — ~50KB vs 300KB for all.min.css
+    wp_enqueue_style('fa-fontfaces', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/fontawesome.min.css', [], '6.5.1');
+    wp_enqueue_style('fa-solid', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/solid.min.css', ['fa-fontfaces'], '6.5.1');
+    wp_enqueue_style('fa-brands', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/brands.min.css', ['fa-fontfaces'], '6.5.1');
 
     wp_enqueue_style('youvanna-main', get_stylesheet_directory_uri() . '/assets/css/main.css', [], filemtime(get_stylesheet_directory() . '/assets/css/main.css'));
     wp_enqueue_script('youvanna-main', get_stylesheet_directory_uri() . '/assets/js/main.js', [], filemtime(get_stylesheet_directory() . '/assets/js/main.js'), true);
 });
 
-// Make Font Awesome non-render-blocking (top-level filter, runs once)
+// Make Font Awesome non-render-blocking (preload + swap for all FA subsets)
 add_filter('style_loader_tag', function($html, $handle) {
-    if ($handle === 'font-awesome') {
-        $noscript_html = $html; // Save original stylesheet version for noscript
-        $html = str_replace("rel='stylesheet'", "rel='preload' as='style' onload=\"this.onload=null;this.rel='stylesheet'\" integrity='sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==' crossorigin='anonymous'", $html);
+    if (in_array($handle, ['fa-fontfaces', 'fa-solid', 'fa-brands'], true)) {
+        $noscript_html = $html;
+        $html = str_replace("rel='stylesheet'", "rel='preload' as='style' onload=\"this.onload=null;this.rel='stylesheet'\" crossorigin='anonymous'", $html);
         return $html . '<noscript>' . $noscript_html . '</noscript>';
     }
     return $html;
@@ -249,6 +251,16 @@ function yv_img($field_name, $size = 'large', $post_id = false, $attrs = []) {
 }
 
 /**
+ * Get attachment ID from an SCF image field
+ */
+function yv_image_id($name, $post_id = false) {
+    if (!function_exists('get_field')) return 0;
+    $img = get_field($name, $post_id);
+    if (!$img) return 0;
+    return is_array($img) ? ($img['ID'] ?? 0) : (int) $img;
+}
+
+/**
  * Raccourci pour options globales (wp_options, préfixe yv_)
  */
 function yv_option($name, $fallback = '') {
@@ -262,13 +274,25 @@ function yv_option($name, $fallback = '') {
 function yv_render_hero($args = []) {
     $a = wp_parse_args($args, [
         'image' => '',
+        'image_id' => 0,
         'title' => get_the_title(),
         'subtitle' => '',
         'buttons' => [],
         'class' => 'page-hero',
     ]);
     ?>
-    <section class="<?php echo esc_attr($a['class']); ?>" <?php if ($a['image']): ?>style="background-image: url('<?php echo esc_url($a['image']); ?>')"<?php endif; ?>>
+    <section class="<?php echo esc_attr($a['class']); ?>">
+        <?php if ($a['image_id']): ?>
+            <?php echo wp_get_attachment_image($a['image_id'], 'hero', false, [
+                'class' => 'hero-bg-img',
+                'fetchpriority' => 'high',
+                'decoding' => 'async',
+                'loading' => 'eager',
+                'alt' => '',
+            ]); ?>
+        <?php elseif ($a['image']): ?>
+            <img class="hero-bg-img" src="<?php echo esc_url($a['image']); ?>" alt="" fetchpriority="high" decoding="async" loading="eager">
+        <?php endif; ?>
         <div class="hero-overlay"></div>
         <div class="hero-content">
             <h1><?php echo esc_html($a['title']); ?></h1>
@@ -901,24 +925,7 @@ add_action('wp_head', function() {
     if ($img) echo '<meta name="twitter:image" content="' . esc_url($img) . '">' . "\n";
 }, 3);
 
-// Preload hero image for LCP performance
-add_action('wp_head', function() {
-    if (is_front_page()) {
-        $hero_img = yv_image('hero_image', 'hero');
-    } elseif (is_singular('post')) {
-        $hero_img = get_the_post_thumbnail_url(null, 'hero');
-    } elseif (is_home()) {
-        $blog_id = get_option('page_for_posts');
-        $hero_img = $blog_id ? yv_image('page_hero_image', 'hero', $blog_id) : '';
-    } elseif (is_page()) {
-        $hero_img = yv_image('page_hero_image', 'hero');
-    } else {
-        $hero_img = '';
-    }
-    if ($hero_img) {
-        echo '<link rel="preload" as="image" href="' . esc_url($hero_img) . '" fetchpriority="high">' . "\n";
-    }
-}, 1);
+// Hero LCP: no preload needed — <img fetchpriority="high"> in yv_render_hero() handles discovery natively with srcset
 
 // Noscript fallback: show content if JS disabled
 add_action('wp_head', function() {

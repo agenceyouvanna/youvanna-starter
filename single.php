@@ -2,6 +2,7 @@
 
 <?php
 yv_render_hero([
+    'image_id' => get_post_thumbnail_id(),
     'image' => get_the_post_thumbnail_url(null, 'hero'),
     'title' => get_the_title(),
     'subtitle' => get_the_date(),

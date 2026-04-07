@@ -1,6 +1,9 @@
 <?php if (!get_sub_field('title')) return; ?>
 <?php $bg = get_sub_field('background'); ?>
-<section class="cta-banner reveal" style="background-image: url('<?php echo $bg ? esc_url($bg['url']) : ''; ?>');">
+<section class="cta-banner reveal">
+    <?php if ($bg && !empty($bg['ID'])): ?>
+        <?php echo wp_get_attachment_image($bg['ID'], 'hero', false, ['class' => 'hero-bg-img', 'loading' => 'lazy', 'alt' => '']); ?>
+    <?php endif; ?>
     <div class="cta-overlay"></div>
     <div class="cta-content">
         <h2><?php echo esc_html(get_sub_field('title')); ?></h2>

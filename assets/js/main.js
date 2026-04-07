@@ -161,15 +161,18 @@
                 if (header) header.classList.toggle('scrolled', scrollY > 50);
                 // Back to top visibility
                 if (backToTop) backToTop.classList.toggle('visible', scrollY > 400);
-                // Parallax
+                // Parallax (transform on .hero-bg-img for GPU compositing)
                 if (enableParallax) {
                     parallaxEls.forEach(function(el) {
                         var rect = el.getBoundingClientRect();
                         var elTop = rect.top + scrollY;
                         var elHeight = rect.height;
                         if (scrollY + window.innerHeight > elTop && scrollY < elTop + elHeight) {
-                            var offset = (scrollY - elTop) * 0.3;
-                            el.style.backgroundPositionY = 'calc(50% + ' + offset + 'px)';
+                            var offset = (scrollY - elTop) * 0.15;
+                            var img = el.querySelector('.hero-bg-img');
+                            if (img) {
+                                img.style.transform = 'translateY(' + offset + 'px) scale(1.1)';
+                            }
                         }
                     });
                 }

@@ -2,6 +2,7 @@
 
 <?php
 yv_render_hero([
+    'image_id' => yv_image_id('page_hero_image') ?: get_post_thumbnail_id(),
     'image'    => yv_image('page_hero_image', 'hero') ?: get_the_post_thumbnail_url(null, 'large'),
     'title'    => yv_field('page_hero_title') ?: get_the_title(),
     'subtitle' => yv_field('page_hero_subtitle'),

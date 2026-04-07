@@ -10,6 +10,7 @@ if ($t = yv_field('hero_cta2_text')) {
     $buttons[] = ['text' => $t, 'url' => yv_field('hero_cta2_link', '#'), 'class' => 'btn-secondary'];
 }
 yv_render_hero([
+    'image_id' => yv_image_id('hero_image'),
     'image'    => yv_image('hero_image', 'hero'),
     'title'    => yv_field('hero_title', get_bloginfo('name')),
     'subtitle' => yv_field('hero_subtitle', get_bloginfo('description')),
@@ -113,7 +114,10 @@ yv_render_hero([
 
 <!-- CTA BANNER -->
 <?php if (yv_field('cta_title')): ?>
-<section class="cta-banner reveal" style="background-image: url('<?php echo esc_url(yv_image('cta_background')); ?>');">
+<section class="cta-banner reveal">
+    <?php $cta_bg_id = yv_image_id('cta_background'); if ($cta_bg_id): ?>
+        <?php echo wp_get_attachment_image($cta_bg_id, 'hero', false, ['class' => 'hero-bg-img', 'loading' => 'lazy', 'alt' => '']); ?>
+    <?php endif; ?>
     <div class="cta-overlay"></div>
     <div class="cta-content">
         <h2><?php echo esc_html(yv_field('cta_title', 'Prêt à démarrer ?')); ?></h2>

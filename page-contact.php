@@ -4,6 +4,7 @@ get_header(); ?>
 
 <?php
 yv_render_hero([
+    'image_id' => yv_image_id('page_hero_image'),
     'image'    => yv_image('page_hero_image', 'hero'),
     'title'    => yv_field('page_hero_title') ?: get_the_title(),
     'subtitle' => yv_field('page_hero_subtitle'),
