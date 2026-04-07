@@ -240,7 +240,9 @@ Puis mettre a jour : `update_field('contact_form_id', $form_id, $contact_page_id
 - Contact Form 7
 - Yoast SEO (gere OG meta quand actif, sinon fallback auto dans functions.php)
 - Youvanna Languages (plugin inclus dans plugins/youvanna-languages/ — multilingue i18n)
-- Wordfence (securite — auto-config via `wp eval-file wordfence-autoconfig.php`)
+- Wordfence (securite — auto-config via `post-clone-setup.php`)
+- Redis Object Cache (cache objet persistant)
+- WP Super Cache (cache de page statique)
 - Plugin youvanna-cookies (bandeau RGPD auto)
 
 ## Performance
@@ -299,13 +301,19 @@ wp plugin activate youvanna-languages --allow-root
 wp rewrite flush --allow-root
 ```
 
-## Wordfence (securite)
+## Post-clone setup (securite + cache + plugins)
 
-Script auto-config inclus : `wordfence-autoconfig.php`
+Script unique qui configure TOUT apres le clonage : `post-clone-setup.php`
 ```bash
-wp eval-file wp-content/themes/youvanna-starter/wordfence-autoconfig.php --allow-root
+wp eval-file wp-content/themes/youvanna-starter/post-clone-setup.php --allow-root
 ```
-Configure automatiquement : WAF bootstrap (wordfence-waf.php), Plesk auto_prepend_file, firewall (learning mode 7j), brute force (5 tentatives), scanner, login security, XMLRPC protection. 100% automatique, aucune etape manuelle.
+Configure automatiquement :
+- Youvanna Languages : copie + activation
+- Redis Object Cache : install + activation + enable (si Redis dispo sur le serveur)
+- WP Super Cache : install + activation + enable
+- Wordfence : install + WAF bootstrap + Plesk auto_prepend_file + firewall + brute force + scanner + login security + XMLRPC
+- Wordfence Central : deconnexion (sites clones)
+100% automatique, aucune etape manuelle.
 
 ## Infos serveur
 
