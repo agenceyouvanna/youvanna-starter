@@ -10,12 +10,12 @@
             this.setAttribute('aria-expanded', !expanded);
             menu.classList.toggle('active');
             toggle.classList.toggle('active');
-            
+            document.body.classList.toggle('overflow-hidden');
         });
         menu.querySelectorAll('a').forEach(function(link) {
             link.addEventListener('click', function() {
                 menu.classList.remove('active');
-                
+                document.body.classList.remove('overflow-hidden');
                 toggle.classList.remove('active');
                 toggle.setAttribute('aria-expanded', 'false');
             });
@@ -27,7 +27,7 @@
     mql960.addEventListener('change', function(e) {
         if (e.matches && menu) {
             menu.classList.remove('active');
-            
+            document.body.classList.remove('overflow-hidden');
             if (toggle) {
                 toggle.classList.remove('active');
                 toggle.setAttribute('aria-expanded', 'false');
@@ -37,11 +37,6 @@
 
     // ========== Header scroll ==========
     var header = document.getElementById('site-header');
-    if (header) {
-        window.addEventListener('scroll', function() {
-            header.classList.toggle('scrolled', window.scrollY > 50);
-        }, { passive: true });
-    }
 
     // ========== Scroll reveal with stagger ==========
     if ('IntersectionObserver' in window) {
@@ -131,28 +126,7 @@
 
     // ========== Parallax on heroes and CTA ==========
     var parallaxEls = document.querySelectorAll('.hero, .page-hero, .cta-banner');
-    if (parallaxEls.length && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        var ticking = false;
-        window.addEventListener('scroll', function() {
-            if (!ticking) {
-                requestAnimationFrame(function() {
-                    var scrollY = window.scrollY;
-                    parallaxEls.forEach(function(el) {
-                        var rect = el.getBoundingClientRect();
-                        var elTop = rect.top + scrollY;
-                        var elHeight = rect.height;
-                        // Only apply when element is in/near viewport
-                        if (scrollY + window.innerHeight > elTop && scrollY < elTop + elHeight) {
-                            var offset = (scrollY - elTop) * 0.3;
-                            el.style.backgroundPositionY = 'calc(50% + ' + offset + 'px)';
-                        }
-                    });
-                    ticking = false;
-                });
-                ticking = true;
-            }
-        }, { passive: true });
-    }
+    var enableParallax = parallaxEls.length && !prefersReducedMotion;
 
     // ========== Smooth scroll for anchor links ==========
     document.querySelectorAll('a[href^="#"]').forEach(function(a) {
@@ -167,17 +141,43 @@
             }
         });
     });
+
     // ========== Back to top button ==========
     var backToTop = document.querySelector('.back-to-top');
     if (backToTop) {
-        window.addEventListener('scroll', function() {
-            backToTop.classList.toggle('visible', window.scrollY > 400);
-        }, { passive: true });
         backToTop.addEventListener('click', function(e) {
             e.preventDefault();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     }
+
+    // ========== Consolidated scroll handler (header + parallax + back-to-top) ==========
+    var scrollTicking = false;
+    window.addEventListener('scroll', function() {
+        if (!scrollTicking) {
+            requestAnimationFrame(function() {
+                var scrollY = window.scrollY;
+                // Header scroll state
+                if (header) header.classList.toggle('scrolled', scrollY > 50);
+                // Back to top visibility
+                if (backToTop) backToTop.classList.toggle('visible', scrollY > 400);
+                // Parallax
+                if (enableParallax) {
+                    parallaxEls.forEach(function(el) {
+                        var rect = el.getBoundingClientRect();
+                        var elTop = rect.top + scrollY;
+                        var elHeight = rect.height;
+                        if (scrollY + window.innerHeight > elTop && scrollY < elTop + elHeight) {
+                            var offset = (scrollY - elTop) * 0.3;
+                            el.style.backgroundPositionY = 'calc(50% + ' + offset + 'px)';
+                        }
+                    });
+                }
+                scrollTicking = false;
+            });
+            scrollTicking = true;
+        }
+    }, { passive: true });
 
     // ========== FAQ smooth toggle ==========
     document.querySelectorAll('.faq-item summary').forEach(function(summary) {

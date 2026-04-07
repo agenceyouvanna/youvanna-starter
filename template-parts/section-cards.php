@@ -6,6 +6,7 @@
                 <?php while (have_rows('cards')): the_row();
                     $img = get_sub_field('image');
                     yv_render_card([
+                        'image_id' => $img && !empty($img['ID']) ? $img['ID'] : 0,
                         'image' => $img ? ($img['sizes']['card'] ?? $img['url']) : '',
                         'title' => get_sub_field('title'),
                         'text'  => get_sub_field('description'),

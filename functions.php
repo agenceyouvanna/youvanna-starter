@@ -1,6 +1,6 @@
 <?php
 /**
- * Youvanna Starter — functions.php v2.5.0
+ * Youvanna Starter — functions.php v2.6.0
  * Thème Youvanna avec SCF pour sites vitrines
  * Architecture propre, 0 duplication, full automatisable
  */
@@ -20,8 +20,9 @@ add_action('wp_enqueue_scripts', function() {
 // Make Font Awesome non-render-blocking (top-level filter, runs once)
 add_filter('style_loader_tag', function($html, $handle) {
     if ($handle === 'font-awesome') {
+        $noscript_html = $html; // Save original stylesheet version for noscript
         $html = str_replace("rel='stylesheet'", "rel='preload' as='style' onload=\"this.onload=null;this.rel='stylesheet'\" integrity='sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==' crossorigin='anonymous'", $html);
-        return $html . '<noscript>' . $html . '</noscript>';
+        return $html . '<noscript>' . $noscript_html . '</noscript>';
     }
     return $html;
 }, 10, 2);
@@ -44,6 +45,14 @@ add_action('after_setup_theme', function() {
     add_image_size('thumb-sq', 400, 400, true);
     add_theme_support('automatic-feed-links');
 });
+
+// Add aria-current="page" to current nav items (accessibility)
+add_filter('nav_menu_link_attributes', function($atts, $item) {
+    if ($item->current) {
+        $atts['aria-current'] = 'page';
+    }
+    return $atts;
+}, 10, 2);
 
 // Excerpt length for blog cards
 
@@ -336,8 +345,8 @@ function yv_render_stats($rows, $class = 'stats-grid') {
     <div class="<?php echo esc_attr($class); ?>">
         <?php foreach ($rows as $stat): ?>
             <div class="stat">
-                <span class="stat-number"><?php echo esc_html($stat['number']); ?></span>
-                <span class="stat-label"><?php echo esc_html($stat['label']); ?></span>
+                <span class="stat-number"><?php echo esc_html($stat['number'] ?? ''); ?></span>
+                <span class="stat-label"><?php echo esc_html($stat['label'] ?? ''); ?></span>
             </div>
         <?php endforeach; ?>
     </div>
@@ -386,6 +395,10 @@ function yv_settings_fields() {
                 ['name' => 'address', 'label' => 'Adresse', 'type' => 'textarea'],
                 ['name' => 'opening_hours', 'label' => "Horaires d'ouverture", 'type' => 'textarea'],
                 ['name' => 'maps_embed_url', 'label' => 'URL Google Maps Embed', 'type' => 'url', 'desc' => "Copier l'URL src de l'iframe Google Maps"],
+                ['name' => 'city', 'label' => 'Ville', 'type' => 'text'],
+                ['name' => 'postal_code', 'label' => 'Code postal', 'type' => 'text'],
+                ['name' => 'latitude', 'label' => 'Latitude (schema.org)', 'type' => 'text', 'desc' => 'Ex: 48.8566 — pour le schema.org GeoCoordinates'],
+                ['name' => 'longitude', 'label' => 'Longitude (schema.org)', 'type' => 'text', 'desc' => 'Ex: 2.3522 — pour le schema.org GeoCoordinates'],
                 ['name' => 'business_type', 'label' => 'Type d\'activite (schema.org)', 'type' => 'text', 'desc' => 'Ex: Dentist, Restaurant, LegalService, HomeAndConstructionBusiness. Defaut: LocalBusiness'],
             ],
         ],
@@ -744,7 +757,17 @@ add_action('wp_head', function() {
     $email = yv_option('email');
     if ($email) $schema['email'] = $email;
     $address = yv_option('address');
-    if ($address) $schema['address'] = ['@type' => 'PostalAddress', 'streetAddress' => $address, 'addressCountry' => 'FR'];
+    if ($address) {
+        $postal_address = ['@type' => 'PostalAddress', 'streetAddress' => $address, 'addressCountry' => 'FR'];
+        $city = yv_option('city');
+        if ($city) $postal_address['addressLocality'] = $city;
+        $postal_code = yv_option('postal_code');
+        if ($postal_code) $postal_address['postalCode'] = $postal_code;
+        $schema['address'] = $postal_address;
+    }
+    $lat = yv_option('latitude');
+    $lng = yv_option('longitude');
+    if ($lat && $lng) $schema['geo'] = ['@type' => 'GeoCoordinates', 'latitude' => (float) $lat, 'longitude' => (float) $lng];
     $logo_id = get_theme_mod('custom_logo');
     $logo_url = $logo_id ? wp_get_attachment_image_url($logo_id, 'full') : false;
     if ($logo_url) {
@@ -779,7 +802,7 @@ add_action('wp_head', function() {
         'publisher' => ['@type' => 'Organization', 'name' => get_bloginfo('name')],
         'description' => get_the_excerpt(),
     ];
-    $schema['wordCount'] = str_word_count(wp_strip_all_tags(get_the_content()));
+    $schema['wordCount'] = str_word_count(wp_strip_all_tags(get_post_field('post_content', get_the_ID())));
     $thumb = get_the_post_thumbnail_url(null, 'large');
     if ($thumb) {
         $schema['image'] = $thumb;
@@ -818,12 +841,41 @@ add_action('wp_head', function() {
     ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "</script>\n";
 }, 5);
 
+// Noindex for 404 and search pages
+add_action('wp_head', function() {
+    if (is_404() || is_search()) {
+        echo '<meta name="robots" content="noindex, follow">' . "\n";
+    }
+}, 1);
+
 // Open Graph & Twitter Card meta tags (skip if Yoast/RankMath handles it)
 add_action('wp_head', function() {
     if (defined('WPSEO_VERSION') || class_exists('RankMath')) return;
-    $title = is_front_page() ? get_bloginfo('name') . ' - ' . get_bloginfo('description') : get_the_title() . ' - ' . get_bloginfo('name');
-    $desc = is_front_page() ? get_bloginfo('description') : (has_excerpt() ? get_the_excerpt() : get_bloginfo('description'));
-    $url = is_front_page() ? home_url('/') : get_permalink();
+    if (is_404()) return; // No OG on 404
+    if (is_front_page()) {
+        $title = get_bloginfo('name') . ' - ' . get_bloginfo('description');
+        $desc = get_bloginfo('description');
+    } elseif (is_category() || is_tag() || is_tax()) {
+        $title = single_term_title('', false) . ' - ' . get_bloginfo('name');
+        $desc = term_description() ?: get_bloginfo('description');
+    } elseif (is_search()) {
+        $title = 'Recherche - ' . get_bloginfo('name');
+        $desc = get_bloginfo('description');
+    } elseif (is_archive()) {
+        $title = wp_strip_all_tags(get_the_archive_title()) . ' - ' . get_bloginfo('name');
+        $desc = get_bloginfo('description');
+    } else {
+        $title = get_the_title() . ' - ' . get_bloginfo('name');
+        $desc = (is_singular() && has_excerpt()) ? get_the_excerpt() : get_bloginfo('description');
+    }
+    if (is_front_page()) {
+        $url = home_url('/');
+    } elseif (is_singular()) {
+        $url = get_permalink();
+    } else {
+        // Archive, search, etc — use current URL
+        $url = home_url(add_query_arg([], false));
+    }
     $type = is_single() ? 'article' : 'website';
     $img = '';
     if (is_singular() && has_post_thumbnail()) {
@@ -832,11 +884,16 @@ add_action('wp_head', function() {
         $logo_id = get_theme_mod('custom_logo');
         if ($logo_id) $img = wp_get_attachment_image_url($logo_id, 'full');
     }
+    // Meta description + canonical (SEO essentials)
+    echo '<meta name="description" content="' . esc_attr($desc) . '">' . "\n";
+    echo '<link rel="canonical" href="' . esc_url($url) . '">' . "\n";
+    // Open Graph
     echo '<meta property="og:title" content="' . esc_attr($title) . '">' . "\n";
     echo '<meta property="og:description" content="' . esc_attr($desc) . '">' . "\n";
     echo '<meta property="og:url" content="' . esc_url($url) . '">' . "\n";
     echo '<meta property="og:type" content="' . esc_attr($type) . '">' . "\n";
     echo '<meta property="og:site_name" content="' . esc_attr(get_bloginfo('name')) . '">' . "\n";
+    echo '<meta property="og:locale" content="' . esc_attr(get_locale()) . '">' . "\n";
     if ($img) echo '<meta property="og:image" content="' . esc_url($img) . '">' . "\n";
     echo '<meta name="twitter:card" content="summary_large_image">' . "\n";
     echo '<meta name="twitter:title" content="' . esc_attr($title) . '">' . "\n";
@@ -866,7 +923,6 @@ add_action('wp_head', function() {
 // Noscript fallback: show content if JS disabled
 add_action('wp_head', function() {
     echo '<noscript><style>.reveal{opacity:1!important;transform:none!important}.reveal .card,.reveal .faq-item,.reveal .stat,.reveal .testimonial-card,.reveal .team-member{opacity:1!important;transform:none!important}</style></noscript>' . "\n";
-    echo '<style>@media(prefers-reduced-motion:reduce){.marquee-track{animation:none!important}.stat-number{transition:none!important}}</style>' . "\n";
 }, 2);
 
 // Preconnect CDN + GTM/GA

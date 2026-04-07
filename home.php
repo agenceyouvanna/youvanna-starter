@@ -8,10 +8,11 @@ get_header(); ?>
 <?php
 // Use the blog page's SCF hero if available, otherwise default title
 $blog_page_id = get_option('page_for_posts');
+$blog_page_id = $blog_page_id ? (int) $blog_page_id : 0;
 yv_render_hero([
-    'image'    => yv_image('page_hero_image', 'hero', $blog_page_id) ?: '',
-    'title'    => yv_field('page_hero_title', '', $blog_page_id) ?: get_the_title($blog_page_id),
-    'subtitle' => yv_field('page_hero_subtitle', '', $blog_page_id) ?: '',
+    'image'    => $blog_page_id ? yv_image('page_hero_image', 'hero', $blog_page_id) : '',
+    'title'    => $blog_page_id ? (yv_field('page_hero_title', '', $blog_page_id) ?: get_the_title($blog_page_id)) : 'Blog',
+    'subtitle' => $blog_page_id ? yv_field('page_hero_subtitle', '', $blog_page_id) : '',
 ]);
 ?>
 

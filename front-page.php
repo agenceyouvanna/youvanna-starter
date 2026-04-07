@@ -27,6 +27,7 @@ yv_render_hero([
             <?php while (have_rows('services')): the_row();
                 $img = get_sub_field('image');
                 yv_render_card([
+                    'image_id' => $img ? ($img['ID'] ?? 0) : 0,
                     'image' => $img ? ($img['sizes']['card'] ?? $img['url']) : '',
                     'icon'  => get_sub_field('icon'),
                     'title' => get_sub_field('title'),
@@ -49,8 +50,8 @@ yv_render_hero([
         <div class="about-content">
             <h2><?php echo esc_html(yv_field('about_title', 'À propos')); ?></h2>
             <div><?php echo wp_kses_post(yv_field('about_text')); ?></div>
-            <?php $btn = get_field('about_button'); if ($btn): ?>
-                <a href="<?php echo esc_url($btn['url']); ?>" class="btn btn-primary"><?php echo esc_html($btn['title']); ?></a>
+            <?php $btn = get_field('about_button'); if (is_array($btn) && !empty($btn['url'])): ?>
+                <a href="<?php echo esc_url($btn['url']); ?>" class="btn btn-primary"><?php echo esc_html($btn['title'] ?? 'En savoir plus'); ?></a>
             <?php endif; ?>
             <?php yv_render_stats(get_field('stats')); ?>
         </div>
@@ -81,10 +82,10 @@ yv_render_hero([
             <div class="marquee-track" data-direction="left">
                 <?php foreach (array_merge($testi_items, $testi_items) as $t): ?>
                     <div class="testimonial-card">
-                        <div class="testimonial-stars"><?php for ($i = 0; $i < $t['rating']; $i++) echo '&#9733;'; ?></div>
+                        <div class="testimonial-stars" aria-label="<?php echo $t['rating']; ?> sur 5" role="img"><?php for ($i = 0; $i < $t['rating']; $i++) echo '&#9733;'; ?></div>
                         <blockquote><?php echo esc_html($t['text']); ?></blockquote>
                         <div class="testimonial-author">
-                            <?php if ($t['photo']): ?><img src="<?php echo esc_url($t['photo']['sizes']['thumbnail']); ?>" alt="<?php echo esc_attr($t['name']); ?>" loading="lazy"><?php endif; ?>
+                            <?php if ($t['photo'] && !empty($t['photo']['ID'])): ?><?php echo wp_get_attachment_image($t['photo']['ID'], 'thumbnail', false, ['loading' => 'lazy', 'alt' => esc_attr($t['name'])]); ?><?php endif; ?>
                             <div><strong><?php echo esc_html($t['name']); ?></strong><?php if ($t['role']): ?><span><?php echo esc_html($t['role']); ?></span><?php endif; ?></div>
                         </div>
                     </div>
@@ -96,10 +97,10 @@ yv_render_hero([
             <div class="grid grid-3">
                 <?php foreach ($testi_items as $t): ?>
                     <div class="testimonial-card">
-                        <div class="testimonial-stars"><?php for ($i = 0; $i < $t['rating']; $i++) echo '&#9733;'; ?></div>
+                        <div class="testimonial-stars" aria-label="<?php echo $t['rating']; ?> sur 5" role="img"><?php for ($i = 0; $i < $t['rating']; $i++) echo '&#9733;'; ?></div>
                         <blockquote><?php echo esc_html($t['text']); ?></blockquote>
                         <div class="testimonial-author">
-                            <?php if ($t['photo']): ?><img src="<?php echo esc_url($t['photo']['sizes']['thumbnail']); ?>" alt="<?php echo esc_attr($t['name']); ?>" loading="lazy"><?php endif; ?>
+                            <?php if ($t['photo'] && !empty($t['photo']['ID'])): ?><?php echo wp_get_attachment_image($t['photo']['ID'], 'thumbnail', false, ['loading' => 'lazy', 'alt' => esc_attr($t['name'])]); ?><?php endif; ?>
                             <div><strong><?php echo esc_html($t['name']); ?></strong><?php if ($t['role']): ?><span><?php echo esc_html($t['role']); ?></span><?php endif; ?></div>
                         </div>
                     </div>

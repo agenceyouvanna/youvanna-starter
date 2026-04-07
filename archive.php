@@ -2,8 +2,8 @@
 
 <?php
 yv_render_hero([
-    'title'    => get_the_archive_title(),
-    'subtitle' => get_the_archive_description(),
+    'title'    => wp_strip_all_tags(get_the_archive_title()),
+    'subtitle' => wp_strip_all_tags(get_the_archive_description()),
 ]);
 ?>
 
@@ -15,7 +15,7 @@ yv_render_hero([
                     <article class="card blog-card">
                         <a href="<?php the_permalink(); ?>" class="blog-card-link">
                             <?php if (has_post_thumbnail()): ?>
-                                <img src="<?php echo esc_url(get_the_post_thumbnail_url(null, 'card')); ?>" alt="<?php echo esc_attr(get_the_title()); ?>" loading="lazy">
+                                <?php echo get_the_post_thumbnail(null, 'card', ['loading' => 'lazy']); ?>
                             <?php else: ?>
                                 <div class="blog-card-placeholder">
                                     <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="8" y1="3" x2="8" y2="15"/></svg>

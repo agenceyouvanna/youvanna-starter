@@ -36,11 +36,11 @@ $rows = $use_marquee && count($items) > 6 ? 2 : 1;
             <div class="marquee-track" data-direction="left">
                 <?php foreach (array_merge($row1, $row1) as $t): // duplicate for seamless loop ?>
                     <div class="testimonial-card">
-                        <div class="testimonial-stars"><?php for ($i = 0; $i < $t['rating']; $i++) echo '&#9733;'; ?></div>
+                        <div class="testimonial-stars" aria-label="<?php echo $t['rating']; ?> sur 5" role="img"><?php for ($i = 0; $i < $t['rating']; $i++) echo '&#9733;'; ?></div>
                         <blockquote><?php echo esc_html($t['text']); ?></blockquote>
                         <div class="testimonial-author">
-                            <?php if ($t['photo']): ?>
-                                <img src="<?php echo esc_url($t['photo']['sizes']['thumbnail']); ?>" alt="<?php echo esc_attr($t['name']); ?>" loading="lazy">
+                            <?php if ($t['photo'] && !empty($t['photo']['ID'])): ?>
+                                <?php echo wp_get_attachment_image($t['photo']['ID'], 'thumbnail', false, ['loading' => 'lazy', 'alt' => esc_attr($t['name'])]); ?>
                             <?php endif; ?>
                             <div>
                                 <strong><?php echo esc_html($t['name']); ?></strong>
@@ -54,11 +54,11 @@ $rows = $use_marquee && count($items) > 6 ? 2 : 1;
                 <div class="marquee-track" data-direction="right">
                     <?php foreach (array_merge($row2, $row2) as $t): ?>
                         <div class="testimonial-card">
-                            <div class="testimonial-stars"><?php for ($i = 0; $i < $t['rating']; $i++) echo '&#9733;'; ?></div>
+                            <div class="testimonial-stars" aria-label="<?php echo $t['rating']; ?> sur 5" role="img"><?php for ($i = 0; $i < $t['rating']; $i++) echo '&#9733;'; ?></div>
                             <blockquote><?php echo esc_html($t['text']); ?></blockquote>
                             <div class="testimonial-author">
-                                <?php if ($t['photo']): ?>
-                                    <img src="<?php echo esc_url($t['photo']['sizes']['thumbnail']); ?>" alt="<?php echo esc_attr($t['name']); ?>" loading="lazy">
+                                <?php if ($t['photo'] && !empty($t['photo']['ID'])): ?>
+                                    <?php echo wp_get_attachment_image($t['photo']['ID'], 'thumbnail', false, ['loading' => 'lazy', 'alt' => esc_attr($t['name'])]); ?>
                                 <?php endif; ?>
                                 <div>
                                     <strong><?php echo esc_html($t['name']); ?></strong>
@@ -75,11 +75,11 @@ $rows = $use_marquee && count($items) > 6 ? 2 : 1;
             <div class="grid grid-3">
                 <?php foreach ($items as $t): ?>
                     <div class="testimonial-card">
-                        <div class="testimonial-stars"><?php for ($i = 0; $i < $t['rating']; $i++) echo '&#9733;'; ?></div>
+                        <div class="testimonial-stars" aria-label="<?php echo $t['rating']; ?> sur 5" role="img"><?php for ($i = 0; $i < $t['rating']; $i++) echo '&#9733;'; ?></div>
                         <blockquote><?php echo esc_html($t['text']); ?></blockquote>
                         <div class="testimonial-author">
-                            <?php if ($t['photo']): ?>
-                                <img src="<?php echo esc_url($t['photo']['sizes']['thumbnail']); ?>" alt="<?php echo esc_attr($t['name']); ?>" loading="lazy">
+                            <?php if ($t['photo'] && !empty($t['photo']['ID'])): ?>
+                                <?php echo wp_get_attachment_image($t['photo']['ID'], 'thumbnail', false, ['loading' => 'lazy', 'alt' => esc_attr($t['name'])]); ?>
                             <?php endif; ?>
                             <div>
                                 <strong><?php echo esc_html($t['name']); ?></strong>

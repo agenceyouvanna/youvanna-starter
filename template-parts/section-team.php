@@ -10,7 +10,7 @@
                         <?php if ($photo && !empty($photo['ID'])): ?>
                             <?php echo wp_get_attachment_image($photo['ID'], 'card', false, ['loading' => 'lazy', 'alt' => esc_attr(get_sub_field('name'))]); ?>
                         <?php elseif ($photo): ?>
-                            <img src="<?php echo esc_url($photo['sizes']['card'] ?? $photo['url']); ?>" alt="<?php echo esc_attr(get_sub_field('name')); ?>" loading="lazy">
+                            <img src="<?php echo esc_url($photo['sizes']['card'] ?? $photo['url']); ?>" alt="<?php echo esc_attr(get_sub_field('name')); ?>" loading="lazy" width="600" height="400">
                         <?php endif; ?>
                         <div class="team-member-info">
                             <h3><?php echo esc_html(get_sub_field('name')); ?></h3>

@@ -13,7 +13,7 @@
             }
             if ($embed_url): ?>
                 <div class="video-wrapper">
-                    <iframe src="<?php echo esc_url($embed_url); ?>" width="100%" height="450" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy" title="Video"></iframe>
+                    <iframe src="<?php echo esc_url($embed_url); ?>" width="100%" height="450" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy" title="<?php echo esc_attr(get_sub_field('title') ?: 'Video'); ?>"></iframe>
                 </div>
             <?php elseif (preg_match('/\.(mp4|webm|ogg)$/i', $url)): ?>
                 <video controls preload="metadata" style="width:100%;border-radius:var(--radius);">

@@ -1,4 +1,4 @@
-# Youvanna Starter v2.5.0 - Guide Claude Code
+# Youvanna Starter v2.6.0 - Guide Claude Code
 
 Ce fichier est lu automatiquement par Claude Code. Il contient toutes les regles, conventions, feedbacks et contexte pour travailler sur les sites Youvanna.
 
@@ -102,6 +102,10 @@ yv_render_stats($rows, $class)           // Grille de chiffres (counter animatio
 | `yv_address` | Footer, contact, schema.org |
 | `yv_opening_hours` | Contact, schema.org (openingHours) |
 | `yv_maps_embed_url` | Contact (iframe Google Maps) |
+| `yv_city` | Schema.org addressLocality |
+| `yv_postal_code` | Schema.org postalCode |
+| `yv_latitude` | Schema.org GeoCoordinates latitude |
+| `yv_longitude` | Schema.org GeoCoordinates longitude |
 | `yv_business_type` | Schema.org @type (Dentist, Restaurant, LegalService... Defaut: LocalBusiness) |
 | `yv_footer_description` | Footer |
 | `yv_cta_text` / `yv_cta_link` | Bouton CTA header |
@@ -118,11 +122,104 @@ yv_render_stats($rows, $class)           // Grille de chiffres (counter animatio
 
 ## Flexible Content layouts (11)
 
-`text_image`, `cards`, `cta`, `testimonials`, `faq`, `gallery`, `map`, `numbers`, `text`, `video`, `team`
+Dispatching : `page.php` fait `get_template_part('template-parts/section', get_row_layout())` — le layout `cards` charge `template-parts/section-cards.php`.
 
-Tous les layouts (sauf cta, text_image, map, text, video) ont un champ `badge` optionnel pour le pill au-dessus du titre.
+Tous les layouts (sauf cta, text_image, map, text, video) ont un champ `badge` optionnel.
 
-**Note link fields** : Les CTA homepage utilisent des champs text separees (hero_cta1_text + hero_cta1_link). Les boutons flex content (section-cta, section-text_image) et about_button utilisent le type `link` SCF qui retourne `['url' => '...', 'title' => '...', 'target' => '']`.
+### Sub-fields par layout
+
+| Layout | Sub-fields | Types |
+|--------|-----------|-------|
+| `text_image` | title (text), text (wysiwyg), image (image), image_position (select: right/left), link (link) | |
+| `cards` | title (text), subtitle (textarea), badge (text), columns (select: 2/3/4), cards (repeater) | cards[]: image (image), title (text), description (textarea), link (link) |
+| `cta` | background (image), title (text), text (textarea), button (link) | |
+| `testimonials` | title (text), badge (text), items (repeater) | items[]: text (textarea), name (text), role (text), photo (image), rating (number 1-5) |
+| `faq` | title (text), badge (text), items (repeater) | items[]: question (text), answer (wysiwyg) |
+| `gallery` | title (text), badge (text), columns (select: 2/3/4), images (gallery) | |
+| `map` | title (text), map_url (url), height (number, defaut 450) | |
+| `numbers` | title (text), badge (text), bg_color (select: light/primary/dark), items (repeater) | items[]: number (text), label (text) |
+| `text` | title (text), content (wysiwyg full+media), narrow (true_false, defaut 1) | |
+| `video` | title (text), video_url (url) | |
+| `team` | title (text), subtitle (textarea), badge (text), columns (select: 3/4), members (repeater) | members[]: photo (image), name (text), role (text), bio (textarea) |
+
+### Field-type cheat sheet pour update_field()
+
+| Type SCF | Format update_field() | Exemple |
+|----------|----------------------|---------|
+| `text` | string | `'Mon titre'` |
+| `textarea` | string | `'Description...'` |
+| `wysiwyg` | string HTML | `'<p>Contenu</p>'` |
+| `number` | int | `5` |
+| `url` | string URL | `'https://...'` |
+| `image` (return_format: array) | int (attachment ID) | `42` |
+| `gallery` (return_format: array) | array of int (IDs) | `[42, 43, 44]` |
+| `link` | array | `['url' => '/contact', 'title' => 'Contactez-nous', 'target' => '']` |
+| `select` | string (value key) | `'3'` ou `'primary'` |
+| `true_false` | int | `1` ou `0` |
+| `repeater` | array of arrays | voir exemples ci-dessous |
+| `flexible_content` | array of arrays avec `acf_fc_layout` | voir exemples ci-dessous |
+
+### Link fields : text pair vs SCF link array
+
+| Champ | Pattern | Format update_field() |
+|-------|---------|----------------------|
+| `hero_cta1_text` + `hero_cta1_link` | text pair | 2 appels : `update_field('hero_cta1_text', 'Texte')` + `update_field('hero_cta1_link', '/url')` |
+| `cta_button_text` + `cta_button_link` | text pair | idem |
+| `about_button` | SCF link | `update_field('about_button', ['url' => '/a-propos', 'title' => 'En savoir plus', 'target' => ''])` |
+| services[].link | SCF link | dans le repeater |
+| flex cards[].cards[].link | SCF link | dans le repeater imbrique |
+| flex cta.button | SCF link | `['url' => '...', 'title' => '...', 'target' => '']` |
+| flex text_image.link | SCF link | idem |
+
+### Exemples update_field()
+
+```php
+// Homepage hero
+update_field('hero_title', 'Bienvenue chez Nom Client', $front_id);
+update_field('hero_subtitle', 'Votre artisan a Lorient', $front_id);
+update_field('hero_cta1_text', 'Nos services', $front_id);
+update_field('hero_cta1_link', '/nos-services', $front_id);
+update_field('hero_image', $hero_attachment_id, $front_id); // ID, pas URL !
+
+// Homepage services (repeater)
+update_field('services', [
+    ['icon' => '', 'title' => 'Service 1', 'description' => 'Texte...', 'image' => $img_id, 'link' => ['url' => '/service-1', 'title' => 'En savoir plus', 'target' => '']],
+    ['icon' => '', 'title' => 'Service 2', 'description' => 'Texte...', 'image' => $img_id2, 'link' => ['url' => '/service-2', 'title' => 'En savoir plus', 'target' => '']],
+], $front_id);
+
+// Page interieure - flexible content
+update_field('sections', [
+    ['acf_fc_layout' => 'text_image', 'title' => 'Notre histoire', 'text' => '<p>Texte HTML</p>', 'image' => $img_id, 'image_position' => 'right', 'link' => ['url' => '/contact', 'title' => 'Contactez-nous', 'target' => '']],
+    ['acf_fc_layout' => 'cards', 'title' => 'Nos services', 'subtitle' => '', 'badge' => 'Services', 'columns' => '3', 'cards' => [
+        ['title' => 'Carte 1', 'description' => 'Texte', 'image' => $img_id, 'link' => ['url' => '/s1', 'title' => 'Voir', 'target' => '']],
+    ]],
+    ['acf_fc_layout' => 'faq', 'title' => 'Questions frequentes', 'badge' => 'FAQ', 'items' => [
+        ['question' => 'Question 1 ?', 'answer' => '<p>Reponse</p>'],
+    ]],
+    ['acf_fc_layout' => 'gallery', 'title' => 'Galerie', 'badge' => '', 'columns' => '3', 'images' => [$img_id1, $img_id2, $img_id3]],
+    ['acf_fc_layout' => 'numbers', 'title' => 'En chiffres', 'badge' => '', 'bg_color' => 'primary', 'items' => [
+        ['number' => '15+', 'label' => 'Annees d\'experience'],
+    ]],
+    ['acf_fc_layout' => 'testimonials', 'title' => 'Avis clients', 'badge' => '', 'items' => [
+        ['text' => 'Super service', 'name' => 'Jean Dupont', 'role' => 'Client', 'photo' => $photo_id, 'rating' => 5],
+    ]],
+    ['acf_fc_layout' => 'team', 'title' => 'Notre equipe', 'subtitle' => '', 'badge' => 'Equipe', 'columns' => '3', 'members' => [
+        ['photo' => $photo_id, 'name' => 'Jean', 'role' => 'Gerant', 'bio' => 'Bio courte'],
+    ]],
+    ['acf_fc_layout' => 'video', 'title' => 'Presentation', 'video_url' => 'https://www.youtube.com/watch?v=xxx'],
+    ['acf_fc_layout' => 'text', 'title' => 'Mentions legales', 'content' => '<p>Contenu HTML...</p>', 'narrow' => 1],
+    ['acf_fc_layout' => 'map', 'title' => 'Nous trouver', 'map_url' => 'https://www.google.com/maps/embed?pb=...', 'height' => 450],
+    ['acf_fc_layout' => 'cta', 'title' => 'Pret a demarrer ?', 'text' => 'Contactez-nous', 'background' => $bg_id, 'button' => ['url' => '/contact', 'title' => 'Contact', 'target' => '']],
+], $page_id);
+```
+
+### CF7 form ID discovery
+
+Apres clonage du template, trouver l'ID du formulaire Contact Form 7 :
+```bash
+wp post list --post_type=wpcf7_contact_form --fields=ID,post_title --allow-root
+```
+Puis mettre a jour : `update_field('contact_form_id', $form_id, $contact_page_id);`
 
 ## CSS Variables (dans :root)
 
@@ -156,17 +253,26 @@ Tous les layouts (sauf cta, text_image, map, text, video) ont un champ `badge` o
 - `scroll-padding-top` pour offset header fixe sur ancres
 - Nav link underline animation CSS
 - Media queries consolides (1 bloc 960px, 1 bloc 768px)
-- Marquee `will-change: transform` pour GPU compositing
+- Scroll handlers consolides (1 seul rAF pour header, parallax, back-to-top)
+- Body scroll lock sur mobile menu (overflow-hidden)
+- Mobile nav max-height + overflow-y auto
+- Focus-visible WCAG 2.1 AA sur tous les elements interactifs
+- Gallery hover overlay avec icone FA search
 
 ## SEO
 
-- Open Graph + Twitter Card meta automatiques (fallback si Yoast/RankMath absent)
+- `<meta name="description">` + `<link rel="canonical">` automatiques (skip si Yoast/RankMath)
+- `<meta name="robots" content="noindex, follow">` sur 404 et search
+- Open Graph + Twitter Card + `og:locale` automatiques (fallback si Yoast/RankMath absent)
+- OG tags gere correctement archives, categories, search (pas seulement singular)
 - WebSite schema avec SearchAction
-- LocalBusiness schema complet (address avec addressCountry FR, openingHours, sameAs, image, logo)
+- LocalBusiness schema complet (address + addressLocality + postalCode + geo GeoCoordinates + openingHours, sameAs, image, logo)
 - BlogPosting avec wordCount, mainEntityOfPage, image fallback logo
 - FAQPage schema automatique sur pages avec section FAQ
 - BreadcrumbList sur toutes les pages sauf homepage
 - Gallery items avec aria-label
+- aria-current="page" sur les liens nav actifs
+- Testimonial stars avec aria-label + role="img"
 
 ## Infos serveur
 

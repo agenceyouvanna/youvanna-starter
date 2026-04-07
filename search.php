@@ -2,8 +2,8 @@
 
 <?php
 yv_render_hero([
-    'title' => 'Recherche : ' . esc_html(get_search_query()),
-    'subtitle' => sprintf('%d résultat(s) trouvé(s)', $wp_query->found_posts),
+    'title' => 'Recherche : ' . get_search_query(),
+    'subtitle' => sprintf('%d résultat(s) trouvé(s)', $GLOBALS['wp_query']->found_posts),
 ]);
 ?>
 
