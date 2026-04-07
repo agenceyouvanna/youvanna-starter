@@ -1,7 +1,7 @@
 <?php
 /**
  * Youvanna Starter — functions.php v2.4.0
- * Thème Youvanna avec ACF pour sites vitrines
+ * Thème Youvanna avec SCF pour sites vitrines
  * Architecture propre, 0 duplication, full automatisable
  */
 if (!defined('ABSPATH')) exit;
@@ -89,7 +89,7 @@ add_action('wp_default_scripts', function($scripts) {
 // 4b. ADMIN UX — Interface propre pour le client
 // ============================================
 
-// Masquer l'éditeur WP sur les pages (tout est dans ACF)
+// Masquer l'éditeur WP sur les pages (tout est dans SCF)
 add_action('admin_init', function() {
     remove_post_type_support('page', 'editor');
 });
@@ -99,7 +99,7 @@ add_action('admin_menu', function() {
     remove_menu_page('edit.php?post_type=acf-field-group'); // ACF admin (pas pour le client)
 }, 999);
 
-// CSS admin custom pour rendre ACF plus beau
+// CSS admin custom pour rendre SCF plus beau
 add_action('admin_head', function() {
     $screen = get_current_screen();
     if (!$screen || !in_array($screen->base, ['post', 'toplevel_page_site-settings'])) return;
@@ -108,7 +108,7 @@ add_action('admin_head', function() {
     /* Cacher le titre WP sur la homepage (il est fixe) */
     body.post-type-page #titlediv { margin-bottom: 8px; }
 
-    /* ACF Tabs — plus gros, plus clairs */
+    /* SCF Tabs — plus gros, plus clairs */
     .acf-tab-group li a {
         font-size: 14px !important;
         padding: 10px 18px !important;
@@ -119,21 +119,21 @@ add_action('admin_head', function() {
         border-bottom-color: #2563eb !important;
     }
 
-    /* ACF Fields — plus aérés */
+    /* SCF Fields — plus aérés */
     .acf-field { padding: 16px 12px !important; }
     .acf-label label { font-size: 14px !important; font-weight: 600 !important; color: #1e293b !important; }
     .acf-field .description { font-size: 13px !important; color: #64748b !important; margin-top: 4px !important; }
 
-    /* ACF Field Groups — style carte */
+    /* SCF Field Groups — style carte */
     .acf-postbox { border: 1px solid #e2e8f0 !important; border-radius: 8px !important; margin-bottom: 20px !important; overflow: hidden; }
     .acf-postbox .postbox-header { background: #f8fafc !important; border-bottom: 1px solid #e2e8f0 !important; }
     .acf-postbox .postbox-header h2 { font-size: 15px !important; font-weight: 700 !important; color: #0f172a !important; padding: 12px 16px !important; }
 
-    /* ACF Repeater — plus lisible */
+    /* SCF Repeater — plus lisible */
     .acf-repeater .acf-row { border-color: #e2e8f0 !important; }
     .acf-repeater .acf-row:hover { background: #f8fafc !important; }
 
-    /* ACF Flexible Content — plus clair */
+    /* SCF Flexible Content — plus clair */
     .acf-flexible-content .layout { border: 1px solid #e2e8f0 !important; border-radius: 8px !important; margin-bottom: 12px !important; }
     .acf-flexible-content .layout .acf-fc-layout-handle { background: #f8fafc !important; font-weight: 600 !important; }
 
@@ -143,7 +143,7 @@ add_action('admin_head', function() {
     /* Image fields — preview arrondi */
     .acf-image-uploader img { border-radius: 8px !important; }
 
-    /* Messages ACF optionnels dans les onglets */
+    /* Messages SCF optionnels dans les onglets */
     .acf-field-message .acf-input p {
         background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%);
         border: 1px solid #fde68a;
@@ -202,7 +202,7 @@ add_action('edit_form_after_title', function($post) {
 // ============================================
 
 /**
- * Récupérer un champ ACF avec fallback
+ * Récupérer un champ SCF avec fallback
  * Supporte 'option' comme 3e argument pour les options globales
  */
 function yv_field($name, $fallback = '', $post_id = false) {
@@ -213,7 +213,7 @@ function yv_field($name, $fallback = '', $post_id = false) {
 }
 
 /**
- * Récupérer l'URL d'une image ACF
+ * Récupérer l'URL d'une image SCF
  */
 function yv_image($name, $size = 'large', $post_id = false) {
     if (!function_exists('get_field')) return '';
@@ -329,7 +329,7 @@ function yv_render_stats($rows, $class = 'stats-grid') {
 }
 
 // ============================================
-// 6. PAGE RÉGLAGES DU SITE (WP natif, sans ACF PRO)
+// 6. PAGE RÉGLAGES DU SITE (WP natif, sans SCF PRO)
 // ============================================
 add_action('admin_menu', function() {
     add_menu_page(
@@ -447,7 +447,7 @@ function yv_render_settings_page() {
 }
 
 // ============================================
-// 7. ACF FIELD GROUPS — All via PHP (no GUI)
+// 7. SCF FIELD GROUPS — All via PHP (no GUI)
 // ============================================
 add_action('acf/include_fields', function() {
     if (!function_exists('acf_add_local_field_group')) return;

@@ -111,7 +111,7 @@ yv_render_stats($rows, $class)           // Grille de chiffres (counter animatio
 
 `text_image`, `cards`, `cta`, `testimonials`, `faq`, `gallery`, `map`, `numbers`, `text`, `video`, `team`
 
-**Note link fields** : Les CTA homepage utilisent des champs text separees (hero_cta1_text + hero_cta1_link). Les boutons flex content (section-cta, section-text_image) et about_button utilisent le type `link` ACF qui retourne `['url' => '...', 'title' => '...', 'target' => '']`.
+**Note link fields** : Les CTA homepage utilisent des champs text separees (hero_cta1_text + hero_cta1_link). Les boutons flex content (section-cta, section-text_image) et about_button utilisent le type `link` SCF qui retourne `['url' => '...', 'title' => '...', 'target' => '']`.
 
 ## CSS Variables (dans :root)
 
@@ -126,7 +126,7 @@ yv_render_stats($rows, $class)           // Grille de chiffres (counter animatio
 ## Dependances
 
 - Font Awesome 6.5 (CDN, charge en async non-bloquant via preload+onload)
-- SCF (Secure Custom Fields - fork gratuit d'ACF avec Repeater + Flex Content)
+- SCF (Secure Custom Fields - plugin officiel WordPress, fork gratuit d'ACF avec Repeater + Flex Content integres)
 - Contact Form 7
 - Yoast SEO (gere OG meta quand actif, sinon fallback auto dans functions.php)
 - Plugin youvanna-cookies (bandeau RGPD auto)

@@ -6,7 +6,7 @@
 get_header(); ?>
 
 <?php
-// Use the blog page's ACF hero if available, otherwise default title
+// Use the blog page's SCF hero if available, otherwise default title
 $blog_page_id = get_option('page_for_posts');
 yv_render_hero([
     'image'    => yv_image('page_hero_image', 'hero', $blog_page_id) ?: '',
