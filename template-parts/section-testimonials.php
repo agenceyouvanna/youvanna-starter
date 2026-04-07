@@ -18,7 +18,7 @@ $rows = $use_marquee && count($items) > 6 ? 2 : 1;
 ?>
 <section class="section testimonials-section reveal">
     <div class="container">
-        <?php yv_section_header(get_sub_field('title')); ?>
+        <?php yv_section_header(get_sub_field('title'), '', get_sub_field('badge')); ?>
     </div>
     <?php if ($use_marquee): ?>
         <?php

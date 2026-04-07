@@ -4,19 +4,18 @@
     // ========== Mobile menu ==========
     var toggle = document.querySelector('.nav-toggle');
     var menu = document.querySelector('.nav-menu');
-    var cta = document.querySelector('.nav-cta');
     if (toggle && menu) {
         toggle.addEventListener('click', function() {
             var expanded = this.getAttribute('aria-expanded') === 'true';
             this.setAttribute('aria-expanded', !expanded);
             menu.classList.toggle('active');
             toggle.classList.toggle('active');
-            if (cta) cta.classList.toggle('active');
+            
         });
         menu.querySelectorAll('a').forEach(function(link) {
             link.addEventListener('click', function() {
                 menu.classList.remove('active');
-                if (cta) cta.classList.remove('active');
+                
                 toggle.classList.remove('active');
                 toggle.setAttribute('aria-expanded', 'false');
             });
@@ -28,7 +27,7 @@
     mql960.addEventListener('change', function(e) {
         if (e.matches && menu) {
             menu.classList.remove('active');
-            if (cta) cta.classList.remove('active');
+            
             if (toggle) {
                 toggle.classList.remove('active');
                 toggle.setAttribute('aria-expanded', 'false');
@@ -115,7 +114,8 @@
     }
 
     // Observe stat-numbers for counter animation
-    if ('IntersectionObserver' in window) {
+    var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if ('IntersectionObserver' in window && !prefersReducedMotion) {
         var counterObs = new IntersectionObserver(function(entries) {
             entries.forEach(function(entry) {
                 if (!entry.isIntersecting) return;

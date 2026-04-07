@@ -44,9 +44,7 @@ yv_render_hero([
 <section class="section about-section reveal">
     <div class="container grid grid-2">
         <div class="about-image">
-            <?php $img = yv_image('about_image'); if ($img): ?>
-                <img src="<?php echo esc_url($img); ?>" alt="<?php echo esc_attr(yv_field('about_title')); ?>" loading="lazy">
-            <?php endif; ?>
+            <?php echo yv_img('about_image', 'large', false, ['alt' => esc_attr(yv_field('about_title'))]); ?>
         </div>
         <div class="about-content">
             <h2><?php echo esc_html(yv_field('about_title', 'À propos')); ?></h2>

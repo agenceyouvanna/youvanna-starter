@@ -36,6 +36,13 @@
         <button class="nav-toggle" aria-label="Menu" aria-expanded="false">
             <span></span><span></span><span></span>
         </button>
+
+        <div class="nav-mobile-cta">
+            <?php if ($phone): ?>
+                <a href="tel:<?php echo esc_attr(preg_replace('/\s/', '', $phone)); ?>" class="nav-phone"><?php echo esc_html($phone); ?></a>
+            <?php endif; ?>
+            <a href="<?php echo esc_url(yv_option('cta_link', '/contact')); ?>" class="btn btn-primary btn-sm"><?php echo esc_html(yv_option('cta_text', 'Nous contacter')); ?></a>
+        </div>
     </nav>
 </header>
 

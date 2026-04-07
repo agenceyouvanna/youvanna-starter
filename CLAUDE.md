@@ -1,4 +1,4 @@
-# Youvanna Starter v2.4.0 - Guide Claude Code
+# Youvanna Starter v2.5.0 - Guide Claude Code
 
 Ce fichier est lu automatiquement par Claude Code. Il contient toutes les regles, conventions, feedbacks et contexte pour travailler sur les sites Youvanna.
 
@@ -7,7 +7,7 @@ Ce fichier est lu automatiquement par Claude Code. Il contient toutes les regles
 ## Regles absolues
 
 1. **JAMAIS de couleur hardcodee** - Toute couleur passe par les CSS variables `:root` dans `main.css`. NULLE PART ailleurs.
-2. **JAMAIS de code duplique** - Utilise les helpers PHP existants (yv_field, yv_option, yv_image, yv_render_card, etc.)
+2. **JAMAIS de code duplique** - Utilise les helpers PHP existants (yv_field, yv_option, yv_image, yv_img, yv_render_card, etc.)
 3. **JAMAIS hardcoder une info client** - Tout passe par `wp option update yv_xxx` ou `update_field()`
 4. **TOUJOURS les accents francais** - e, e, e, e, a, a, u, u, o, c, i. JAMAIS "equipe" -> "equipe", JAMAIS "Pret" -> "Pret". Si SSH pose des problemes d'encodage, utiliser `scp` + `wp eval-file` (preserve l'UTF-8).
 5. **JAMAIS inventer ce qu'on ne sait pas** - Pas de faux avis, pas de faux chiffres, pas de fausses donnees. Lorem Ipsum pour les temoignages si pas de vrais avis. Pas de section numbers si pas de chiffres verifies. Les descriptions de services doivent etre basees sur des infos reelles (site existant, brief client). Regle numero 1 de l'utilisateur.
@@ -16,11 +16,13 @@ Ce fichier est lu automatiquement par Claude Code. Il contient toutes les regles
 8. **JAMAIS de texte sur les images Gemini** - Toujours inclure "no text, no words, no letters, no logos, no watermarks" dans les prompts.
 9. **Ratio d'image = reflechir au contenu** - Le ratio depend de la quantite de texte a cote. Rediger le contenu AVANT de generer les images. Texte court -> 4:3, texte moyen -> 1:1 ou 4:5, texte long -> 3:4 portrait. Heroes toujours 16:9.
 10. **Schema.org = automatique** - LocalBusiness, WebSite (avec SearchAction), BreadcrumbList, FAQPage, BlogPosting. JAMAIS ecrire de schema manuellement.
-11. **Animations = automatiques** - Counter, stagger (cards, faq, stats, testimonials, team), parallax, marquee, FAQ smooth, back-to-top. Ne rien ajouter.
+11. **Animations = automatiques** - Counter (skip prefers-reduced-motion), stagger (cards, faq, stats, testimonials, team), parallax, marquee (will-change: transform), FAQ smooth, back-to-top. Ne rien ajouter.
 12. **TOUJOURS des FAQ pour le SEO** - Ajouter une section FAQ sur chaque page pertinente.
-13. **Section headers style Framer** - `<mark>` pour highlight, badge pill en 3e argument de `yv_section_header()`.
+13. **Section headers style Framer** - `<mark>` pour highlight, badge pill en 3e argument de `yv_section_header()`. Badge disponible sur tous les layouts flex.
 14. **TOUJOURS sync --color-primary-rgb** - Quand on change `--color-primary`, mettre a jour `--color-primary-rgb` avec les valeurs R, G, B.
 15. **OG Meta = automatique** - Open Graph + Twitter Card generes automatiquement si Yoast/RankMath n'est pas actif.
+16. **TOUJOURS utiliser wp_get_attachment_image()** - Pour les images SCF, utiliser `yv_img()` ou `wp_get_attachment_image($img['ID'])` au lieu de `<img src>` brut. Donne width/height/srcset/sizes automatiquement.
+17. **SCF, pas ACF** - On utilise SCF (Secure Custom Fields), le plugin officiel WordPress. C'est un fork gratuit d'ACF avec Repeater + Flex Content integres. L'API garde le prefixe `acf_` pour compatibilite, mais dans les commentaires et la doc on ecrit SCF.
 
 ---
 
@@ -40,6 +42,12 @@ JAMAIS de faux avis, faux chiffres ("500+ clients", "98% satisfaction"), fausses
 - Toujours 2K, toujours "no text, no words, no letters, no logos, no watermarks"
 - Le ratio depend du texte a cote, PAS du type de section
 - Methode : curl en bash, PAS un helper PHP cote serveur
+
+### SCF pas ACF
+L'utilisateur insiste : on utilise SCF (Secure Custom Fields), pas ACF. Toujours ecrire SCF dans les commentaires, la doc, et les descriptions. L'API utilise le prefixe `acf_` pour compatibilite mais c'est bien SCF.
+
+### Memory dans CLAUDE.md
+L'utilisateur veut que TOUTES les regles et feedbacks soient aussi dans ce fichier CLAUDE.md (pas seulement dans la memoire locale de Claude Code), pour que toute session future les retrouve automatiquement.
 
 ---
 
@@ -77,7 +85,8 @@ youvanna-starter/
 ```php
 yv_option($name, $fallback)              // wp_options avec prefixe yv_
 yv_field($name, $fallback, $post_id)     // Champ SCF (gere 0 et valeurs falsy correctement)
-yv_image($name, $size, $post_id)         // URL image SCF
+yv_image($name, $size, $post_id)         // URL image SCF (retourne string URL)
+yv_img($name, $size, $post_id, $attrs)   // Image SCF avec wp_get_attachment_image (width/height/srcset auto)
 yv_render_hero($args)                     // Bandeau hero (background-image + preload auto)
 yv_section_header($title, $sub, $badge)  // H2 + subtitle + badge pill. $title supporte <mark>
 yv_render_card($args)                     // Carte (image_id > image > icon). link verifie is_array()
@@ -111,6 +120,8 @@ yv_render_stats($rows, $class)           // Grille de chiffres (counter animatio
 
 `text_image`, `cards`, `cta`, `testimonials`, `faq`, `gallery`, `map`, `numbers`, `text`, `video`, `team`
 
+Tous les layouts (sauf cta, text_image, map, text, video) ont un champ `badge` optionnel pour le pill au-dessus du titre.
+
 **Note link fields** : Les CTA homepage utilisent des champs text separees (hero_cta1_text + hero_cta1_link). Les boutons flex content (section-cta, section-text_image) et about_button utilisent le type `link` SCF qui retourne `['url' => '...', 'title' => '...', 'target' => '']`.
 
 ## CSS Variables (dans :root)
@@ -125,7 +136,7 @@ yv_render_stats($rows, $class)           // Grille de chiffres (counter animatio
 
 ## Dependances
 
-- Font Awesome 6.5 (CDN, charge en async non-bloquant via preload+onload)
+- Font Awesome 6.5 (CDN avec SRI, charge en async non-bloquant via preload+onload)
 - SCF (Secure Custom Fields - plugin officiel WordPress, fork gratuit d'ACF avec Repeater + Flex Content integres)
 - Contact Form 7
 - Yoast SEO (gere OG meta quand actif, sinon fallback auto dans functions.php)
@@ -134,15 +145,18 @@ yv_render_stats($rows, $class)           // Grille de chiffres (counter animatio
 ## Performance
 
 - Cache busting automatique via `filemtime()`
-- Font Awesome async (preload + onload swap, non-render-blocking)
+- Font Awesome async (preload + onload swap + SRI hash, non-render-blocking)
 - Hero image preload avec `fetchpriority="high"` (homepage, pages, blog posts, blog listing)
 - Preconnect cdnjs + GTM/GA
+- `wp_get_attachment_image()` partout (width/height/srcset/sizes automatiques, 0 CLS)
 - Lazy loading sur toutes les images below-fold + photos temoignages
 - `<noscript>` fallback pour animations `.reveal` (cards, faq, stats, testimonials, team)
+- `prefers-reduced-motion` respecte : parallax, counter, marquee, stagger
 - Bloat WP supprime (block CSS, emoji, oEmbed, REST link, jquery-migrate)
 - `scroll-padding-top` pour offset header fixe sur ancres
 - Nav link underline animation CSS
-- Team members hover + stagger reveal animation
+- Media queries consolides (1 bloc 960px, 1 bloc 768px)
+- Marquee `will-change: transform` pour GPU compositing
 
 ## SEO
 
@@ -152,6 +166,7 @@ yv_render_stats($rows, $class)           // Grille de chiffres (counter animatio
 - BlogPosting avec wordCount, mainEntityOfPage, image fallback logo
 - FAQPage schema automatique sur pages avec section FAQ
 - BreadcrumbList sur toutes les pages sauf homepage
+- Gallery items avec aria-label
 
 ## Infos serveur
 

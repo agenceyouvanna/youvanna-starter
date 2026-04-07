@@ -8,8 +8,10 @@
             <?php endif; ?>
         </div>
         <div class="ti-image">
-            <?php $img = get_sub_field('image'); if ($img): ?>
-                <img src="<?php echo esc_url(($img['sizes']['large'] ?? $img['url'])); ?>" alt="<?php echo esc_attr(get_sub_field('title')); ?>" loading="lazy">
+            <?php $img = get_sub_field('image'); if ($img && !empty($img['ID'])): ?>
+                <?php echo wp_get_attachment_image($img['ID'], 'large', false, ['loading' => 'lazy', 'alt' => esc_attr(get_sub_field('title'))]); ?>
+            <?php elseif ($img): ?>
+                <img src="<?php echo esc_url($img['sizes']['large'] ?? $img['url']); ?>" alt="<?php echo esc_attr(get_sub_field('title')); ?>" loading="lazy">
             <?php endif; ?>
         </div>
     </div>

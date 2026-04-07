@@ -8,7 +8,7 @@ yv_render_hero([
 ]);
 ?>
 
-<?php if (get_the_content()): ?>
+<?php if (trim(wp_strip_all_tags(get_the_content()))): ?>
 <section class="section page-content-section">
     <div class="container">
         <?php the_content(); ?>

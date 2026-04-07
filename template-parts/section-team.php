@@ -1,13 +1,15 @@
 <section class="section team-section reveal">
     <div class="container">
-        <?php yv_section_header(get_sub_field('title'), get_sub_field('subtitle')); ?>
+        <?php yv_section_header(get_sub_field('title'), get_sub_field('subtitle'), get_sub_field('badge')); ?>
         <?php if (have_rows('members')): ?>
             <div class="grid grid-<?php echo intval(get_sub_field('columns') ?: 3); ?> team-grid">
                 <?php while (have_rows('members')): the_row();
                     $photo = get_sub_field('photo');
                 ?>
                     <div class="team-member">
-                        <?php if ($photo): ?>
+                        <?php if ($photo && !empty($photo['ID'])): ?>
+                            <?php echo wp_get_attachment_image($photo['ID'], 'card', false, ['loading' => 'lazy', 'alt' => esc_attr(get_sub_field('name'))]); ?>
+                        <?php elseif ($photo): ?>
                             <img src="<?php echo esc_url($photo['sizes']['card'] ?? $photo['url']); ?>" alt="<?php echo esc_attr(get_sub_field('name')); ?>" loading="lazy">
                         <?php endif; ?>
                         <div class="team-member-info">

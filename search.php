@@ -15,7 +15,7 @@ yv_render_hero([
                     <article class="card blog-card">
                         <a href="<?php the_permalink(); ?>" class="blog-card-link">
                             <?php if (has_post_thumbnail()): ?>
-                                <img src="<?php echo esc_url(get_the_post_thumbnail_url(null, 'card')); ?>" alt="<?php echo esc_attr(get_the_title()); ?>" loading="lazy">
+                                <?php echo get_the_post_thumbnail(null, 'card', ['loading' => 'lazy']); ?>
                             <?php endif; ?>
                             <div class="card-body">
                                 <div class="blog-card-meta">

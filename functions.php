@@ -1,6 +1,6 @@
 <?php
 /**
- * Youvanna Starter — functions.php v2.4.0
+ * Youvanna Starter — functions.php v2.5.0
  * Thème Youvanna avec SCF pour sites vitrines
  * Architecture propre, 0 duplication, full automatisable
  */
@@ -11,6 +11,7 @@ if (!defined('ABSPATH')) exit;
 // ============================================
 add_action('wp_enqueue_scripts', function() {
     wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css', [], '6.5.1');
+    // SRI integrity check added via style_loader_tag filter below
 
     wp_enqueue_style('youvanna-main', get_stylesheet_directory_uri() . '/assets/css/main.css', [], filemtime(get_stylesheet_directory() . '/assets/css/main.css'));
     wp_enqueue_script('youvanna-main', get_stylesheet_directory_uri() . '/assets/js/main.js', [], filemtime(get_stylesheet_directory() . '/assets/js/main.js'), true);
@@ -19,7 +20,8 @@ add_action('wp_enqueue_scripts', function() {
 // Make Font Awesome non-render-blocking (top-level filter, runs once)
 add_filter('style_loader_tag', function($html, $handle) {
     if ($handle === 'font-awesome') {
-        return str_replace("rel='stylesheet'", "rel='preload' as='style' onload=\"this.onload=null;this.rel='stylesheet'\"", $html) . '<noscript>' . $html . '</noscript>';
+        $html = str_replace("rel='stylesheet'", "rel='preload' as='style' onload=\"this.onload=null;this.rel='stylesheet'\" integrity='sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==' crossorigin='anonymous'", $html);
+        return $html . '<noscript>' . $html . '</noscript>';
     }
     return $html;
 }, 10, 2);
@@ -221,6 +223,20 @@ function yv_image($name, $size = 'large', $post_id = false) {
     if (!$img) return '';
     if (is_array($img)) return $img['sizes'][$size] ?? $img['url'];
     return wp_get_attachment_image_url($img, $size) ?: '';
+}
+
+/**
+ * Render une image SCF avec width/height/srcset/sizes automatiques
+ * Utilise wp_get_attachment_image() pour la performance (CLS, responsive)
+ */
+function yv_img($field_name, $size = 'large', $post_id = false, $attrs = []) {
+    if (!function_exists('get_field')) return '';
+    $img = get_field($field_name, $post_id);
+    if (!$img) return '';
+    $id = is_array($img) ? ($img['ID'] ?? 0) : (int) $img;
+    if (!$id) return '';
+    $defaults = ['loading' => 'lazy'];
+    return wp_get_attachment_image($id, $size, false, array_merge($defaults, $attrs));
 }
 
 /**
@@ -538,6 +554,7 @@ add_action('acf/include_fields', function() {
                 ['key' => 'yv_fl_cards', 'name' => 'cards', 'label' => 'Grille de cartes', 'sub_fields' => [
                     ['key' => 'yv_fl_c_t', 'label' => 'Titre section', 'name' => 'title', 'type' => 'text'],
                     ['key' => 'yv_fl_c_sub', 'label' => 'Sous-titre', 'name' => 'subtitle', 'type' => 'textarea', 'rows' => 2],
+                    ['key' => 'yv_fl_c_badge', 'label' => 'Badge (optionnel)', 'name' => 'badge', 'type' => 'text', 'instructions' => 'Petit texte au-dessus du titre, ex: Nos services'],
                     ['key' => 'yv_fl_c_cols', 'label' => 'Colonnes', 'name' => 'columns', 'type' => 'select', 'choices' => ['2' => '2', '3' => '3', '4' => '4'], 'default_value' => '3'],
                     ['key' => 'yv_fl_c_rpt', 'label' => 'Cartes', 'name' => 'cards', 'type' => 'repeater', 'layout' => 'block', 'sub_fields' => [
                         ['key' => 'yv_fl_c_img', 'label' => 'Image', 'name' => 'image', 'type' => 'image', 'return_format' => 'array'],
@@ -554,6 +571,7 @@ add_action('acf/include_fields', function() {
                 ]],
                 ['key' => 'yv_fl_testi', 'name' => 'testimonials', 'label' => 'Avis clients', 'sub_fields' => [
                     ['key' => 'yv_fl_testi_t', 'label' => 'Titre', 'name' => 'title', 'type' => 'text', 'default_value' => 'Témoignages'],
+                    ['key' => 'yv_fl_testi_badge', 'label' => 'Badge (optionnel)', 'name' => 'badge', 'type' => 'text'],
                     ['key' => 'yv_fl_testi_rpt', 'label' => 'Témoignages', 'name' => 'items', 'type' => 'repeater', 'layout' => 'block', 'sub_fields' => [
                         ['key' => 'yv_fl_testi_txt', 'label' => 'Texte', 'name' => 'text', 'type' => 'textarea', 'rows' => 3],
                         ['key' => 'yv_fl_testi_name', 'label' => 'Nom', 'name' => 'name', 'type' => 'text'],
@@ -564,6 +582,7 @@ add_action('acf/include_fields', function() {
                 ]],
                 ['key' => 'yv_fl_faq', 'name' => 'faq', 'label' => 'Questions fréquentes', 'sub_fields' => [
                     ['key' => 'yv_fl_faq_t', 'label' => 'Titre', 'name' => 'title', 'type' => 'text', 'default_value' => 'Questions fréquentes'],
+                    ['key' => 'yv_fl_faq_badge', 'label' => 'Badge (optionnel)', 'name' => 'badge', 'type' => 'text'],
                     ['key' => 'yv_fl_faq_rpt', 'label' => 'Questions', 'name' => 'items', 'type' => 'repeater', 'layout' => 'block', 'sub_fields' => [
                         ['key' => 'yv_fl_faq_q', 'label' => 'Question', 'name' => 'question', 'type' => 'text'],
                         ['key' => 'yv_fl_faq_a', 'label' => 'Réponse', 'name' => 'answer', 'type' => 'wysiwyg', 'media_upload' => 0, 'toolbar' => 'basic'],
@@ -571,6 +590,7 @@ add_action('acf/include_fields', function() {
                 ]],
                 ['key' => 'yv_fl_gallery', 'name' => 'gallery', 'label' => 'Galerie photos', 'sub_fields' => [
                     ['key' => 'yv_fl_gal_t', 'label' => 'Titre', 'name' => 'title', 'type' => 'text'],
+                    ['key' => 'yv_fl_gal_badge', 'label' => 'Badge (optionnel)', 'name' => 'badge', 'type' => 'text'],
                     ['key' => 'yv_fl_gal_cols', 'label' => 'Colonnes', 'name' => 'columns', 'type' => 'select', 'choices' => ['2' => '2', '3' => '3', '4' => '4'], 'default_value' => '3'],
                     ['key' => 'yv_fl_gal_imgs', 'label' => 'Images', 'name' => 'images', 'type' => 'gallery', 'return_format' => 'array', 'preview_size' => 'thumbnail'],
                 ]],
@@ -591,6 +611,7 @@ add_action('acf/include_fields', function() {
                 ['key' => 'yv_fl_team', 'name' => 'team', 'label' => 'Equipe', 'sub_fields' => [
                     ['key' => 'yv_fl_team_t', 'label' => 'Titre', 'name' => 'title', 'type' => 'text'],
                     ['key' => 'yv_fl_team_sub', 'label' => 'Sous-titre', 'name' => 'subtitle', 'type' => 'textarea', 'rows' => 2],
+                    ['key' => 'yv_fl_team_badge', 'label' => 'Badge (optionnel)', 'name' => 'badge', 'type' => 'text'],
                     ['key' => 'yv_fl_team_cols', 'label' => 'Colonnes', 'name' => 'columns', 'type' => 'select', 'choices' => ['3' => '3', '4' => '4'], 'default_value' => '3'],
                     ['key' => 'yv_fl_team_rpt', 'label' => 'Membres', 'name' => 'members', 'type' => 'repeater', 'layout' => 'block', 'sub_fields' => [
                         ['key' => 'yv_fl_team_photo', 'label' => 'Photo', 'name' => 'photo', 'type' => 'image', 'return_format' => 'array', 'preview_size' => 'thumbnail'],
@@ -601,6 +622,7 @@ add_action('acf/include_fields', function() {
                 ]],
                ['key' => 'yv_fl_numbers', 'name' => 'numbers', 'label' => 'Chiffres clés', 'sub_fields' => [
                     ['key' => 'yv_fl_num_t', 'label' => 'Titre', 'name' => 'title', 'type' => 'text'],
+                    ['key' => 'yv_fl_num_badge', 'label' => 'Badge (optionnel)', 'name' => 'badge', 'type' => 'text'],
                     ['key' => 'yv_fl_num_bg', 'label' => 'Couleur de fond', 'name' => 'bg_color', 'type' => 'select', 'choices' => ['light' => 'Clair', 'primary' => 'Couleur principale', 'dark' => 'Sombre'], 'default_value' => 'light'],
                     ['key' => 'yv_fl_num_rpt', 'label' => 'Chiffres', 'name' => 'items', 'type' => 'repeater', 'layout' => 'table', 'sub_fields' => [
                         ['key' => 'yv_fl_num_n', 'label' => 'Chiffre', 'name' => 'number', 'type' => 'text'],
@@ -844,6 +866,7 @@ add_action('wp_head', function() {
 // Noscript fallback: show content if JS disabled
 add_action('wp_head', function() {
     echo '<noscript><style>.reveal{opacity:1!important;transform:none!important}.reveal .card,.reveal .faq-item,.reveal .stat,.reveal .testimonial-card,.reveal .team-member{opacity:1!important;transform:none!important}</style></noscript>' . "\n";
+    echo '<style>@media(prefers-reduced-motion:reduce){.marquee-track{animation:none!important}.stat-number{transition:none!important}}</style>' . "\n";
 }, 2);
 
 // Preconnect CDN + GTM/GA
