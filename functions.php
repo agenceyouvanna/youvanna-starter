@@ -776,7 +776,7 @@ add_action('wp_head', function() {
     }
     // Opening hours
     $hours = yv_option('opening_hours');
-    if ($hours) $schema['openingHours'] = array_filter(array_map('trim', explode("\n", $hours)));
+    if ($hours) $schema['openingHours'] = array_values(array_filter(array_map('trim', explode("\n", $hours))));
     // Social profiles (sameAs)
     $same_as = [];
     foreach (['social_facebook','social_instagram','social_linkedin','social_youtube','social_tiktok'] as $key) {
@@ -798,7 +798,7 @@ add_action('wp_head', function() {
         'mainEntityOfPage' => ['@type' => 'WebPage', '@id' => get_permalink()],
         'datePublished' => get_the_date('c'),
         'dateModified' => get_the_modified_date('c'),
-        'author' => ['@type' => 'Person', 'name' => get_the_author()],
+        'author' => ['@type' => 'Person', 'name' => get_the_author() ?: get_bloginfo('name')],
         'publisher' => ['@type' => 'Organization', 'name' => get_bloginfo('name')],
         'description' => get_the_excerpt(),
     ];

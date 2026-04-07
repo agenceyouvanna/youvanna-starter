@@ -1,3 +1,4 @@
+<?php if (!get_sub_field('video_url')) return; ?>
 <section class="section video-section reveal">
     <div class="container container-narrow">
         <?php yv_section_header(get_sub_field('title')); ?>
@@ -22,7 +23,7 @@
             <?php else:
                 $oembed = wp_oembed_get($url);
                 if ($oembed): ?>
-                    <div class="video-wrapper"><?php echo $oembed; ?></div>
+                    <div class="video-wrapper"><?php echo wp_kses_post($oembed); ?></div>
                 <?php endif;
             endif;
         endif; ?>

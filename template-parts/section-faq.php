@@ -1,3 +1,4 @@
+<?php if (!have_rows('items')) return; ?>
 <section class="section faq-section reveal">
     <div class="container container-narrow">
         <?php yv_section_header(get_sub_field('title'), '', get_sub_field('badge')); ?>

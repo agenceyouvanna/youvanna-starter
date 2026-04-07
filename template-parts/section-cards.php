@@ -1,3 +1,4 @@
+<?php if (!have_rows('cards')) return; ?>
 <section class="section cards-section reveal">
     <div class="container">
         <?php yv_section_header(get_sub_field('title'), get_sub_field('subtitle'), get_sub_field('badge')); ?>

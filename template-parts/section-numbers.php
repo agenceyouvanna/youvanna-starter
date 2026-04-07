@@ -1,3 +1,4 @@
+<?php if (!have_rows('items')) return; ?>
 <?php $bg = get_sub_field('bg_color') ?: 'light'; ?>
 <section class="section numbers-section numbers-<?php echo esc_attr($bg); ?> reveal">
     <div class="container">

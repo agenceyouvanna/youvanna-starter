@@ -148,7 +148,7 @@ h6 { font-size: 0.9rem; }
 .nav-menu li.current-menu-item a { color: var(--color-primary); background: var(--color-primary-light); }
 .nav-cta { display: flex; align-items: center; gap: 16px; }
 .nav-phone { font-size: 14px; font-weight: 600; color: var(--color-text); }
-.nav-toggle { display: none; background: none; border: none; cursor: pointer; padding: 8px; }
+.nav-toggle { display: none; background: none; border: none; cursor: pointer; padding: 10px; min-width: 44px; min-height: 44px; }
 .nav-mobile-cta { display: none; }
 .nav-toggle span { display: block; width: 24px; height: 2px; background: var(--color-secondary); margin: 5px 0; transition: all var(--transition); transform-origin: center; }
 .nav-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
@@ -162,6 +162,7 @@ h6 { font-size: 0.9rem; }
     position: relative;
     display: flex; align-items: center; justify-content: center;
     text-align: center;
+    background-color: var(--color-secondary);
     background-size: cover; background-position: center;
     margin-top: var(--header-height);
 }
@@ -312,6 +313,7 @@ h6 { font-size: 0.9rem; }
 .cta-banner {
     position: relative; padding: 80px 24px;
     text-align: center;
+    background-color: var(--color-secondary);
     background-size: cover; background-position: center;
 }
 .cta-overlay {
@@ -490,6 +492,7 @@ h6 { font-size: 0.9rem; }
    ============================================ */
 @media (max-width: 960px) {
     .grid-2 { grid-template-columns: 1fr; }
+    .grid-4 { grid-template-columns: repeat(2, 1fr); }
     .nav-menu, .nav-cta { display: none; }
     .nav-toggle { display: block; }
     .nav-menu.active {
@@ -614,6 +617,7 @@ h6 { font-size: 0.9rem; }
     width: max-content;
     animation: marquee-scroll 40s linear infinite;
     padding: 8px 0;
+    will-change: transform;
 }
 .marquee-track[data-direction="right"] {
     animation-name: marquee-scroll-reverse;

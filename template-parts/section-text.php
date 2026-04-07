@@ -1,3 +1,4 @@
+<?php if (!get_sub_field('content')) return; ?>
 <?php $narrow = get_sub_field('narrow'); ?>
 <section class="section text-section reveal">
     <div class="container <?php echo $narrow ? 'container-narrow' : ''; ?>">
