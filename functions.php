@@ -877,6 +877,7 @@ add_action('wp_head', function() {
 // Open Graph & Twitter Card meta tags (skip if Yoast/RankMath handles it)
 add_action('wp_head', function() {
     if (defined('WPSEO_VERSION') || class_exists('RankMath')) return;
+    if (class_exists('YVL_Languages') && YVL_Languages::is_translated()) return; // Handled by Youvanna Languages plugin
     if (is_404()) return; // No OG on 404
     if (is_front_page()) {
         $title = get_bloginfo('name') . ' - ' . get_bloginfo('description');

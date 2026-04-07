@@ -239,6 +239,8 @@ Puis mettre a jour : `update_field('contact_form_id', $form_id, $contact_page_id
 - SCF (Secure Custom Fields - plugin officiel WordPress, fork gratuit d'ACF avec Repeater + Flex Content integres)
 - Contact Form 7
 - Yoast SEO (gere OG meta quand actif, sinon fallback auto dans functions.php)
+- Youvanna Languages (plugin inclus dans plugins/youvanna-languages/ — multilingue i18n)
+- Wordfence (securite — auto-config via `wp eval-file wordfence-autoconfig.php`)
 - Plugin youvanna-cookies (bandeau RGPD auto)
 
 ## Performance
@@ -277,6 +279,34 @@ Puis mettre a jour : `update_field('contact_form_id', $form_id, $contact_page_id
 - Gallery items avec aria-label
 - aria-current="page" sur les liens nav actifs
 - Testimonial stars avec aria-label + role="img"
+
+## Multilingue (Youvanna Languages)
+
+Plugin inclus dans `plugins/youvanna-languages/`. Apres activation :
+- Admin : Langues → Gerer les langues (ajouter/supprimer)
+- Admin : Langues → Traduire (page complete avec tous les champs par langue)
+- Admin : Langues → Exporter/Importer (JSON)
+- URLs : langue par defaut = pas de prefixe, secondaires = `/en/`, `/de/`, etc.
+- hreflang automatique, sitemap par langue, Yoast compatible
+- Traduit : titres, contenus, extraits, slugs, champs SCF, menus, options yv_*, Yoast meta
+- Sélecteur de langue flottant ou shortcode `[yvl_switcher]`
+- JSON export/import pour traduction via IA (skill)
+
+### Installation sur un nouveau site :
+```bash
+cp -r wp-content/themes/youvanna-starter/plugins/youvanna-languages wp-content/plugins/
+wp plugin activate youvanna-languages --allow-root
+wp rewrite flush --allow-root
+```
+
+## Wordfence (securite)
+
+Script auto-config inclus : `wordfence-autoconfig.php`
+```bash
+wp eval-file wp-content/themes/youvanna-starter/wordfence-autoconfig.php --allow-root
+```
+Configure automatiquement : firewall (learning mode 7j), brute force (5 tentatives), scanner, login security, XMLRPC protection.
+Etape manuelle restante : Wordfence → Firewall → "Optimize Wordfence Firewall" (necessite confirmation serveur).
 
 ## Infos serveur
 
