@@ -253,6 +253,10 @@ Puis mettre a jour : `update_field('contact_form_id', $form_id, $contact_page_id
 - Cache busting automatique via `filemtime()`
 - Font Awesome subsets async (fontawesome + solid + brands, preload + onload swap, ~50KB) + inline `font-display: swap` override (FA CDN uses `block` by default)
 - Google Fonts TOUJOURS avec `&display=swap` dans l'URL
+- WebP conversion automatique a l'upload (image_editor_output_format filter)
+- Compression images 82% (wp_editor_set_quality filter)
+- Big images cappees a 2560px (big_image_size_threshold filter)
+- Cache headers statiques : configures via Nginx (1 an, immutable) — voir SKILL etape 0b2
 - System font stack par defaut (0 requete font). Custom via @font-face + variables CSS
 - Hero LCP : vrai `<img class="hero-bg-img" fetchpriority="high">` avec `wp_get_attachment_image()` (srcset/sizes auto, pas de background-image)
 - CTA banners : meme pattern `<img class="hero-bg-img">` (lazy loaded)
