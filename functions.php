@@ -1046,15 +1046,33 @@ $yv_auto_setup = function() {
     if (!is_plugin_active('wp-super-cache/wp-cache.php')) {
         activate_plugin('wp-super-cache/wp-cache.php');
     }
-    // Enable caching
+    // Enable WP_CACHE in wp-config.php
+    $wp_config_path = ABSPATH . 'wp-config.php';
+    if (file_exists($wp_config_path)) {
+        $wpc = file_get_contents($wp_config_path);
+        if (strpos($wpc, "define('WP_CACHE'") === false && strpos($wpc, 'define("WP_CACHE"') === false) {
+            $wpc = str_replace("<?php", "<?php\ndefine('WP_CACHE', true);", $wpc);
+            file_put_contents($wp_config_path, $wpc);
+        }
+    }
+    // Create advanced-cache.php drop-in
+    $ac = WP_CONTENT_DIR . '/advanced-cache.php';
+    if (!file_exists($ac)) {
+        file_put_contents($ac, "<?php\nif (!defined('ABSPATH')) die();\nif (file_exists(WP_CONTENT_DIR.'/wp-cache-config.php')) include_once(WP_CONTENT_DIR.'/wp-cache-config.php');\nif (file_exists(WP_CONTENT_DIR.'/plugins/wp-super-cache/wp-cache-phase1.php')) include_once(WP_CONTENT_DIR.'/plugins/wp-super-cache/wp-cache-phase1.php');\n");
+    }
+    // Create wp-cache-config.php with sane defaults
     $cache_config = WP_CONTENT_DIR . '/wp-cache-config.php';
-    if (file_exists($cache_config)) {
+    if (!file_exists($cache_config)) {
+        $secret = bin2hex(random_bytes(16));
+        file_put_contents($cache_config, "<?php\n\$cache_enabled = true;\n\$super_cache_enabled = true;\n\$cache_compression = 0;\n\$cache_max_time = 86400;\n\$cache_path = WP_CONTENT_DIR . '/cache/';\n\$file_prefix = 'wp-cache-';\n\$wp_cache_mobile_enabled = 1;\n\$wp_super_cache_late_init = 0;\n\$wp_cache_clear_on_post_edit = 1;\n\$wp_cache_not_logged_in = 2;\n\$cache_rebuild_files = 1;\n\$wp_cache_mod_rewrite = 0;\n\$cache_page_secret = '{$secret}';\n");
+    } else {
         $c = file_get_contents($cache_config);
         if (strpos($c, '$cache_enabled = false') !== false) {
             file_put_contents($cache_config, str_replace('$cache_enabled = false', '$cache_enabled = true', $c));
         }
     }
     wp_mkdir_p(WP_CONTENT_DIR . '/cache/supercache');
+    wp_mkdir_p(WP_CONTENT_DIR . '/cache/wp_cache');
 
     // --- Wordfence ---
     if (!is_dir(WP_PLUGIN_DIR . '/wordfence')) {

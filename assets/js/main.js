@@ -65,6 +65,13 @@
         document.querySelectorAll('.reveal').forEach(function(el) {
             revealObs.observe(el);
         });
+
+        // Fallback: force-reveal all sections after 2.5s (improves Speed Index for Lighthouse/bots)
+        setTimeout(function() {
+            document.querySelectorAll('.reveal:not(.visible)').forEach(function(el) {
+                el.classList.add('visible');
+            });
+        }, 2500);
     }
 
     // ========== Counter animation for numbers ==========
