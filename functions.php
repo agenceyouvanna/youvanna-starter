@@ -935,6 +935,11 @@ add_action('wp_head', function() {
     echo '<noscript><style>.reveal{opacity:1!important;transform:none!important}.reveal .card,.reveal .faq-item,.reveal .stat,.reveal .testimonial-card,.reveal .team-member{opacity:1!important;transform:none!important}</style></noscript>' . "\n";
 }, 2);
 
+// Override Font Awesome font-display: block → swap (avoid FOIT, improve FCP)
+add_action('wp_head', function() {
+    echo '<style>@font-face{font-family:"Font Awesome 6 Free";font-display:swap}@font-face{font-family:"Font Awesome 6 Brands";font-display:swap}</style>' . "\n";
+}, 3);
+
 // Preconnect CDN + GTM/GA
 add_action('wp_head', function() {
     echo '<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>' . "\n";

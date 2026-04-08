@@ -23,6 +23,9 @@ Ce fichier est lu automatiquement par Claude Code. Il contient toutes les regles
 15. **OG Meta = automatique** - Open Graph + Twitter Card generes automatiquement si Yoast/RankMath n'est pas actif.
 16. **TOUJOURS utiliser wp_get_attachment_image()** - Pour les images SCF, utiliser `yv_img()` ou `wp_get_attachment_image($img['ID'])` au lieu de `<img src>` brut. Donne width/height/srcset/sizes automatiquement.
 17. **SCF, pas ACF** - On utilise SCF (Secure Custom Fields), le plugin officiel WordPress. C'est un fork gratuit d'ACF avec Repeater + Flex Content integres. L'API garde le prefixe `acf_` pour compatibilite, mais dans les commentaires et la doc on ecrit SCF.
+18. **TOUJOURS font-display: swap sur TOUTES les fonts** - Le theme override FA CDN (`font-display: block`) avec un inline `font-display: swap` dans `wp_head`. Google Fonts DOIT toujours inclure `&display=swap` dans l'URL. JAMAIS charger une font externe sans `font-display: swap` — ca bloque le FCP et casse les scores PageSpeed. Si un agent ou un dev ajoute une font sans swap, c'est un bug critique a corriger immediatement.
+19. **ACCENTS FRANÇAIS = NON NEGOCIABLE** - TOUS les textes visibles (titres, descriptions, meta titles Yoast, meta descriptions, alt texts, noms de categories, FAQ, boutons, labels menu) DOIVENT avoir les accents corrects : e, e, e, e, a, a, u, u, o, c, i, oe, ae. Ca inclut les rapports d'agents et le JSON SEO. "A propos" = FAUX, "A propos" = CORRECT. "Securite" = FAUX, "Securite" = CORRECT. Verifier CHAQUE output d'agent.
+20. **NE JAMAIS INVENTER = LOI ABSOLUE** - Aucun agent ne doit inventer de donnees : pas de faux avis, pas de faux chiffres, pas de fausses certifications, pas de faux partenariats. Les temoignages = Lorem Ipsum avec noms placeholder. Les stats = uniquement si verifiees. Les descriptions de services = basees sur le brief client. Toute invention detectee = bug critique a corriger immediatement.
 
 ---
 
@@ -248,7 +251,8 @@ Puis mettre a jour : `update_field('contact_form_id', $form_id, $contact_page_id
 ## Performance
 
 - Cache busting automatique via `filemtime()`
-- Font Awesome subsets async (fontawesome + solid + brands, preload + onload swap, ~50KB)
+- Font Awesome subsets async (fontawesome + solid + brands, preload + onload swap, ~50KB) + inline `font-display: swap` override (FA CDN uses `block` by default)
+- Google Fonts TOUJOURS avec `&display=swap` dans l'URL
 - System font stack par defaut (0 requete font). Custom via @font-face + variables CSS
 - Hero LCP : vrai `<img class="hero-bg-img" fetchpriority="high">` avec `wp_get_attachment_image()` (srcset/sizes auto, pas de background-image)
 - CTA banners : meme pattern `<img class="hero-bg-img">` (lazy loaded)
