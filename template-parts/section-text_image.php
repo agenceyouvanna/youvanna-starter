@@ -2,7 +2,7 @@
 <section class="section text-image-section <?php echo get_sub_field('image_position') === 'left' ? 'reverse' : ''; ?> reveal">
     <div class="container grid grid-2">
         <div class="ti-content">
-            <h2><?php echo esc_html(get_sub_field('title')); ?></h2>
+            <h2><?php echo wp_kses(get_sub_field('title'), ['mark' => []]); ?></h2>
             <div><?php echo wp_kses_post(get_sub_field('text')); ?></div>
             <?php $link = get_sub_field('link'); if ($link && is_array($link)): ?>
                 <a href="<?php echo esc_url($link['url']); ?>" class="btn btn-primary"><?php echo esc_html($link['title'] ?? 'En savoir plus'); ?></a>

@@ -297,7 +297,7 @@ function yv_render_hero($args = []) {
         <?php endif; ?>
         <div class="hero-overlay"></div>
         <div class="hero-content">
-            <h1><?php echo esc_html($a['title']); ?></h1>
+            <h1><?php echo wp_kses($a['title'], ['mark' => []]); ?></h1>
             <?php if ($a['subtitle']): ?>
                 <p class="hero-subtitle"><?php echo esc_html($a['subtitle']); ?></p>
             <?php endif; ?>
@@ -947,18 +947,23 @@ add_action('wp_head', function() {
 // ============================================
 // 10. AUTO-SETUP — Runs once after cloning to a new domain
 // ============================================
-// Detection: if Wordfence is NOT in wp-content/plugins, this is a fresh clone
-// (the demo has Wordfence installed — a clone only gets the theme, not plugins)
+// Hook into both admin_init (browser) and wp_loaded (WP-CLI)
 $yv_auto_setup = function() {
     static $ran = false;
     if ($ran) return;
 
-    // Already set up: Wordfence exists in plugins → not a fresh clone
-    if (is_dir(WP_PLUGIN_DIR . '/wordfence')) return;
-
     $is_cli = defined('WP_CLI') && WP_CLI;
     if (!$is_cli && !current_user_can('manage_options')) return;
     if (!$is_cli && !is_admin()) return;
+
+    $current_domain = parse_url(get_option('siteurl'), PHP_URL_HOST);
+    $setup_domain = get_option('yv_setup_domain', '');
+
+    // If domain matches, setup already ran for this site
+    if ($setup_domain === $current_domain) return;
+
+    // Mark as done FIRST to prevent re-entry
+    update_option('yv_setup_domain', $current_domain, true);
 
     // --- Youvanna Languages ---
     $yvl_source = get_stylesheet_directory() . '/plugins/youvanna-languages';
@@ -1050,11 +1055,10 @@ $yv_auto_setup = function() {
 
     // Plesk auto_prepend_file (requires root — works when admin visits after WP-CLI clone)
     $waf_path = realpath($waf);
-    $domain = parse_url(get_option('siteurl'), PHP_URL_HOST);
-    if ($domain && $waf_path) {
+    if ($current_domain && $waf_path) {
         $tmp = tempnam('/tmp', 'waf_');
         file_put_contents($tmp, 'auto_prepend_file = ' . $waf_path);
-        shell_exec('plesk bin site --update-php-settings ' . escapeshellarg($domain) . ' -additional-settings ' . escapeshellarg($tmp) . ' 2>&1');
+        shell_exec('plesk bin site --update-php-settings ' . escapeshellarg($current_domain) . ' -additional-settings ' . escapeshellarg($tmp) . ' 2>&1');
         @unlink($tmp);
     }
 
