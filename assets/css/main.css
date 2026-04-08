@@ -810,3 +810,4 @@ a:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; 
 .wpcf7 .wpcf7-mail-sent-ok, .wpcf7 .wpcf7-response-output.wpcf7-mail-sent-ok { border-color: #10b981; color: #065f46; background: #ecfdf5; }
 .wpcf7 .wpcf7-validation-errors { border-color: #ef4444; color: #991b1b; background: #fef2f2; }
 .wpcf7 label { display: block; font-size: 14px; font-weight: 600; color: var(--color-text); margin-bottom: 6px; }
+/* Webhook sync test — 2026-04-08T15:31:50Z */
