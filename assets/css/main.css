@@ -6,25 +6,28 @@
 
 /* --- DESIGN TOKENS (override per client) --- */
 :root {
-    /* Couleurs — modifier ICI pour changer tout le site */
-    --color-primary: #2563eb;
-    --color-primary-rgb: 37, 99, 235;  /* MÊME couleur en RGB — pour les rgba() */
-    --color-primary-dark: #1d4ed8;
+    /* Couleurs — SFSCMFCO palette */
+    --color-primary: #1b8cae;
+    --color-primary-rgb: 27, 140, 174;  /* MÊME couleur en RGB — pour les rgba() */
+    --color-primary-dark: #01496c;
     --color-primary-light: rgba(var(--color-primary-rgb), .08);
-    --color-secondary: #0f172a;
-    --color-secondary-rgb: 15, 23, 42;
-    --color-accent: #3b82f6;
+    --color-secondary: #070c19;
+    --color-secondary-rgb: 7, 12, 25;
+    --color-accent: #26b0d5;
     --color-text: #1e293b;
     --color-text-light: #64748b;
-    --color-bg: #ffffff;
+    --color-bg: #f4f4f4;
     --color-bg-alt: #f8fafc;
-    --color-border: #e2e8f0;
+    --color-border: #b8b7b7;
 
-    /* Typo — modifier ICI pour changer toutes les polices
-       Par défaut : system font stack (0 requête, rendu instantané)
-       Pour une police custom : ajouter @font-face AVANT :root, puis changer ces variables */
-    --font-heading: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    /* Couleurs additionnelles SFSCMFCO */
+    --color-highlight: #99dcea;
+    --color-red: #e94d33;
+    --color-turquoise: #19BECE;
+
+    /* Typo — Gotham & Apercu Pro (self-hosted) + Google fallbacks */
+    --font-heading: 'Gotham', 'Playfair Display', sans-serif;
+    --font-body: 'Apercu Pro', 'Lato', sans-serif;
 
     /* Layout */
     --max-width: 1200px;
@@ -56,7 +59,11 @@ body {
     line-height: 1.7;
     color: var(--color-text);
     background: var(--color-bg);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
+#main-content { flex: 1; }
 img { max-width: 100%; height: auto; display: block; }
 
 /* Skip link — accessibility */
@@ -153,7 +160,7 @@ h6 { font-size: 0.9rem; }
 .nav-menu li .sub-menu { position: absolute; top: 100%; left: 0; min-width: 240px; background: #fff; border-radius: var(--radius-md, 8px); box-shadow: 0 8px 24px rgba(0,0,0,.12); padding: 8px 0; list-style: none; opacity: 0; visibility: hidden; transform: translateY(8px); transition: all .2s ease; z-index: 100; }
 .nav-menu li:hover > .sub-menu { opacity: 1; visibility: visible; transform: translateY(0); }
 .nav-menu li .sub-menu li a { padding: 10px 20px; font-size: 13px; white-space: nowrap; border-radius: 0; }
-.nav-menu li .sub-menu li a::after { display: none; }
+.nav-menu li .sub-menu li:not(.menu-item-has-children) a::after { display: none; }
 .nav-menu li .sub-menu li a:hover { background: var(--color-primary-light, #f0f9ff); color: var(--color-primary); }
 /* Chevron dropdown indicator */
 .nav-menu li.menu-item-has-children > a { padding-right: 28px; } .nav-menu li.menu-item-has-children > a::after { content: ''; position: absolute; right: 10px; top: 50%; width: 5px; height: 5px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: translateY(-50%) rotate(45deg); background: none; left: auto; bottom: auto; }
@@ -549,6 +556,10 @@ h6 { font-size: 0.9rem; }
     .marquee-track .testimonial-card { min-width: 280px; max-width: 320px; }
     .marquee-track { gap: 16px; }
     .back-to-top { bottom: 20px; right: 20px; width: 40px; height: 40px; }
+    .page-hero { aspect-ratio: auto; min-height: 200px; padding: 48px 0; }
+    .page-hero .hero-content h1 { font-size: clamp(1.5rem, 6vw, 2rem); }
+    .hero { min-height: 60vh; }
+    .hero-bg-img { width: 100%; max-width: 100%; }
 }
 
 /* ============================================
@@ -811,3 +822,119 @@ a:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; 
 .wpcf7 .wpcf7-validation-errors { border-color: #ef4444; color: #991b1b; background: #fef2f2; }
 .wpcf7 label { display: block; font-size: 14px; font-weight: 600; color: var(--color-text); margin-bottom: 6px; }
 /* Webhook sync test — 2026-04-08T15:31:50Z */
+
+/* Card clickable — toute la carte est un lien */
+a.card-clickable {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+}
+a.card-clickable:hover { text-decoration: none; color: inherit; }
+a.card-clickable .card-link { color: var(--color-primary); }
+a.card-clickable:hover .card-link { color: var(--color-primary-dark); }
+
+/* Nested sub-menus — open to the right */
+.nav-menu li .sub-menu .sub-menu {
+    top: 0;
+    left: 100%;
+    transform: translateX(8px);
+    margin-top: -8px;
+}
+.nav-menu li .sub-menu li:hover > .sub-menu {
+    opacity: 1; visibility: visible; transform: translateX(0);
+}
+/* Chevron right for nested dropdown parent */
+.nav-menu .sub-menu li.menu-item-has-children > a::after {
+    display: block !important;
+    content: '';
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    width: 5px;
+    height: 5px;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: translateY(-50%) rotate(-45deg);
+    background: none;
+    left: auto;
+    bottom: auto;
+}
+/* Header items vertical alignment */
+.nav-menu > li > a {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    min-height: 60px;
+}
+
+/* ============================================
+   SFSCMFCO DESIGN ENHANCEMENTS
+   ============================================ */
+
+/* Hero — darker overlay for text readability */
+.hero-overlay { background: linear-gradient(135deg, rgba(1,73,108,0.85) 0%, rgba(27,140,174,0.7) 100%); }
+
+/* Section badges — SFSCMFCO teal style */
+.section-badge {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+    color: #fff;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 11px;
+    letter-spacing: 2px;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: inline-block;
+    margin-bottom: 16px;
+}
+
+/* Cards — refined hover with SFSCMFCO accent */
+.card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+.card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(27,140,174,0.15); }
+
+/* About section — gradient accent line */
+.about-content h2::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(to right, var(--color-primary), var(--color-accent));
+    margin-top: 16px;
+    border-radius: 2px;
+}
+
+/* Stats counter — SFSCMFCO color */
+.stat-number { 
+    font-family: var(--font-heading);
+    font-size: 2.5rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* CTA banner — better contrast */
+.cta-banner { position: relative; overflow: hidden; }
+.cta-overlay { background: linear-gradient(135deg, rgba(1,73,108,0.9), rgba(27,140,174,0.8)); }
+
+/* Section text_image — better layout */
+.text-image-section .container { gap: 48px; }
+
+/* Team members grid */
+.team-member { text-align: center; }
+.team-member img { border-radius: 50%; width: 120px; height: 120px; object-fit: cover; border: 3px solid var(--color-primary-light); }
+
+/* FAQ — refined accordion */
+.faq-item { border-left: 3px solid var(--color-primary); }
+.faq-item[open] { border-left-color: var(--color-accent); }
+
+/* Page hero — gradient overlay */
+.page-hero .hero-overlay {
+    background: linear-gradient(135deg, rgba(1,73,108,0.8) 0%, rgba(27,140,174,0.6) 100%);
+}
+
+/* Congress section on homepage */
+.congres-section .card img { height: 200px; object-fit: cover; }
+.videos-section .card img { height: 180px; object-fit: cover; }
