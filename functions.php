@@ -930,15 +930,34 @@ add_action('wp_head', function() {
 
 // Hero LCP: no preload needed — <img fetchpriority="high"> in yv_render_hero() handles discovery natively with srcset
 
+// ============================================
+// 9b. IMAGE OPTIMIZATION — WebP + quality + size cap
+// ============================================
+// Convert uploaded images to WebP (WordPress 5.8+ with GD/Imagick WebP support)
+add_filter('image_editor_output_format', function($formats) {
+    $formats['image/jpeg'] = 'image/webp';
+    $formats['image/png']  = 'image/webp';
+    return $formats;
+});
+// Compress images: 82% quality (good balance between size and visual quality)
+add_filter('wp_editor_set_quality', function() { return 82; });
+// Cap big images at 2560px (WordPress default, explicit for clarity)
+add_filter('big_image_size_threshold', function() { return 2560; });
+
 // Noscript fallback: show content if JS disabled
 add_action('wp_head', function() {
     echo '<noscript><style>.reveal{opacity:1!important;transform:none!important}.reveal .card,.reveal .faq-item,.reveal .stat,.reveal .testimonial-card,.reveal .team-member{opacity:1!important;transform:none!important}</style></noscript>' . "\n";
 }, 2);
 
-// Override Font Awesome font-display: block → swap (avoid FOIT, improve FCP)
+// Override Font Awesome font-display: block → swap with self-hosted woff2 (avoid FOIT, improve FCP)
+// Must be AFTER wp_print_styles (priority 8) so it overrides CDN @font-face declarations
 add_action('wp_head', function() {
-    echo '<style>@font-face{font-family:"Font Awesome 6 Free";font-display:swap}@font-face{font-family:"Font Awesome 6 Brands";font-display:swap}</style>' . "\n";
-}, 3);
+    $fonts_url = get_stylesheet_directory_uri() . '/assets/fonts';
+    echo '<style>'
+        . '@font-face{font-family:"Font Awesome 6 Free";font-style:normal;font-weight:900;font-display:swap;src:url(' . $fonts_url . '/fa-solid-900.woff2) format("woff2")}'
+        . '@font-face{font-family:"Font Awesome 6 Brands";font-style:normal;font-weight:400;font-display:swap;src:url(' . $fonts_url . '/fa-brands-400.woff2) format("woff2")}'
+        . '</style>' . "\n";
+}, 999);
 
 // Preconnect CDN + GTM/GA
 add_action('wp_head', function() {
