@@ -931,18 +931,9 @@ add_action('wp_head', function() {
 // Hero LCP: no preload needed — <img fetchpriority="high"> in yv_render_hero() handles discovery natively with srcset
 
 // ============================================
-// 9b. IMAGE OPTIMIZATION — WebP + quality + size cap
+// 9b. IMAGE OPTIMIZATION — Géré par mu-plugin webp-auto-convert.php
 // ============================================
-// Convert uploaded images to WebP (WordPress 5.8+ with GD/Imagick WebP support)
-add_filter('image_editor_output_format', function($formats) {
-    $formats['image/jpeg'] = 'image/webp';
-    $formats['image/png']  = 'image/webp';
-    return $formats;
-});
-// Compress images: 82% quality (good balance between size and visual quality)
-add_filter('wp_editor_set_quality', function() { return 82; });
-// Cap big images at 2560px (WordPress default, explicit for clarity)
-add_filter('big_image_size_threshold', function() { return 2560; });
+// WebP auto-convert, qualité 82%, cap 2560px → voir mu-plugins/webp-auto-convert.php
 
 // Noscript fallback: show content if JS disabled
 add_action('wp_head', function() {
