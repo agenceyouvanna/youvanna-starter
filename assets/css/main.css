@@ -572,7 +572,6 @@ a.card-clickable:hover { transform: translateY(-4px); box-shadow: var(--shadow-l
     }
     .marquee-track { animation: none !important; }
     .stat-number { transition: none !important; }
-    .image-frame::before { transform: translate(6px, 6px) !important; transition: none !important; }
 }
 
 /* ============================================
@@ -1042,21 +1041,8 @@ a.card-clickable:hover { box-shadow: var(--shadow-lg); border-color: transparent
     display: block;
     width: 100%;
     border-radius: 18px;
-    margin: 12px 18px 28px 12px;
     overflow: visible;
 }
-.image-frame::before {
-    content: '';
-    position: absolute;
-    inset: -12px;
-    border-radius: 22px;
-    border: 2px solid rgba(var(--color-accent-rgb), .35);
-    pointer-events: none;
-    z-index: 0;
-    transform: translate(12px, 12px);
-    transition: transform .7s cubic-bezier(.22,1,.36,1), border-color .4s ease;
-}
-.image-frame:hover::before { transform: translate(6px, 6px); border-color: rgba(var(--color-primary-rgb), .5); }
 .image-frame > img,
 .image-frame picture > img {
     position: relative;
@@ -1140,8 +1126,7 @@ a.card-clickable:hover { box-shadow: var(--shadow-lg); border-color: transparent
 .reveal.visible .image-stat-badge { opacity: 1; transform: translateY(0) scale(1); animation: yvFloatBob 4.2s ease-in-out infinite 1.3s; }
 
 @media (max-width: 768px) {
-    .image-frame { margin: 8px 10px 24px 8px; }
-    .image-frame::before { inset: -8px; transform: translate(6px, 6px); }
+    .image-frame { margin: 0 0 24px 0; }
     .image-stat-badge {
         right: 8px !important;
         left: auto !important;
