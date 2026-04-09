@@ -3,16 +3,21 @@
 <footer id="site-footer" role="contentinfo">
     <div class="footer-container">
         <div class="footer-brand">
-            <a href="<?php echo esc_url(home_url()); ?>" class="footer-logo">
+            <a href="<?php echo esc_url(home_url()); ?>" class="footer-logo" rel="home">
                 <?php
+                // IMPORTANT : ne JAMAIS utiliser the_custom_logo() ici - il genere son propre <a>
+                // imbrique dans le footer-logo anchor => HTML invalide, le browser auto-ferme
+                // et les regles CSS .footer-brand .footer-logo .custom-logo ne matchent plus
+                // (d'ou le logo qui s'affiche a taille naturelle). On extrait l'image directement.
                 $yv_footer_logo_id = (int) get_theme_mod('yv_footer_logo_id', 0);
+                if (!$yv_footer_logo_id) {
+                    $yv_footer_logo_id = (int) get_theme_mod('custom_logo');
+                }
                 if ($yv_footer_logo_id && wp_attachment_is_image($yv_footer_logo_id)):
                     echo wp_get_attachment_image($yv_footer_logo_id, 'full', false, [
                         'class' => 'custom-logo footer-custom-logo',
                         'alt'   => get_post_meta($yv_footer_logo_id, '_wp_attachment_image_alt', true) ?: get_bloginfo('name'),
                     ]);
-                elseif (has_custom_logo()):
-                    the_custom_logo();
                 else: ?>
                     <span><?php bloginfo('name'); ?></span>
                 <?php endif; ?>
