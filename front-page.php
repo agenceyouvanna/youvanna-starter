@@ -84,7 +84,7 @@ yv_render_hero([
                 <?php foreach (array_merge($testi_items, $testi_items) as $t): ?>
                     <div class="testimonial-card">
                         <div class="testimonial-stars" aria-label="<?php echo esc_attr($t['rating']); ?> sur 5" role="img"><?php for ($i = 0; $i < $t['rating']; $i++) echo '&#9733;'; ?></div>
-                        <blockquote><?php echo esc_html($t['text']); ?></blockquote>
+                        <blockquote><?php echo wp_kses_post($t['text']); ?></blockquote>
                         <div class="testimonial-author">
                             <?php if ($t['photo'] && !empty($t['photo']['ID'])): ?><?php echo wp_get_attachment_image($t['photo']['ID'], 'thumbnail', false, ['loading' => 'lazy', 'alt' => esc_attr($t['name'])]); ?><?php endif; ?>
                             <div><strong><?php echo esc_html($t['name']); ?></strong><?php if ($t['role']): ?><span><?php echo esc_html($t['role']); ?></span><?php endif; ?></div>
@@ -99,7 +99,7 @@ yv_render_hero([
                 <?php foreach ($testi_items as $t): ?>
                     <div class="testimonial-card">
                         <div class="testimonial-stars" aria-label="<?php echo esc_attr($t['rating']); ?> sur 5" role="img"><?php for ($i = 0; $i < $t['rating']; $i++) echo '&#9733;'; ?></div>
-                        <blockquote><?php echo esc_html($t['text']); ?></blockquote>
+                        <blockquote><?php echo wp_kses_post($t['text']); ?></blockquote>
                         <div class="testimonial-author">
                             <?php if ($t['photo'] && !empty($t['photo']['ID'])): ?><?php echo wp_get_attachment_image($t['photo']['ID'], 'thumbnail', false, ['loading' => 'lazy', 'alt' => esc_attr($t['name'])]); ?><?php endif; ?>
                             <div><strong><?php echo esc_html($t['name']); ?></strong><?php if ($t['role']): ?><span><?php echo esc_html($t['role']); ?></span><?php endif; ?></div>
@@ -121,7 +121,7 @@ yv_render_hero([
     <div class="cta-overlay"></div>
     <div class="cta-content">
         <h2><?php echo wp_kses(yv_field('cta_title', 'Prêt à démarrer ?'), ['mark' => []]); ?></h2>
-        <p><?php echo esc_html(yv_field('cta_text_home')); ?></p>
+        <div class="cta-text"><?php echo wp_kses_post(yv_field('cta_text_home')); ?></div>
         <a href="<?php echo esc_url(yv_field('cta_button_link', '/contact')); ?>" class="btn btn-primary"><?php echo esc_html(yv_field('cta_button_text', 'Contactez-nous')); ?></a>
     </div>
 </section>

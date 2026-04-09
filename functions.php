@@ -356,7 +356,9 @@ function yv_render_card($args = []) {
         <?php endif; ?>
         <div class="card-body">
             <h3><?php echo esc_html($a['title']); ?></h3>
-            <p><?php echo esc_html($a['text']); ?></p>
+            <?php if (!empty($a['text'])): ?>
+                <div class="card-text"><?php echo wp_kses_post(wpautop($a['text'])); ?></div>
+            <?php endif; ?>
             <?php if ($has_link): ?>
                 <span class="card-link"><?php echo esc_html($a['link']['title'] ?? 'En savoir plus'); ?> &rarr;</span>
             <?php endif; ?>

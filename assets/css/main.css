@@ -30,8 +30,9 @@
     --font-body: 'Apercu Pro', 'Lato', sans-serif;
 
     /* Layout */
-    --max-width: 1200px;
-    --max-width-narrow: 800px;
+    --max-width: 1320px;
+    --max-width-narrow: 860px;
+    --max-width-wide: 1440px;
     --radius: 12px;
     --radius-sm: 8px;
 
@@ -137,9 +138,9 @@ h6 { font-size: 0.9rem; }
 }
 #site-header.scrolled { box-shadow: var(--shadow); }
 .nav-container {
-    max-width: var(--max-width); margin: 0 auto;
+    max-width: var(--max-width-wide); margin: 0 auto;
     display: flex; align-items: center; justify-content: space-between;
-    padding: 0 24px; height: var(--header-height);
+    padding: 0 32px; height: var(--header-height);
 }
 .nav-logo img, .nav-logo .custom-logo { height: 48px; width: auto; }
 .nav-logo .site-name { font-size: 1.4rem; font-weight: 800; color: var(--color-secondary); }
