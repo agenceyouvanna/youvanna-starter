@@ -4,7 +4,16 @@
     <div class="footer-container">
         <div class="footer-brand">
             <a href="<?php echo esc_url(home_url()); ?>" class="footer-logo">
-                <?php if (has_custom_logo()): the_custom_logo(); else: ?>
+                <?php
+                $yv_footer_logo_id = (int) get_theme_mod('yv_footer_logo_id', 0);
+                if ($yv_footer_logo_id && wp_attachment_is_image($yv_footer_logo_id)):
+                    echo wp_get_attachment_image($yv_footer_logo_id, 'full', false, [
+                        'class' => 'custom-logo footer-custom-logo',
+                        'alt'   => get_post_meta($yv_footer_logo_id, '_wp_attachment_image_alt', true) ?: get_bloginfo('name'),
+                    ]);
+                elseif (has_custom_logo()):
+                    the_custom_logo();
+                else: ?>
                     <span><?php bloginfo('name'); ?></span>
                 <?php endif; ?>
             </a>
