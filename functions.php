@@ -626,6 +626,9 @@ add_action('acf/include_fields', function() {
                     ['key' => 'yv_fl_ti_img', 'label' => 'Image', 'name' => 'image', 'type' => 'image', 'return_format' => 'array'],
                     ['key' => 'yv_fl_ti_pos', 'label' => 'Position image', 'name' => 'image_position', 'type' => 'select', 'choices' => ['right' => 'Droite', 'left' => 'Gauche']],
                     ['key' => 'yv_fl_ti_lnk', 'label' => 'Bouton', 'name' => 'link', 'type' => 'link'],
+                    ['key' => 'yv_fl_ti_bn', 'label' => 'Badge - Chiffre', 'name' => 'badge_number', 'type' => 'text', 'instructions' => 'Ex: 20+ / 100% / 50+. Laisser vide pour pas de badge.'],
+                    ['key' => 'yv_fl_ti_bl', 'label' => 'Badge - Label', 'name' => 'badge_label', 'type' => 'text', 'instructions' => 'Ex: ans d\'expertise'],
+                    ['key' => 'yv_fl_ti_bi', 'label' => 'Badge - Icône', 'name' => 'badge_icon', 'type' => 'text', 'instructions' => 'Classe Font Awesome, ex: fa-solid fa-medal', 'default_value' => 'fa-solid fa-medal'],
                 ]],
                 ['key' => 'yv_fl_cards', 'name' => 'cards', 'label' => 'Grille de cartes', 'sub_fields' => [
                     ['key' => 'yv_fl_c_t', 'label' => 'Titre section', 'name' => 'title', 'type' => 'text'],

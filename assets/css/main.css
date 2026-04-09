@@ -215,6 +215,11 @@ h6 { font-size: 0.9rem; font-weight: 700; }
     width: 100%; height: 100%;
     object-fit: cover; object-position: center;
     z-index: 0;
+    /* Initial scale matches the JS parallax transform to avoid jump on first scroll */
+    transform: translateY(0) scale(1.1);
+    transform-origin: center center;
+    will-change: transform;
+    backface-visibility: hidden;
 }
 .hero-overlay {
     position: absolute; inset: 0; z-index: 1;
@@ -558,13 +563,16 @@ a.card-clickable:hover { transform: translateY(-4px); box-shadow: var(--shadow-l
     html { scroll-behavior: auto; }
     .reveal, .reveal .card, .reveal .faq-item, .reveal .stat, .reveal .testimonial-card, .reveal .team-member,
     .reveal .card-minimal, .reveal .card-steps,
-    .reveal .about-image img, .reveal .ti-image img, .reveal.text-image-section img {
+    .reveal .about-image img, .reveal .ti-image img, .reveal.text-image-section img,
+    .reveal .image-stat-badge, .reveal.visible .image-stat-badge {
         opacity: 1 !important;
         transform: none !important;
         transition: none !important;
+        animation: none !important;
     }
     .marquee-track { animation: none !important; }
     .stat-number { transition: none !important; }
+    .image-frame::before { transform: translate(6px, 6px) !important; transition: none !important; }
 }
 
 /* ============================================
@@ -1017,7 +1025,7 @@ a.card-clickable:hover { box-shadow: var(--shadow-lg); border-color: transparent
 }
 
 /* About / Text+Image — upgraded styling */
-.about-image, .ti-image { border-radius: 16px; }
+.about-image, .ti-image { border-radius: 16px; position: relative; }
 .about-image img, .ti-image img {
     border-radius: 16px;
     box-shadow: 0 20px 60px rgba(0,0,0,.12);
@@ -1025,6 +1033,126 @@ a.card-clickable:hover { box-shadow: var(--shadow-lg); border-color: transparent
 }
 .about-content h2, .ti-content h2 { font-size: clamp(1.5rem, 3vw, 2rem); }
 .about-content p, .ti-content p { font-size: 16px; line-height: 1.8; }
+
+/* ============================================
+   IMAGE FRAME + FLOATING STAT BADGES — Framer style
+   ============================================ */
+.image-frame {
+    position: relative;
+    display: block;
+    width: 100%;
+    border-radius: 18px;
+    margin: 12px 18px 28px 12px;
+}
+.image-frame::before {
+    content: '';
+    position: absolute;
+    inset: -12px;
+    border-radius: 22px;
+    border: 2px solid rgba(var(--color-accent-rgb), .35);
+    pointer-events: none;
+    z-index: 0;
+    transform: translate(12px, 12px);
+    transition: transform .7s cubic-bezier(.22,1,.36,1), border-color .4s ease;
+}
+.image-frame:hover::before { transform: translate(6px, 6px); border-color: rgba(var(--color-primary-rgb), .5); }
+.image-frame > img,
+.image-frame picture > img {
+    position: relative;
+    z-index: 1;
+    border-radius: 18px;
+    width: 100%;
+    display: block;
+}
+
+/* Floating stat badge overlay */
+.image-stat-badge {
+    position: absolute;
+    bottom: -22px;
+    right: -18px;
+    background: #fff;
+    border-radius: 14px;
+    padding: 14px 20px;
+    box-shadow: 0 18px 40px -14px rgba(15,23,42,.25), 0 6px 16px -8px rgba(15,23,42,.15);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    z-index: 2;
+    min-width: 170px;
+    animation: yvFloatBob 4.2s ease-in-out infinite;
+    transition: transform .4s cubic-bezier(.22,1,.36,1), box-shadow .4s ease;
+}
+.image-stat-badge:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 24px 48px -14px rgba(15,23,42,.30), 0 10px 20px -8px rgba(15,23,42,.18);
+}
+.image-stat-badge.is-top-left    { top: -22px; left: -18px; bottom: auto; right: auto; animation-delay: -2s; }
+.image-stat-badge.is-top-right   { top: -22px; right: -18px; bottom: auto; left: auto; animation-delay: -1s; }
+.image-stat-badge.is-bottom-left { bottom: -22px; left: -18px; top: auto; right: auto; animation-delay: -3s; }
+.image-stat-badge.is-bottom-right{ bottom: -22px; right: -18px; top: auto; left: auto; }
+
+.image-stat-badge__icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1.1rem;
+    background: var(--gradient-brand);
+    flex-shrink: 0;
+    box-shadow: 0 6px 14px -6px rgba(var(--color-primary-rgb), .5);
+}
+.image-stat-badge__text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+}
+.image-stat-badge__number {
+    font-size: 1.7rem;
+    font-weight: 800;
+    letter-spacing: -.02em;
+    background: var(--gradient-brand);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    white-space: nowrap;
+}
+.image-stat-badge__label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-text-light, #64748b);
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    margin-top: 4px;
+    white-space: nowrap;
+}
+
+@keyframes yvFloatBob {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-6px); }
+}
+
+/* Entry animation: badge comes in after image reveals */
+.reveal .image-stat-badge { opacity: 0; transform: translateY(20px) scale(.9); transition: opacity .8s cubic-bezier(.22,1,.36,1), transform .8s cubic-bezier(.22,1,.36,1); transition-delay: .5s; animation: none; }
+.reveal.visible .image-stat-badge { opacity: 1; transform: translateY(0) scale(1); animation: yvFloatBob 4.2s ease-in-out infinite 1.3s; }
+
+@media (max-width: 768px) {
+    .image-frame { margin: 8px 10px 24px 8px; }
+    .image-frame::before { inset: -8px; transform: translate(6px, 6px); }
+    .image-stat-badge {
+        right: 8px !important;
+        left: auto !important;
+        top: auto !important;
+        bottom: 8px !important;
+        min-width: 140px;
+        padding: 10px 14px;
+    }
+    .image-stat-badge__number { font-size: 1.35rem; }
+    .image-stat-badge__icon { width: 36px; height: 36px; font-size: 1rem; border-radius: 10px; }
+    .image-stat-badge__label { font-size: 10px; }
+}
 
 /* Stats — bigger numbers, cleaner look */
 .stat { padding: 32px 20px; border-radius: 16px; }

@@ -150,6 +150,23 @@
     var parallaxEls = document.querySelectorAll('.hero, .page-hero, .cta-banner');
     var enableParallax = parallaxEls.length && !prefersReducedMotion;
 
+    // Apply parallax transform immediately to avoid first-scroll jump
+    function applyParallax(scrollY) {
+        parallaxEls.forEach(function(el) {
+            var rect = el.getBoundingClientRect();
+            var elTop = rect.top + scrollY;
+            var elHeight = rect.height;
+            if (scrollY + window.innerHeight > elTop && scrollY < elTop + elHeight) {
+                var offset = (scrollY - elTop) * 0.15;
+                var img = el.querySelector('.hero-bg-img');
+                if (img) {
+                    img.style.transform = 'translateY(' + offset + 'px) scale(1.1)';
+                }
+            }
+        });
+    }
+    if (enableParallax) applyParallax(window.scrollY);
+
     // ========== Smooth scroll for anchor links ==========
     document.querySelectorAll('a[href^="#"]').forEach(function(a) {
         a.addEventListener('click', function(e) {
@@ -184,20 +201,7 @@
                 // Back to top visibility
                 if (backToTop) backToTop.classList.toggle('visible', scrollY > 400);
                 // Parallax (transform on .hero-bg-img for GPU compositing)
-                if (enableParallax) {
-                    parallaxEls.forEach(function(el) {
-                        var rect = el.getBoundingClientRect();
-                        var elTop = rect.top + scrollY;
-                        var elHeight = rect.height;
-                        if (scrollY + window.innerHeight > elTop && scrollY < elTop + elHeight) {
-                            var offset = (scrollY - elTop) * 0.15;
-                            var img = el.querySelector('.hero-bg-img');
-                            if (img) {
-                                img.style.transform = 'translateY(' + offset + 'px) scale(1.1)';
-                            }
-                        }
-                    });
-                }
+                if (enableParallax) applyParallax(scrollY);
                 scrollTicking = false;
             });
             scrollTicking = true;

@@ -50,8 +50,18 @@ yv_render_hero([
 <?php if (yv_field('about_title') || yv_field('about_text')): ?>
 <section class="section about-section reveal">
     <div class="container grid grid-2">
-        <div class="about-image">
+        <div class="about-image image-frame">
             <?php echo yv_img('about_image', 'large', false, ['alt' => esc_attr(yv_field('about_title'))]); ?>
+            <?php $badge_num = yv_field('about_badge_number'); if ($badge_num): ?>
+                <div class="image-stat-badge is-bottom-right">
+                    <?php $badge_ico = yv_field('about_badge_icon', 'fa-solid fa-medal'); ?>
+                    <div class="image-stat-badge__icon"><i class="<?php echo esc_attr($badge_ico); ?>"></i></div>
+                    <div class="image-stat-badge__text">
+                        <span class="image-stat-badge__number stat-number"><?php echo esc_html($badge_num); ?></span>
+                        <span class="image-stat-badge__label"><?php echo esc_html(yv_field('about_badge_label', '')); ?></span>
+                    </div>
+                </div>
+            <?php endif; ?>
         </div>
         <div class="about-content">
             <h2><?php echo yv_format_title(yv_field('about_title', 'À propos')); ?></h2>
