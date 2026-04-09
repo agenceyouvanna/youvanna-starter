@@ -297,7 +297,7 @@ function yv_render_hero($args = []) {
         <?php endif; ?>
         <div class="hero-overlay"></div>
         <div class="hero-content">
-            <h1><?php echo wp_kses($a['title'], ['mark' => []]); ?></h1>
+            <h1><?php echo esc_html($a['title']); ?></h1>
             <?php if ($a['subtitle']): ?>
                 <p class="hero-subtitle"><?php echo esc_html($a['subtitle']); ?></p>
             <?php endif; ?>
@@ -321,8 +321,7 @@ function yv_section_header($title, $subtitle = '', $badge = '') {
     if ($badge) {
         echo '<span class="section-badge">' . esc_html($badge) . '</span>';
     }
-    // Allow <mark> tag in title for color highlight
-    echo '<h2 class="section-title">' . wp_kses($title, ['mark' => []]) . '</h2>';
+    echo '<h2 class="section-title">' . esc_html($title) . '</h2>';
     if ($subtitle) {
         echo '<p class="section-subtitle">' . esc_html($subtitle) . '</p>';
     }
@@ -340,8 +339,14 @@ function yv_render_card($args = []) {
         'text' => '',
         'link' => null,
     ]);
+    $has_link = $a['link'] && is_array($a['link']) && !empty($a['link']['url']);
+    $target = ($has_link && !empty($a['link']['target'])) ? ' target="' . esc_attr($a['link']['target']) . '"' : '';
     ?>
-    <div class="card">
+    <?php if ($has_link): ?>
+        <a href="<?php echo esc_url($a['link']['url']); ?>" class="card card-clickable"<?php echo $target; ?>>
+    <?php else: ?>
+        <div class="card">
+    <?php endif; ?>
         <?php if ($a['image_id']): ?>
             <?php echo wp_get_attachment_image($a['image_id'], 'card', false, ['loading' => 'lazy', 'alt' => esc_attr($a['title'])]); ?>
         <?php elseif ($a['image']): ?>
@@ -352,11 +357,15 @@ function yv_render_card($args = []) {
         <div class="card-body">
             <h3><?php echo esc_html($a['title']); ?></h3>
             <p><?php echo esc_html($a['text']); ?></p>
-            <?php if ($a['link'] && is_array($a['link'])): ?>
-                <a href="<?php echo esc_url($a['link']['url']); ?>" class="card-link"><?php echo esc_html($a['link']['title'] ?? 'En savoir plus'); ?> &rarr;</a>
+            <?php if ($has_link): ?>
+                <span class="card-link"><?php echo esc_html($a['link']['title'] ?? 'En savoir plus'); ?> &rarr;</span>
             <?php endif; ?>
         </div>
-    </div>
+    <?php if ($has_link): ?>
+        </a>
+    <?php else: ?>
+        </div>
+    <?php endif; ?>
     <?php
 }
 
