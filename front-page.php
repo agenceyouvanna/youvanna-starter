@@ -75,6 +75,13 @@ yv_render_hero([
 </section>
 <?php endif; ?>
 
+<!-- FLEXIBLE SECTIONS (home extras — zones, marques, FAQ, etc) -->
+<?php if (function_exists('have_rows') && have_rows('sections')): ?>
+    <?php while (have_rows('sections')): the_row(); ?>
+        <?php get_template_part('template-parts/section', get_row_layout()); ?>
+    <?php endwhile; ?>
+<?php endif; ?>
+
 <!-- TESTIMONIALS — marquee horizontal -->
 <?php if (function_exists('have_rows') && have_rows('testimonials')):
     $testi_items = [];

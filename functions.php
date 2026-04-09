@@ -730,9 +730,11 @@ add_action('acf/include_fields', function() {
                 ], 'instructions' => 'Affiche automatiquement tous les partenaires d\'une catégorie (ex: Diamant, Or, Institutionnels). Assigner la catégorie au partenaire dans son CPT pour qu\'il apparaisse ici.'],
             ]],
         ],
+        // Available on all pages including the front page, so the home can be
+        // extended with extra SEO sections (zones, marques, FAQ...) without
+        // touching the theme.
         'location' => [[
             ['param' => 'post_type', 'operator' => '==', 'value' => 'page'],
-            ['param' => 'page_type', 'operator' => '!=', 'value' => 'front_page'],
         ]],
     ]);
 
