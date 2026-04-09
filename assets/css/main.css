@@ -572,6 +572,8 @@ a.card-clickable:hover { transform: translateY(-4px); box-shadow: var(--shadow-l
     }
     .marquee-track { animation: none !important; }
     .stat-number { transition: none !important; }
+    .image-frame::before { transform: translate(10px, 10px) !important; transition: none !important; }
+    .image-frame.is-right::before { transform: translate(-10px, 10px) !important; }
 }
 
 /* ============================================
@@ -1039,9 +1041,26 @@ a.card-clickable:hover { box-shadow: var(--shadow-lg); border-color: transparent
 .image-frame {
     position: relative;
     display: block;
-    width: 100%;
+    width: calc(100% - 22px);
+    max-width: calc(100% - 22px);
+    margin: 0 22px 26px 0;
     border-radius: 18px;
     overflow: visible;
+}
+.image-frame::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 18px;
+    border: 2px solid rgba(var(--color-accent-rgb), .4);
+    pointer-events: none;
+    z-index: 0;
+    transform: translate(14px, 14px);
+    transition: transform .7s cubic-bezier(.22,1,.36,1), border-color .4s ease;
+}
+.image-frame:hover::before {
+    transform: translate(8px, 8px);
+    border-color: rgba(var(--color-primary-rgb), .55);
 }
 .image-frame > img,
 .image-frame picture > img {
@@ -1050,6 +1069,17 @@ a.card-clickable:hover { box-shadow: var(--shadow-lg); border-color: transparent
     border-radius: 18px;
     width: 100%;
     display: block;
+}
+/* When image is in the right column of a grid: flip offset to the left so
+   the decorative border stays in the gutter, not on top of the text. */
+.image-frame.is-right {
+    margin: 0 0 26px 22px;
+}
+.image-frame.is-right::before {
+    transform: translate(-14px, 14px);
+}
+.image-frame.is-right:hover::before {
+    transform: translate(-8px, 8px);
 }
 
 /* Floating stat badge overlay */
@@ -1126,7 +1156,13 @@ a.card-clickable:hover { box-shadow: var(--shadow-lg); border-color: transparent
 .reveal.visible .image-stat-badge { opacity: 1; transform: translateY(0) scale(1); animation: yvFloatBob 4.2s ease-in-out infinite 1.3s; }
 
 @media (max-width: 768px) {
-    .image-frame { margin: 0 0 24px 0; }
+    .image-frame, .image-frame.is-right {
+        width: 100%;
+        max-width: 100%;
+        margin: 0 0 24px 0;
+    }
+    .image-frame::before { transform: translate(10px, 10px); }
+    .image-frame.is-right::before { transform: translate(-10px, 10px); }
     .image-stat-badge {
         right: 8px !important;
         left: auto !important;

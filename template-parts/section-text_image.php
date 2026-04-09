@@ -1,5 +1,6 @@
 <?php if (!get_sub_field('title') && !get_sub_field('text')) return; ?>
-<section class="section text-image-section <?php echo get_sub_field('image_position') === 'left' ? 'reverse' : ''; ?> reveal">
+<?php $ti_img_pos = get_sub_field('image_position'); $ti_is_right = $ti_img_pos !== 'left'; ?>
+<section class="section text-image-section <?php echo !$ti_is_right ? 'reverse' : ''; ?> reveal">
     <div class="container grid grid-2">
         <div class="ti-content">
             <h2><?php echo yv_format_title(get_sub_field('title')); ?></h2>
@@ -8,7 +9,7 @@
                 <a href="<?php echo esc_url($link['url']); ?>" class="btn btn-primary"><?php echo esc_html($link['title'] ?? 'En savoir plus'); ?></a>
             <?php endif; ?>
         </div>
-        <div class="ti-image image-frame">
+        <div class="ti-image image-frame<?php echo $ti_is_right ? ' is-right' : ''; ?>">
             <?php $img = get_sub_field('image'); if ($img && !empty($img['ID'])): ?>
                 <?php echo wp_get_attachment_image($img['ID'], 'large', false, ['loading' => 'lazy', 'alt' => esc_attr(get_sub_field('title'))]); ?>
             <?php elseif ($img): ?>
