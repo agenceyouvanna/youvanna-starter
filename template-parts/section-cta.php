@@ -6,7 +6,7 @@
     <?php endif; ?>
     <div class="cta-overlay"></div>
     <div class="cta-content">
-        <h2><?php echo esc_html(get_sub_field('title')); ?></h2>
+        <h2><?php echo yv_format_title(get_sub_field('title')); ?></h2>
         <div class="cta-text"><?php echo wp_kses_post(get_sub_field('text')); ?></div>
         <?php $link = get_sub_field('button'); if ($link && is_array($link)): ?>
             <a href="<?php echo esc_url($link['url']); ?>" class="btn btn-primary"><?php echo esc_html($link['title'] ?? 'En savoir plus'); ?></a>

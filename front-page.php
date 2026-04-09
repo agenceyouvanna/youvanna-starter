@@ -54,7 +54,7 @@ yv_render_hero([
             <?php echo yv_img('about_image', 'large', false, ['alt' => esc_attr(yv_field('about_title'))]); ?>
         </div>
         <div class="about-content">
-            <h2><?php echo esc_html(yv_field('about_title', 'À propos')); ?></h2>
+            <h2><?php echo yv_format_title(yv_field('about_title', 'À propos')); ?></h2>
             <div><?php echo wp_kses_post(yv_field('about_text')); ?></div>
             <?php $btn = function_exists('get_field') ? get_field('about_button') : null; if (is_array($btn) && !empty($btn['url'])): ?>
                 <a href="<?php echo esc_url($btn['url']); ?>" class="btn btn-primary"><?php echo esc_html($btn['title'] ?? 'En savoir plus'); ?></a>
@@ -125,7 +125,7 @@ yv_render_hero([
     <?php endif; ?>
     <div class="cta-overlay"></div>
     <div class="cta-content">
-        <h2><?php echo wp_kses(yv_field('cta_title', 'Prêt à démarrer ?'), ['mark' => []]); ?></h2>
+        <h2><?php echo yv_format_title(yv_field('cta_title', 'Prêt à démarrer ?')); ?></h2>
         <div class="cta-text"><?php echo wp_kses_post(yv_field('cta_text_home')); ?></div>
         <a href="<?php echo esc_url(yv_field('cta_button_link', '/contact')); ?>" class="btn btn-primary"><?php echo esc_html(yv_field('cta_button_text', 'Contactez-nous')); ?></a>
     </div>

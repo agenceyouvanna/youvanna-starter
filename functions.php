@@ -10,6 +10,9 @@ if (!defined('ABSPATH')) exit;
 // 1. ASSETS — CSS & JS
 // ============================================
 add_action('wp_enqueue_scripts', function() {
+    // Google Fonts — Inter (display=swap, preconnect via wp_resource_hints)
+    wp_enqueue_style('youvanna-fonts', 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap', [], null);
+
     // FA subsets only (solid + brands) — ~50KB vs 300KB for all.min.css
     wp_enqueue_style('fa-fontfaces', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/fontawesome.min.css', [], '6.5.1');
     wp_enqueue_style('fa-solid', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/solid.min.css', ['fa-fontfaces'], '6.5.1');
@@ -20,6 +23,15 @@ add_action('wp_enqueue_scripts', function() {
     wp_enqueue_style('youvanna-main', get_stylesheet_directory_uri() . '/assets/css/main.css', [], file_exists($css) ? filemtime($css) : '2.6.0');
     wp_enqueue_script('youvanna-main', get_stylesheet_directory_uri() . '/assets/js/main.js', [], file_exists($js) ? filemtime($js) : '2.6.0', true);
 });
+
+// Preconnect to Google Fonts for faster loading
+add_filter('wp_resource_hints', function($hints, $type) {
+    if ($type === 'preconnect') {
+        $hints[] = ['href' => 'https://fonts.gstatic.com', 'crossorigin' => 'anonymous'];
+        $hints[] = 'https://fonts.googleapis.com';
+    }
+    return $hints;
+}, 10, 2);
 
 // Make Font Awesome non-render-blocking (preload + swap for all FA subsets)
 add_filter('style_loader_tag', function($html, $handle) {
@@ -297,7 +309,7 @@ function yv_render_hero($args = []) {
         <?php endif; ?>
         <div class="hero-overlay"></div>
         <div class="hero-content">
-            <h1><?php echo esc_html($a['title']); ?></h1>
+            <h1><?php echo yv_format_title($a['title']); ?></h1>
             <?php if ($a['subtitle']): ?>
                 <p class="hero-subtitle"><?php echo wp_kses_post($a['subtitle']); ?></p>
             <?php endif; ?>
@@ -314,6 +326,16 @@ function yv_render_hero($args = []) {
 }
 
 /**
+ * Formate un titre : autorise uniquement <span class="highlight"> pour les mots colorés
+ */
+function yv_format_title($title) {
+    return wp_kses($title, [
+        'span' => ['class' => true],
+        'br'   => [],
+    ]);
+}
+
+/**
  * Render section title + subtitle (réutilisé partout)
  */
 function yv_section_header($title, $subtitle = '', $badge = '') {
@@ -321,7 +343,7 @@ function yv_section_header($title, $subtitle = '', $badge = '') {
     if ($badge) {
         echo '<span class="section-badge">' . esc_html($badge) . '</span>';
     }
-    echo '<h2 class="section-title">' . esc_html($title) . '</h2>';
+    echo '<h2 class="section-title">' . yv_format_title($title) . '</h2>';
     if ($subtitle) {
         echo '<p class="section-subtitle">' . esc_html($subtitle) . '</p>';
     }
