@@ -681,6 +681,19 @@ add_action('acf/include_fields', function() {
                         ['key' => 'yv_fl_num_l', 'label' => 'Label', 'name' => 'label', 'type' => 'text'],
                     ]],
                 ]],
+                ['key' => 'yv_fl_pg', 'name' => 'partners_grid', 'label' => 'Grille partenaires (auto CPT)', 'sub_fields' => [
+                    ['key' => 'yv_fl_pg_t', 'label' => 'Titre', 'name' => 'title', 'type' => 'text', 'default_value' => 'Tous nos partenaires'],
+                    ['key' => 'yv_fl_pg_sub', 'label' => 'Sous-titre', 'name' => 'subtitle', 'type' => 'textarea', 'rows' => 2],
+                    ['key' => 'yv_fl_pg_badge', 'label' => 'Badge (optionnel)', 'name' => 'badge', 'type' => 'text'],
+                    ['key' => 'yv_fl_pg_cols', 'label' => 'Colonnes', 'name' => 'columns', 'type' => 'select', 'choices' => ['3' => '3', '4' => '4', '5' => '5', '6' => '6'], 'default_value' => '5'],
+                ], 'instructions' => 'Affiche automatiquement tous les partenaires du CPT "Partenaire". Source unique : ajouter/modifier un partenaire met la grille à jour partout (accueil + cette page).'],
+                ['key' => 'yv_fl_pf', 'name' => 'partners_featured', 'label' => 'Partenaires par catégorie (auto)', 'sub_fields' => [
+                    ['key' => 'yv_fl_pf_t', 'label' => 'Titre (vide = nom de la catégorie)', 'name' => 'title', 'type' => 'text'],
+                    ['key' => 'yv_fl_pf_sub', 'label' => 'Sous-titre', 'name' => 'subtitle', 'type' => 'textarea', 'rows' => 2],
+                    ['key' => 'yv_fl_pf_badge', 'label' => 'Badge (optionnel)', 'name' => 'badge', 'type' => 'text'],
+                    ['key' => 'yv_fl_pf_cat', 'label' => 'Catégorie partenaire', 'name' => 'category', 'type' => 'taxonomy', 'taxonomy' => 'categorie_partenaire', 'field_type' => 'select', 'return_format' => 'id', 'add_term' => 0, 'load_terms' => 0, 'save_terms' => 0],
+                    ['key' => 'yv_fl_pf_cols', 'label' => 'Colonnes', 'name' => 'columns', 'type' => 'select', 'choices' => ['2' => '2', '3' => '3', '4' => '4'], 'default_value' => '3'],
+                ], 'instructions' => 'Affiche automatiquement tous les partenaires d\'une catégorie (ex: Diamant, Or, Institutionnels). Assigner la catégorie au partenaire dans son CPT pour qu\'il apparaisse ici.'],
             ]],
         ],
         'location' => [[
