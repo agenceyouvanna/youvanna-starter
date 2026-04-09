@@ -339,7 +339,9 @@ function yv_render_card($args = []) {
         'text' => '',
         'link' => null,
     ]);
-    $has_link = $a['link'] && is_array($a['link']) && !empty($a['link']['url']);
+    // "#" et chaîne vide ne comptent pas comme un vrai lien — la carte reste un <div>
+    $link_url = (is_array($a['link']) && !empty($a['link']['url'])) ? trim($a['link']['url']) : '';
+    $has_link = $link_url !== '' && $link_url !== '#';
     $target = ($has_link && !empty($a['link']['target'])) ? ' target="' . esc_attr($a['link']['target']) . '"' : '';
     ?>
     <?php if ($has_link): ?>
