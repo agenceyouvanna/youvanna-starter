@@ -632,6 +632,13 @@ add_action('acf/include_fields', function() {
                     ['key' => 'yv_fl_c_sub', 'label' => 'Sous-titre', 'name' => 'subtitle', 'type' => 'textarea', 'rows' => 2],
                     ['key' => 'yv_fl_c_badge', 'label' => 'Badge (optionnel)', 'name' => 'badge', 'type' => 'text', 'instructions' => 'Petit texte au-dessus du titre, ex: Nos services'],
                     ['key' => 'yv_fl_c_cols', 'label' => 'Colonnes', 'name' => 'columns', 'type' => 'select', 'choices' => ['2' => '2', '3' => '3', '4' => '4'], 'default_value' => '3'],
+                    ['key' => 'yv_fl_c_layout', 'label' => 'Mise en page', 'name' => 'layout', 'type' => 'select', 'choices' => [
+                        'grid' => 'Grille standard',
+                        'featured' => 'Une carte vedette + grille',
+                        'horizontal' => 'Liste horizontale (image à gauche)',
+                        'steps' => 'Étapes numérotées',
+                        'minimal' => 'Minimal numéroté (sans image)',
+                    ], 'default_value' => 'grid'],
                     ['key' => 'yv_fl_c_rpt', 'label' => 'Cartes', 'name' => 'cards', 'type' => 'repeater', 'layout' => 'block', 'sub_fields' => [
                         ['key' => 'yv_fl_c_img', 'label' => 'Image', 'name' => 'image', 'type' => 'image', 'return_format' => 'array'],
                         ['key' => 'yv_fl_c_ct', 'label' => 'Titre', 'name' => 'title', 'type' => 'text'],
