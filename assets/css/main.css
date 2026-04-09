@@ -27,6 +27,14 @@
     --color-red: #e94d33;
     --color-turquoise: #19BECE;
 
+    /* Etats form / alertes - utilises par CF7 et les messages flash */
+    --color-error: #ef4444;
+    --color-error-dark: #991b1b;
+    --color-error-bg: #fef2f2;
+    --color-success: #10b981;
+    --color-success-dark: #065f46;
+    --color-success-bg: #ecfdf5;
+
     /* Dégradés réutilisables — basés sur primary/accent */
     --gradient-brand: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
     --gradient-brand-soft: linear-gradient(135deg, rgba(var(--color-primary-rgb),.08) 0%, rgba(var(--color-accent-rgb),.08) 100%);
@@ -154,8 +162,11 @@ h6 { font-size: 0.9rem; font-weight: 700; }
    ============================================ */
 #site-header {
     position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-    background: rgba(255,255,255,.95);
-    backdrop-filter: blur(12px);
+    background: rgba(255,255,255,.96);
+    /* NB : PAS de backdrop-filter ici - il cree un nouveau containing block CSS
+       qui casse le position:fixed des enfants (.nav-mobile-cta menu burger mobile).
+       Le bug se manifeste par un bouton Contact mobile invisible au-dessus du viewport.
+       Si tu veux du blur, applique-le sur un pseudo-element ::before en position absolute. */
     transition: all var(--transition);
 }
 #site-header.scrolled { box-shadow: var(--shadow); }
@@ -1377,11 +1388,11 @@ a:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; 
 .map-wrapper iframe { border-radius: var(--radius); box-shadow: var(--shadow-md); }
 
 /* CF7 form states */
-.wpcf7 .wpcf7-not-valid { border-color: #ef4444 !important; }
+.wpcf7 .wpcf7-not-valid { border-color: var(--color-error) !important; }
 .wpcf7 .wpcf7-not-valid:focus { box-shadow: 0 0 0 3px rgba(239,68,68,.15); }
 .wpcf7 .wpcf7-response-output { border-radius: var(--radius); padding: 16px 20px; font-size: 14px; margin-top: 16px; }
-.wpcf7 .wpcf7-mail-sent-ok, .wpcf7 .wpcf7-response-output.wpcf7-mail-sent-ok { border-color: #10b981; color: #065f46; background: #ecfdf5; }
-.wpcf7 .wpcf7-validation-errors { border-color: #ef4444; color: #991b1b; background: #fef2f2; }
+.wpcf7 .wpcf7-mail-sent-ok, .wpcf7 .wpcf7-response-output.wpcf7-mail-sent-ok { border-color: var(--color-success); color: var(--color-success-dark); background: var(--color-success-bg); }
+.wpcf7 .wpcf7-validation-errors { border-color: var(--color-error); color: var(--color-error-dark); background: var(--color-error-bg); }
 .wpcf7 label { display: block; font-size: 14px; font-weight: 600; color: var(--color-text); margin-bottom: 6px; }
 /* Webhook sync test — 2026-04-08T15:31:50Z */
 
