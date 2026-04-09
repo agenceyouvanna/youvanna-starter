@@ -57,7 +57,7 @@ add_action('after_setup_theme', function() {
         'footer'  => 'Menu Footer',
     ]);
     add_image_size('hero', 1920, 1080, true);
-    add_image_size('card', 600, 400, true);
+    add_image_size('card', 900, 700, true);
     add_image_size('thumb-sq', 400, 400, true);
     add_theme_support('automatic-feed-links');
 });
