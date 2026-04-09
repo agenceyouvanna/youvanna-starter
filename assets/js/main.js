@@ -13,11 +13,26 @@
             document.body.classList.toggle('overflow-hidden');
         });
         menu.querySelectorAll('a').forEach(function(link) {
-            link.addEventListener('click', function() {
+            link.addEventListener('click', function(e) {
+                // En mobile, si lien parent d'un sous-menu → toggle au lieu de naviguer
+                var parentLi = link.parentElement;
+                var isMobile = window.matchMedia('(max-width: 960px)').matches;
+                var hasChildren = parentLi && parentLi.classList.contains('menu-item-has-children');
+                if (isMobile && hasChildren && !parentLi.classList.contains('submenu-open')) {
+                    e.preventDefault();
+                    // Ferme les autres sous-menus au même niveau
+                    var siblings = parentLi.parentElement.querySelectorAll(':scope > li.submenu-open');
+                    siblings.forEach(function(s) { if (s !== parentLi) s.classList.remove('submenu-open'); });
+                    parentLi.classList.add('submenu-open');
+                    return;
+                }
+                // Sinon, ferme le menu mobile en suivant le lien
                 menu.classList.remove('active');
                 document.body.classList.remove('overflow-hidden');
                 toggle.classList.remove('active');
                 toggle.setAttribute('aria-expanded', 'false');
+                // Nettoyer les submenu-open
+                menu.querySelectorAll('.submenu-open').forEach(function(el) { el.classList.remove('submenu-open'); });
             });
         });
     }

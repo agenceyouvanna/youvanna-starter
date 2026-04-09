@@ -24,6 +24,11 @@ yv_render_hero([
         <div class="article-content">
             <?php the_content(); ?>
         </div>
+        <div class="article-cta">
+            <p><strong>Une question, un projet&nbsp;?</strong></p>
+            <p>Notre équipe vous répond et vous accompagne dans votre démarche.</p>
+            <a href="<?php echo esc_url(yv_option('cta_link', '/contact')); ?>" class="btn btn-primary"><?php echo esc_html(yv_option('cta_text', 'Nous contacter')); ?></a>
+        </div>
         <div class="article-nav">
             <?php
             $prev = get_previous_post();
