@@ -20,11 +20,16 @@ yv_render_hero([
 ?>
 
 <!-- SERVICES -->
-<?php if (function_exists('have_rows') && have_rows('services')): ?>
+<?php if (function_exists('have_rows') && have_rows('services')):
+    $services_count = 0;
+    while (have_rows('services')): the_row(); $services_count++; endwhile;
+    $grid_class = 'grid-' . min(max($services_count, 2), 5);
+    $container_class = $services_count >= 5 ? 'container container-wide' : 'container';
+?>
 <section class="section services-section reveal">
-    <div class="container">
+    <div class="<?php echo esc_attr($container_class); ?>">
         <?php yv_section_header(yv_field('services_title', 'Nos Services'), yv_field('services_subtitle')); ?>
-        <div class="grid grid-3">
+        <div class="grid <?php echo esc_attr($grid_class); ?> services-grid-tall">
             <?php while (have_rows('services')): the_row();
                 $img = get_sub_field('image');
                 yv_render_card([

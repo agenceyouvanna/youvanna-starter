@@ -349,14 +349,16 @@ function yv_render_card($args = []) {
     <?php else: ?>
         <div class="card">
     <?php endif; ?>
+        <?php $has_image = $a['image_id'] || $a['image']; ?>
         <?php if ($a['image_id']): ?>
             <?php echo wp_get_attachment_image($a['image_id'], 'card', false, ['loading' => 'lazy', 'alt' => esc_attr($a['title'])]); ?>
         <?php elseif ($a['image']): ?>
             <img src="<?php echo esc_url($a['image']); ?>" alt="<?php echo esc_attr($a['title']); ?>" loading="lazy">
-        <?php elseif ($a['icon']): ?>
-            <div class="card-icon"><?php echo wp_kses_post($a['icon']); ?></div>
         <?php endif; ?>
         <div class="card-body">
+            <?php if ($a['icon']): ?>
+                <div class="card-icon-badge" aria-hidden="true"><i class="<?php echo esc_attr($a['icon']); ?>"></i></div>
+            <?php endif; ?>
             <h3><?php echo esc_html($a['title']); ?></h3>
             <?php if (!empty($a['text'])): ?>
                 <div class="card-text"><?php echo wp_kses_post(wpautop($a['text'])); ?></div>
