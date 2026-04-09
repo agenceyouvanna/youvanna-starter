@@ -19,7 +19,7 @@
                                 <span class="team-role"><?php echo esc_html($role); ?></span>
                             <?php endif; ?>
                             <?php if ($bio = get_sub_field('bio')): ?>
-                                <p><?php echo esc_html($bio); ?></p>
+                                <div class="team-bio"><?php echo wp_kses_post(wpautop($bio)); ?></div>
                             <?php endif; ?>
                         </div>
                     </div>

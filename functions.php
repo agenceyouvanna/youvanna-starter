@@ -299,7 +299,7 @@ function yv_render_hero($args = []) {
         <div class="hero-content">
             <h1><?php echo esc_html($a['title']); ?></h1>
             <?php if ($a['subtitle']): ?>
-                <p class="hero-subtitle"><?php echo esc_html($a['subtitle']); ?></p>
+                <p class="hero-subtitle"><?php echo wp_kses_post($a['subtitle']); ?></p>
             <?php endif; ?>
             <?php if (!empty($a['buttons'])): ?>
                 <div class="hero-buttons">
