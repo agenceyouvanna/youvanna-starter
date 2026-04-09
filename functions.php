@@ -792,6 +792,67 @@ add_action('wp_head', function() {
     ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "</script>\n";
 }, 4);
 
+/**
+ * Convertit un texte d'horaires humain en format Schema.org openingHours.
+ * Exemples acceptés en entrée :
+ *   - "Lundi - Vendredi : 9h00 - 18h00"
+ *   - "Lundi au vendredi : 9h - 18h"
+ *   - "Samedi : 10h00 - 16h00"
+ *   - "Lundi, Mardi : 9h-12h, 14h-18h"
+ * Retourne un tableau de strings au format "Mo-Fr 09:00-18:00".
+ */
+function yv_parse_opening_hours_to_schema($text) {
+    if (!$text) return [];
+    $day_map = [
+        'lundi' => 'Mo', 'mardi' => 'Tu', 'mercredi' => 'We', 'jeudi' => 'Th',
+        'vendredi' => 'Fr', 'samedi' => 'Sa', 'dimanche' => 'Su',
+    ];
+    $lines = array_filter(array_map('trim', preg_split('/[\r\n]+/', $text)));
+    $result = [];
+    foreach ($lines as $line) {
+        $l = mb_strtolower($line);
+        // Séparer jours / heures au premier ":" (obligatoire dans le format humain attendu)
+        $pos = mb_strpos($l, ':');
+        if ($pos === false) continue;
+        $days_part = trim(mb_substr($l, 0, $pos));
+        $hours_part = trim(mb_substr($l, $pos + 1));
+        // Normaliser les jours
+        $days_part = str_replace([' au ', ' à ', '-', '–', '—'], ['|', '|', '|', '|', '|'], $days_part);
+        $days_part = preg_replace('/\s+/', '', $days_part);
+        $day_tokens = array_filter(array_map('trim', explode('|', $days_part)));
+        $schema_days = [];
+        foreach ($day_tokens as $d) {
+            $d = trim($d, " ,.");
+            if (isset($day_map[$d])) $schema_days[] = $day_map[$d];
+        }
+        if (!$schema_days) continue;
+        // Range si exactement 2 jours séparés par tiret (logique : si input avait "-" on préserve)
+        if (count($schema_days) === 2 && strpos($l, '-') !== false) {
+            $days_str = $schema_days[0] . '-' . $schema_days[1];
+        } elseif (count($schema_days) === 2 && (strpos($l, ' au ') !== false || strpos($l, ' à ') !== false)) {
+            $days_str = $schema_days[0] . '-' . $schema_days[1];
+        } else {
+            $days_str = implode(',', $schema_days);
+        }
+        // Parser les heures — plusieurs plages possibles "9h-12h, 14h-18h"
+        $hours_segments = preg_split('/\s*,\s*/', $hours_part);
+        $hour_ranges = [];
+        foreach ($hours_segments as $seg) {
+            if (preg_match('/(\d{1,2})(?:h|:)(\d{0,2})\s*(?:-|–|—|à|au)\s*(\d{1,2})(?:h|:)(\d{0,2})/u', $seg, $hm)) {
+                $h1 = str_pad($hm[1], 2, '0', STR_PAD_LEFT);
+                $m1 = str_pad($hm[2] !== '' ? $hm[2] : '00', 2, '0', STR_PAD_RIGHT);
+                $h2 = str_pad($hm[3], 2, '0', STR_PAD_LEFT);
+                $m2 = str_pad($hm[4] !== '' ? $hm[4] : '00', 2, '0', STR_PAD_RIGHT);
+                $hour_ranges[] = "$h1:$m1-$h2:$m2";
+            }
+        }
+        foreach ($hour_ranges as $hr) {
+            $result[] = "$days_str $hr";
+        }
+    }
+    return $result;
+}
+
 // LocalBusiness schema (homepage)
 add_action('wp_head', function() {
     if (!is_front_page()) return;
@@ -826,9 +887,12 @@ add_action('wp_head', function() {
         $schema['logo'] = $logo_url;
         $schema['image'] = $logo_url;
     }
-    // Opening hours
+    // Opening hours — convertir texte humain ("Lundi - Vendredi : 9h00 - 18h00") en format Schema.org ("Mo-Fr 09:00-18:00")
     $hours = yv_option('opening_hours');
-    if ($hours) $schema['openingHours'] = array_values(array_filter(array_map('trim', explode("\n", $hours))));
+    if ($hours) {
+        $schema_hours = yv_parse_opening_hours_to_schema($hours);
+        if ($schema_hours) $schema['openingHours'] = $schema_hours;
+    }
     // Social profiles (sameAs)
     $same_as = [];
     foreach (['social_facebook','social_instagram','social_linkedin','social_youtube','social_tiktok'] as $key) {
