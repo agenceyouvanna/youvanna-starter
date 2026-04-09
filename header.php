@@ -11,10 +11,19 @@
 
 <header id="site-header" role="banner">
     <nav class="nav-container" aria-label="Navigation principale">
-        <a href="<?php echo esc_url(home_url()); ?>" class="nav-logo">
-            <?php if (has_custom_logo()): ?>
-                <?php the_custom_logo(); ?>
-            <?php else: ?>
+        <a href="<?php echo esc_url(home_url()); ?>" class="nav-logo" rel="home">
+            <?php
+            // IMPORTANT : ne JAMAIS utiliser the_custom_logo() ici — il génère déjà son propre <a>,
+            // ce qui créerait un <a> imbriqué (invalide HTML5, casse le layout du header).
+            // On extrait directement l'image via wp_get_attachment_image().
+            $yv_logo_id = (int) get_theme_mod('custom_logo');
+            if ($yv_logo_id && wp_attachment_is_image($yv_logo_id)):
+                echo wp_get_attachment_image($yv_logo_id, 'full', false, [
+                    'class'         => 'custom-logo',
+                    'alt'           => get_post_meta($yv_logo_id, '_wp_attachment_image_alt', true) ?: get_bloginfo('name'),
+                    'fetchpriority' => 'high',
+                ]);
+            else: ?>
                 <span class="site-name"><?php bloginfo('name'); ?></span>
             <?php endif; ?>
         </a>
