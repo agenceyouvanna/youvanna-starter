@@ -33,10 +33,33 @@
             <?php endif; ?>
         </div>
 
-        <nav class="footer-nav" aria-label="Navigation footer">
-            <h3>Navigation</h3>
-            <?php wp_nav_menu(['theme_location' => 'footer', 'container' => false, 'menu_class' => 'footer-menu', 'fallback_cb' => false]); ?>
-        </nav>
+        <?php
+        // Footer nav : si aucun menu assigné à la location "footer", fallback sur les pages top-level publiées
+        // pour ne jamais afficher une colonne vide (bug sodental 2026-04).
+        if (has_nav_menu('footer')) {
+            echo '<nav class="footer-nav" aria-label="Navigation footer"><h3>Navigation</h3>';
+            wp_nav_menu(['theme_location' => 'footer', 'container' => false, 'menu_class' => 'footer-menu', 'fallback_cb' => false]);
+            echo '</nav>';
+        } else {
+            $fallback_pages = get_pages([
+                'parent'      => 0,
+                'sort_column' => 'menu_order,post_title',
+                'number'      => 7,
+                'post_status' => 'publish',
+            ]);
+            if (!empty($fallback_pages)) {
+                echo '<nav class="footer-nav" aria-label="Navigation footer"><h3>Navigation</h3><ul class="footer-menu">';
+                foreach ($fallback_pages as $fp) {
+                    printf(
+                        '<li><a href="%s">%s</a></li>',
+                        esc_url(get_permalink($fp->ID)),
+                        esc_html($fp->post_title)
+                    );
+                }
+                echo '</ul></nav>';
+            }
+        }
+        ?>
 
         <div class="footer-contact">
             <h3>Contact</h3>
