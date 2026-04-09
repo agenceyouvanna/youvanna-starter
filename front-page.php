@@ -49,7 +49,7 @@ yv_render_hero([
             <?php echo yv_img('about_image', 'large', false, ['alt' => esc_attr(yv_field('about_title'))]); ?>
         </div>
         <div class="about-content">
-            <h2><?php echo wp_kses(yv_field('about_title', 'À propos'), ['mark' => []]); ?></h2>
+            <h2><?php echo esc_html(yv_field('about_title', 'À propos')); ?></h2>
             <div><?php echo wp_kses_post(yv_field('about_text')); ?></div>
             <?php $btn = function_exists('get_field') ? get_field('about_button') : null; if (is_array($btn) && !empty($btn['url'])): ?>
                 <a href="<?php echo esc_url($btn['url']); ?>" class="btn btn-primary"><?php echo esc_html($btn['title'] ?? 'En savoir plus'); ?></a>
