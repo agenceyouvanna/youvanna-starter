@@ -14,16 +14,22 @@
     --color-secondary: #070c19;
     --color-secondary-rgb: 7, 12, 25;
     --color-accent: #26b0d5;
+    --color-accent-rgb: 38, 176, 213;   /* MÊME couleur en RGB — pour les dégradés */
     --color-text: #1e293b;
     --color-text-light: #64748b;
+    --color-text-muted: #5b6472;
     --color-bg: #f4f4f4;
     --color-bg-alt: #f8fafc;
     --color-border: #b8b7b7;
 
-    /* Couleurs additionnelles SFSCMFCO */
+    /* Couleurs additionnelles */
     --color-highlight: #99dcea;
     --color-red: #e94d33;
     --color-turquoise: #19BECE;
+
+    /* Dégradés réutilisables — basés sur primary/accent */
+    --gradient-brand: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+    --gradient-brand-soft: linear-gradient(135deg, rgba(var(--color-primary-rgb),.08) 0%, rgba(var(--color-accent-rgb),.08) 100%);
 
     /* Typo — Inter (Google Fonts, display=swap) */
     --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
@@ -489,28 +495,52 @@ a.card-clickable:hover { transform: translateY(-4px); box-shadow: var(--shadow-l
    ============================================ */
 .reveal {
     opacity: 0;
-    transform: translateY(32px);
-    transition: opacity .7s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1);
+    transform: translateY(40px);
+    transition: opacity .9s cubic-bezier(.22,1,.36,1), transform .9s cubic-bezier(.22,1,.36,1);
+    will-change: opacity, transform;
 }
 .reveal.visible { opacity: 1; transform: translateY(0); }
 
-/* Stagger children (cards, stats, faq items) */
+/* Stagger children (cards, stats, faq items) — Framer-style fade-in-up */
 .reveal .card,
 .reveal .faq-item,
 .reveal .stat,
 .reveal .testimonial-card,
-.reveal .team-member {
+.reveal .team-member,
+.reveal .card-minimal,
+.reveal .card-steps {
     opacity: 0;
-    transform: translateY(24px);
-    transition: opacity .5s cubic-bezier(.16,1,.3,1), transform .5s cubic-bezier(.16,1,.3,1);
+    transform: translateY(36px);
+    transition: opacity .8s cubic-bezier(.22,1,.36,1), transform .8s cubic-bezier(.22,1,.36,1);
+    will-change: opacity, transform;
 }
 .reveal.visible .card,
 .reveal.visible .faq-item,
 .reveal.visible .stat,
 .reveal.visible .testimonial-card,
-.reveal.visible .team-member {
+.reveal.visible .team-member,
+.reveal.visible .card-minimal,
+.reveal.visible .card-steps {
     opacity: 1;
     transform: translateY(0);
+}
+
+/* Subtle content parallax on images inside about / text+image sections */
+.about-image img,
+.ti-image img,
+.text-image-section img {
+    transition: transform 1.2s cubic-bezier(.22,1,.36,1);
+    will-change: transform;
+}
+.reveal .about-image img,
+.reveal .ti-image img,
+.reveal.text-image-section img {
+    transform: scale(1.06);
+}
+.reveal.visible .about-image img,
+.reveal.visible .ti-image img,
+.reveal.visible.text-image-section img {
+    transform: scale(1);
 }
 
 /* Counter animation — numbers start invisible until JS kicks in */
@@ -526,7 +556,9 @@ a.card-clickable:hover { transform: translateY(-4px); box-shadow: var(--shadow-l
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
-    .reveal, .reveal .card, .reveal .faq-item, .reveal .stat, .reveal .testimonial-card, .reveal .team-member {
+    .reveal, .reveal .card, .reveal .faq-item, .reveal .stat, .reveal .testimonial-card, .reveal .team-member,
+    .reveal .card-minimal, .reveal .card-steps,
+    .reveal .about-image img, .reveal .ti-image img, .reveal.text-image-section img {
         opacity: 1 !important;
         transform: none !important;
         transition: none !important;
@@ -540,15 +572,15 @@ a.card-clickable:hover { transform: translateY(-4px); box-shadow: var(--shadow-l
    ============================================ */
 @media (max-width: 1280px) {
     .grid-5 { grid-template-columns: repeat(3, 1fr); }
-    .services-grid-tall .card img { height: 240px; }
+    .services-grid-tall .card img { height: 170px; }
 }
 @media (max-width: 960px) {
     .grid-2 { grid-template-columns: 1fr; }
     .grid-4 { grid-template-columns: repeat(2, 1fr); }
     .grid-5 { grid-template-columns: repeat(2, 1fr); }
-    .services-section { padding: 72px 0; }
-    .services-section .section-subtitle { margin-bottom: 40px; }
-    .services-grid-tall .card img { height: 220px; }
+    .services-section { padding: 64px 0; }
+    .services-section .section-subtitle { margin-bottom: 36px; }
+    .services-grid-tall .card img { height: 160px; }
     .nav-menu, .nav-cta { display: none; }
     .nav-toggle { display: block; }
     .nav-menu.active {
@@ -596,7 +628,7 @@ a.card-clickable:hover { transform: translateY(-4px); box-shadow: var(--shadow-l
 }
 @media (max-width: 768px) {
     .grid-2, .grid-3, .grid-4, .grid-5 { grid-template-columns: 1fr; }
-    .services-grid-tall .card img { height: 220px; }
+    .services-grid-tall .card img { height: 180px; }
     .card-icon-badge { width: 56px; height: 56px; font-size: 1.4rem; }
     .contact-grid { grid-template-columns: 1fr; }
     .footer-container { grid-template-columns: 1fr; gap: 32px; }
@@ -690,10 +722,10 @@ a.card-clickable:hover { box-shadow: var(--shadow-lg); border-color: transparent
 }
 .card-icon-badge i { line-height: 1; }
 
-/* Services section — wider, taller, portrait cards matching design ref */
-.services-section { padding: 112px 0; }
+/* Services section — compact portrait cards */
+.services-section { padding: 96px 0; }
 .services-section .section-title { margin-bottom: 14px; }
-.services-section .section-subtitle { max-width: 760px; margin: 0 auto 64px; }
+.services-section .section-subtitle { max-width: 760px; margin: 0 auto 56px; }
 
 .services-grid-tall .card {
     position: relative;
@@ -713,14 +745,14 @@ a.card-clickable:hover { box-shadow: var(--shadow-lg); border-color: transparent
 }
 .services-grid-tall .card img {
     width: 100%;
-    height: 280px;
+    height: 196px;
     object-fit: cover;
     border-radius: 18px 18px 0 0;
     display: block;
 }
 .services-grid-tall .card-body {
     position: relative;
-    padding: 44px 28px 32px;
+    padding: 32px 22px 22px;
     display: flex;
     flex-direction: column;
     flex: 1;
@@ -728,23 +760,27 @@ a.card-clickable:hover { box-shadow: var(--shadow-lg); border-color: transparent
 }
 .services-grid-tall .card-body .card-icon-badge {
     position: absolute;
-    top: -24px;
-    left: 26px;
+    top: -22px;
+    left: 22px;
     margin: 0;
+    width: 46px;
+    height: 46px;
+    font-size: 1.15rem;
+    background: var(--gradient-brand);
 }
 .services-grid-tall .card-body h3 {
-    font-size: 1.1rem;
-    line-height: 1.35;
-    margin: 0 0 10px;
+    font-size: 1.05rem;
+    line-height: 1.3;
+    margin: 0 0 8px;
     letter-spacing: -.01em;
     color: var(--color-text, #0f172a);
 }
 .services-grid-tall .card-body .card-text,
 .services-grid-tall .card-body p {
-    font-size: 14.5px;
-    line-height: 1.65;
+    font-size: 14px;
+    line-height: 1.55;
     color: var(--color-text-muted, #5b6472);
-    margin: 0 0 18px;
+    margin: 0 0 10px;
 }
 .services-grid-tall .card-link {
     margin-top: auto;
@@ -888,21 +924,50 @@ a.card-clickable:hover { box-shadow: var(--shadow-lg); border-color: transparent
 /* No image, large numbers, minimal text — for "Reasons to choose" type sections */
 .cards-layout-minimal {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 40px 32px;
+    grid-template-columns: repeat(auto-fit, minmax(440px, 1fr));
+    gap: 44px 40px;
     max-width: 1160px; margin: 0 auto;
 }
 .cards-layout-minimal .card-minimal {
     position: relative;
-    padding: 24px 0 24px 84px;
+    padding: 28px 28px 32px 96px;
     background: transparent;
     box-shadow: none;
-    border-radius: 0;
+    border-radius: 14px;
+    transition: background 0.5s ease;
+}
+.cards-layout-minimal .card-minimal::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.045), rgba(var(--color-primary-rgb), 0) 65%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+    z-index: 0;
+}
+.cards-layout-minimal .card-minimal:hover::before {
+    opacity: 1;
+}
+.cards-layout-minimal .card-minimal::after {
+    content: '';
+    position: absolute;
+    left: 96px; bottom: 18px;
+    width: 40px; height: 2px;
+    background: var(--color-primary);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: 1;
+}
+.cards-layout-minimal .card-minimal:hover::after {
+    transform: scaleX(1);
 }
 .cards-layout-minimal .card-number {
     position: absolute;
-    top: 12px; left: 0;
-    font-size: 3.2rem;
+    top: 22px; left: 12px;
+    font-size: 3.4rem;
     font-weight: 800;
     line-height: 1;
     background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
@@ -910,14 +975,23 @@ a.card-clickable:hover { box-shadow: var(--shadow-lg); border-color: transparent
     background-clip: text;
     -webkit-text-fill-color: transparent;
     letter-spacing: -.03em;
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: 1;
 }
-.cards-layout-minimal .card-body { padding: 0; text-align: left; }
+.cards-layout-minimal .card-minimal:hover .card-number {
+    transform: translateY(-3px) scale(1.05);
+}
+.cards-layout-minimal .card-body { padding: 0; text-align: left; position: relative; z-index: 1; }
 .cards-layout-minimal .card-body h3 {
-    font-size: 1.2rem; margin: 0 0 10px; line-height: 1.3;
+    font-size: 1.25rem; margin: 0 0 12px; line-height: 1.3;
+    transition: color 0.4s ease;
+}
+.cards-layout-minimal .card-minimal:hover .card-body h3 {
+    color: var(--color-primary);
 }
 .cards-layout-minimal .card-body .card-text,
 .cards-layout-minimal .card-body p {
-    font-size: 15px; line-height: 1.7; color: var(--color-text-muted, #5b6472); margin: 0;
+    font-size: 15px; line-height: 1.75; color: var(--color-text-muted, #5b6472); margin: 0;
 }
 .cards-layout-minimal .card-link { display: none; }
 
@@ -1207,8 +1281,8 @@ a.card-clickable:hover .card-link { color: var(--color-primary-dark); }
    SFSCMFCO DESIGN ENHANCEMENTS
    ============================================ */
 
-/* Hero — darker overlay for text readability (CSS vars only) */
-.hero-overlay { background: linear-gradient(135deg, rgba(var(--color-secondary-rgb),0.85) 0%, rgba(var(--color-primary-rgb),0.55) 100%); }
+/* Hero — overlay teinté primaire + touche d'accent */
+.hero-overlay { background: linear-gradient(135deg, rgba(var(--color-secondary-rgb),0.82) 0%, rgba(var(--color-primary-rgb),0.55) 55%, rgba(var(--color-accent-rgb),0.42) 100%); }
 
 /* Section badges — SFSCMFCO teal style */
 .section-badge {
@@ -1250,9 +1324,11 @@ a.card-clickable:hover { transform: translateY(-6px); box-shadow: var(--shadow-l
     background-clip: text;
 }
 
-/* CTA banner — better contrast (CSS vars only) */
+/* CTA banner — dégradé primaire + accent */
 .cta-banner { position: relative; overflow: hidden; }
-.cta-overlay { background: linear-gradient(135deg, rgba(var(--color-secondary-rgb),0.92) 0%, rgba(var(--color-primary-rgb),0.85) 100%); }
+.cta-overlay { background: linear-gradient(135deg, rgba(var(--color-secondary-rgb),0.90) 0%, rgba(var(--color-primary-rgb),0.82) 45%, rgba(var(--color-accent-rgb),0.72) 100%); }
+.cta-banner .btn-primary { background: #fff; color: var(--color-primary); position: relative; z-index: 1; }
+.cta-banner .btn-primary:hover { background: var(--color-accent); color: #fff; border-color: var(--color-accent); }
 
 /* Section text_image — better layout */
 .text-image-section .container { gap: 48px; }
