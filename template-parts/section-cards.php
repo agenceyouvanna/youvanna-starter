@@ -29,6 +29,7 @@ if (in_array($layout, ['featured', 'horizontal', 'minimal', 'steps'], true)) {
                     $link_target = $has_link && !empty($link_raw['target']) ? ' target="' . esc_attr($link_raw['target']) . '"' : '';
                     $title = get_sub_field('title');
                     $desc  = get_sub_field('description');
+                    $icon  = get_sub_field('icon') ?: '';
                 ?>
                     <?php if ($layout === 'minimal' || $layout === 'steps'): ?>
                         <?php if ($has_link): ?>
@@ -47,6 +48,7 @@ if (in_array($layout, ['featured', 'horizontal', 'minimal', 'steps'], true)) {
                         <?php yv_render_card([
                             'image_id' => $img && !empty($img['ID']) ? $img['ID'] : 0,
                             'image' => $img ? ($img['sizes']['card'] ?? $img['url']) : '',
+                            'icon'  => $icon,
                             'title' => $title,
                             'text'  => $desc,
                             'link'  => $link_raw,

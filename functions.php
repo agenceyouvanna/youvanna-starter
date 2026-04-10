@@ -293,6 +293,8 @@ function yv_render_hero($args = []) {
         'subtitle' => '',
         'buttons' => [],
         'class' => 'page-hero',
+        'badge' => '',
+        'wave' => false,
     ]);
     ?>
     <section class="<?php echo esc_attr($a['class']); ?>">
@@ -309,6 +311,9 @@ function yv_render_hero($args = []) {
         <?php endif; ?>
         <div class="hero-overlay"></div>
         <div class="hero-content">
+            <?php if ($a['badge']): ?>
+                <span class="hero-badge"><?php echo esc_html($a['badge']); ?></span>
+            <?php endif; ?>
             <h1><?php echo yv_format_title($a['title']); ?></h1>
             <?php if ($a['subtitle']): ?>
                 <p class="hero-subtitle"><?php echo wp_kses_post($a['subtitle']); ?></p>
@@ -321,6 +326,9 @@ function yv_render_hero($args = []) {
                 </div>
             <?php endif; ?>
         </div>
+        <?php if ($a['wave']): ?>
+            <div class="hero-wave"><svg viewBox="0 0 1440 60" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 60V30C240 0 480 0 720 30C960 60 1200 60 1440 30V60H0Z" fill="var(--color-bg, #F5F3EF)"/></svg></div>
+        <?php endif; ?>
     </section>
     <?php
 }
@@ -647,6 +655,7 @@ add_action('acf/include_fields', function() {
                         ['key' => 'yv_fl_c_ct', 'label' => 'Titre', 'name' => 'title', 'type' => 'text'],
                         ['key' => 'yv_fl_c_cd', 'label' => 'Description', 'name' => 'description', 'type' => 'textarea', 'rows' => 3],
                         ['key' => 'yv_fl_c_cl', 'label' => 'Lien', 'name' => 'link', 'type' => 'link'],
+                        ['key' => 'yv_fl_c_icon', 'label' => 'Icône', 'name' => 'icon', 'type' => 'text', 'instructions' => 'Classe Font Awesome, ex: fa-solid fa-laptop-code'],
                     ]],
                 ]],
                 ['key' => 'yv_fl_cta', 'name' => 'cta', 'label' => 'Bandeau d\'appel à l\'action', 'sub_fields' => [
