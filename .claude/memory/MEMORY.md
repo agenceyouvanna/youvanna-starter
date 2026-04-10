@@ -1,0 +1,15 @@
+- [Plesk Server](reference_plesk_server.md) — Tu es root sur ce serveur, PHP 8.3, WP-CLI
+- [GitHub Credentials](reference_github_credentials.md) — PAT et identifiants GitHub agenceyouvanna
+- [Gemini API Key](reference_gemini_api.md) — Clé API Gemini pour génération d'images
+- [Youvanna Starter Template](project_demo_starter.md) — Template de base demo.youvanna.com, repo GitHub
+- [Wordfence Status](project_wordfence_status.md) — Script auto-config Wordfence pour chaque clone
+- [French Accents](feedback_french_accents.md) — TOUJOURS les accents français partout
+- [Never Invent](feedback_never_invent.md) — JAMAIS inventer chiffres, avis clients ou données
+- [Always Perfect](feedback_perfection.md) — JAMAIS dire "c'est OK" — toujours corriger le skill
+- [Telegram Updates](feedback_telegram_updates.md) — TOUJOURS envoyer des updates régulières via Telegram
+- [GitHub Sync](feedback_github_sync.md) — TOUJOURS push les modifs starter vers GitHub, webhook auto-pull instantané
+- [Hetzner Storage Box](reference_hetzner_storage.md) — Backup offsite quotidien, u573642, cron 3h, 1 To
+- [Namecheap API](reference_namecheap_api.md) — Clé API Namecheap pour DNS youvanna.com, pointer sous-domaines
+- [No Mark + Clickable Cards](feedback_no_mark_clickable_cards.md) — JAMAIS de mark/highlight, cards entièrement cliquables
+- [Always Continue](feedback_always_continue.md) — TOUJOURS continuer toutes les phases, ne jamais s'arrêter
+- [Image Model](feedback_image_model.md) — TOUJOURS gemini-3-pro-image-preview, JAMAIS imagen (règle absolue)

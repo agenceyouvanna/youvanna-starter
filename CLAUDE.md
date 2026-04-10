@@ -1,61 +1,76 @@
-# Youvanna Starter v2.6.0 - Guide Claude Code
+# Youvanna Starter v2.7.0 - Guide Claude Code
 
-Ce fichier est lu automatiquement par Claude Code. Il contient toutes les regles, conventions, feedbacks et contexte pour travailler sur les sites Youvanna.
+Ce fichier est lu automatiquement par Claude Code. Il contient toutes les règles, conventions, feedbacks et contexte pour travailler sur les sites Youvanna.
 
 ---
 
-## Regles absolues
+## Règles absolues
 
-1. **JAMAIS de couleur hardcodee** - Toute couleur passe par les CSS variables `:root` dans `main.css`. NULLE PART ailleurs.
-2. **JAMAIS de code duplique** - Utilise les helpers PHP existants (yv_field, yv_option, yv_image, yv_img, yv_render_card, etc.)
+1. **JAMAIS de couleur hardcodée** - Toute couleur passe par les CSS variables `:root` dans `main.css`. NULLE PART ailleurs.
+2. **JAMAIS de code dupliqué** - Utilise les helpers PHP existants (yv_field, yv_option, yv_image, yv_img, yv_render_card, etc.)
 3. **JAMAIS hardcoder une info client** - Tout passe par `wp option update yv_xxx` ou `update_field()`
-4. **TOUJOURS les accents francais** - e, e, e, e, a, a, u, u, o, c, i. JAMAIS "equipe" -> "equipe", JAMAIS "Pret" -> "Pret". Si SSH pose des problemes d'encodage, utiliser `scp` + `wp eval-file` (preserve l'UTF-8).
-5. **JAMAIS inventer ce qu'on ne sait pas** - Pas de faux avis, pas de faux chiffres, pas de fausses donnees. Lorem Ipsum pour les temoignages si pas de vrais avis. Pas de section numbers si pas de chiffres verifies. Les descriptions de services doivent etre basees sur des infos reelles (site existant, brief client). Regle numero 1 de l'utilisateur.
-6. **JAMAIS de tirets speciaux** - Utiliser `-` uniquement. Pas de em-dash, en-dash, smart quotes.
-7. **TOUJOURS des images Gemini sur les cartes** - Pas d'icones quand on peut mettre une image. Icones FA en fallback uniquement si 6+ cartes.
+4. **TOUJOURS les accents français** - é, è, ê, ë, à, â, ù, û, ô, ç, î, œ, æ. JAMAIS "equipe" -> toujours "équipe", JAMAIS "Pret" -> toujours "Prêt". Si SSH pose des problèmes d'encodage, utiliser `scp` + `wp eval-file` (préserve l'UTF-8).
+5. **JAMAIS inventer ce qu'on ne sait pas** - Pas de faux avis, pas de faux chiffres, pas de fausses données. Lorem Ipsum pour les témoignages si pas de vrais avis. Pas de section numbers si pas de chiffres vérifiés. Les descriptions de services doivent être basées sur des infos réelles (site existant, brief client). Règle numéro 1 de l'utilisateur.
+6. **JAMAIS de tirets spéciaux** - Utiliser `-` uniquement. Pas de em-dash `—`, en-dash `–`, smart quotes. Ce sont des tells IA que Google détecte. Filet de sécurité : `mu-plugins/yv-no-emdash.php`.
+7. **TOUJOURS des images Gemini sur les cartes** - Pas d'icônes quand on peut mettre une image. Icônes FA en fallback uniquement si 6+ cartes.
 8. **JAMAIS de texte sur les images Gemini** - Toujours inclure "no text, no words, no letters, no logos, no watermarks" dans les prompts.
-9. **Ratio d'image = reflechir au contenu** - Le ratio depend de la quantite de texte a cote. Rediger le contenu AVANT de generer les images. Texte court -> 4:3, texte moyen -> 1:1 ou 4:5, texte long -> 3:4 portrait. Heroes toujours 16:9.
-10. **Schema.org = automatique** - LocalBusiness, WebSite (avec SearchAction), BreadcrumbList, FAQPage, BlogPosting. JAMAIS ecrire de schema manuellement.
+9. **Ratio d'image = réfléchir au contenu** - Le ratio dépend de la quantité de texte à côté. Rédiger le contenu AVANT de générer les images. Texte court -> 4:3, texte moyen -> 1:1 ou 4:5, texte long -> 3:4 portrait. Heroes toujours 16:9.
+10. **Schema.org = automatique** - LocalBusiness, WebSite (avec SearchAction), BreadcrumbList, FAQPage, BlogPosting. JAMAIS écrire de schema manuellement.
 11. **Animations = automatiques** - Counter (skip prefers-reduced-motion), stagger (cards, faq, stats, testimonials, team), parallax, marquee (will-change: transform), FAQ smooth, back-to-top. Ne rien ajouter.
 12. **TOUJOURS des FAQ pour le SEO** - Ajouter une section FAQ sur chaque page pertinente.
-13. **Section headers style Framer** - `<mark>` pour highlight, badge pill en 3e argument de `yv_section_header()`. Badge disponible sur tous les layouts flex.
-14. **TOUJOURS sync --color-primary-rgb** - Quand on change `--color-primary`, mettre a jour `--color-primary-rgb` avec les valeurs R, G, B.
-15. **OG Meta = automatique** - Open Graph + Twitter Card generes automatiquement si Yoast/RankMath n'est pas actif.
+13. **JAMAIS de `<mark>` dans les titres** - Pas de surligné/highlight. Les titres sont en texte brut. Les badges pills sont acceptés via le 3e argument de `yv_section_header()`.
+14. **TOUJOURS sync --color-primary-rgb** - Quand on change `--color-primary`, mettre à jour `--color-primary-rgb` avec les valeurs R, G, B.
+15. **OG Meta = automatique** - Open Graph + Twitter Card générés automatiquement si Yoast/RankMath n'est pas actif.
 16. **TOUJOURS utiliser wp_get_attachment_image()** - Pour les images SCF, utiliser `yv_img()` ou `wp_get_attachment_image($img['ID'])` au lieu de `<img src>` brut. Donne width/height/srcset/sizes automatiquement.
-17. **SCF, pas ACF** - On utilise SCF (Secure Custom Fields), le plugin officiel WordPress. C'est un fork gratuit d'ACF avec Repeater + Flex Content integres. L'API garde le prefixe `acf_` pour compatibilite, mais dans les commentaires et la doc on ecrit SCF.
-18. **TOUJOURS font-display: swap sur TOUTES les fonts** - Le theme override FA CDN (`font-display: block`) avec un inline `font-display: swap` dans `wp_head`. Google Fonts DOIT toujours inclure `&display=swap` dans l'URL. JAMAIS charger une font externe sans `font-display: swap` — ca bloque le FCP et casse les scores PageSpeed. Si un agent ou un dev ajoute une font sans swap, c'est un bug critique a corriger immediatement.
-19. **ACCENTS FRANÇAIS = NON NEGOCIABLE** - TOUS les textes visibles (titres, descriptions, meta titles Yoast, meta descriptions, alt texts, noms de categories, FAQ, boutons, labels menu) DOIVENT avoir les accents corrects : e, e, e, e, a, a, u, u, o, c, i, oe, ae. Ca inclut les rapports d'agents et le JSON SEO. "A propos" = FAUX, "A propos" = CORRECT. "Securite" = FAUX, "Securite" = CORRECT. Verifier CHAQUE output d'agent.
-20. **NE JAMAIS INVENTER = LOI ABSOLUE** - Aucun agent ne doit inventer de donnees : pas de faux avis, pas de faux chiffres, pas de fausses certifications, pas de faux partenariats. Les temoignages = Lorem Ipsum avec noms placeholder. Les stats = uniquement si verifiees. Les descriptions de services = basees sur le brief client. Toute invention detectee = bug critique a corriger immediatement.
-21. **JAMAIS de `<style>` ou `<script>` dans `post_content`** - `wp_kses_post` strippe les tags quand on ecrit via CLI/PHP (pas de capability `unfiltered_html`) ET `wptexturize` bousille les `var(--color-*)` en `var(&#8211;color-*)` et les `""` en guillemets francais. Le CSS va TOUJOURS dans `assets/css/main.css`, le JS dans `assets/js/main.js`. Le post_content doit etre du HTML pur. Si une migration importe du HTML contenant des `<style>`, les deplacer dans main.css AVANT d'inserer en base.
-22. **JAMAIS `esc_html()` sur du contenu riche** - Si un champ SCF peut contenir du HTML (wysiwyg, textarea multi-ligne, description, contenu flexible), utiliser `wp_kses_post()`. `esc_html()` rend `<p>` et `<strong>` en texte litteral visible. Reserver `esc_html()` aux titres, labels, attributs, URLs — JAMAIS pour `$card['text']`, `$testimonial['text']`, `cta_text`, `description`, etc. Bug historique : `yv_render_card` utilisait `esc_html($a['text'])` et tout s'affichait en brut sur les pages tarifs/adhesion. Corrige en `wp_kses_post(wpautop($a['text']))`.
-23. **Header full-width** - La `.nav-container` doit utiliser `--max-width-wide` (1440px) pas `--max-width` (1320px), sinon le logo se retrouve loin du bord gauche sur ecrans larges et le header fait resserre. Idem pour les layouts avec sidebar : la `.page-with-sidebar > .container` doit utiliser `--max-width-wide` pour donner de la place au contenu principal.
-24. **Hover card = signal de clickability** - `.card:hover { transform }` est INTERDIT. L'animation hover (translateY, shadow, border) doit UNIQUEMENT cibler `a.card-clickable:hover`. Sinon les cards non-cliquables "bougent" au hover et le visiteur pense qu'elles sont clickables → clic → rien → frustration. `yv_render_card()` wrap deja la carte dans `<a class="card card-clickable">` quand un `link` est fourni, sinon `<div class="card">`. Les regles CSS DOIVENT respecter cette distinction.
-25. **Cards doivent pointer vers les VRAIS permalinks** - Ne jamais ecrire `/adhesion` en esperant que Yoast redirige, toujours ecrire le chemin hierarchique complet `/la-societe/adhesion/`. Les slugs courts tombent en 404 reel si Yoast n'a pas la redirection. A l'import CLI/PHP, resolver avec `get_permalink($id)` pour obtenir le chemin final.
+17. **SCF, pas ACF** - On utilise SCF (Secure Custom Fields), le plugin officiel WordPress. Fork gratuit d'ACF avec Repeater + Flex Content intégrés. L'API garde le préfixe `acf_` pour compatibilité, mais dans les commentaires et la doc on écrit SCF.
+18. **TOUJOURS font-display: swap sur TOUTES les fonts** - Le thème override FA CDN (`font-display: block`) avec un inline `font-display: swap` dans `wp_head`. Google Fonts DOIT toujours inclure `&display=swap`. JAMAIS charger une font externe sans `font-display: swap` - ça bloque le FCP et casse les scores PageSpeed.
+19. **JAMAIS de `<style>` ou `<script>` dans `post_content`** - `wp_kses_post` strippe les tags quand on écrit via CLI/PHP (pas de capability `unfiltered_html`) ET `wptexturize` bousille les `var(--color-*)` en `var(&#8211;color-*)`. Le CSS va TOUJOURS dans `assets/css/main.css`, le JS dans `assets/js/main.js`. Le post_content doit être du HTML pur.
+20. **JAMAIS `esc_html()` sur du contenu riche** - Si un champ SCF peut contenir du HTML (wysiwyg, textarea, description, contenu flexible), utiliser `wp_kses_post()`. `esc_html()` rend `<p>` et `<strong>` en texte littéral visible. Réserver `esc_html()` aux titres, labels, attributs, URLs.
+21. **Header full-width** - La `.nav-container` doit utiliser `--max-width-wide` (1440px) pas `--max-width` (1320px).
+22. **Hover card = signal de clickability** - `.card:hover { transform }` est INTERDIT. L'animation hover doit UNIQUEMENT cibler `a.card-clickable:hover`. Les cards non-cliquables ne bougent pas.
+23. **Cards doivent pointer vers les VRAIS permalinks** - Ne jamais écrire `/adhesion` en espérant que Yoast redirige. Toujours le chemin hiérarchique complet `/la-societe/adhesion/`. Utiliser `get_permalink($id)` à l'import.
+24. **Footer : DEUX menus OBLIGATOIRES** - Le skill Agent 4 doit créer `Menu Principal` ET `Menu Footer`. Vérifier : `wp menu location list` doit montrer primary + footer avec un menu assigné. Le footer.php a un fallback (pages top-level) mais ce n'est qu'un filet de sécurité.
+25. **JAMAIS wrapper `the_custom_logo()` dans un `<a>`** - Cette fonction génère déjà son propre `<a class="custom-logo-link">`. L'imbriquer dans un `<a>` crée du HTML invalide. Toujours utiliser `wp_get_attachment_image(get_theme_mod('custom_logo'), 'full', false, [...])` pour extraire juste l'image.
+26. **JAMAIS `aspect-ratio` + `min-height` sans media query** - Sur mobile, le navigateur calcule la largeur depuis la hauteur (`width = min-height * aspect-ratio`), ce qui déborde le viewport. Toujours scoper dans `@media (min-width: 769px)`.
+27. **TOUJOURS `overflow-x: hidden` sur `html` et `body`** - Safety net contre tout élément qui dépasserait. Combiné avec `max-width: 100vw` sur le body.
+28. **TOUJOURS tester mobile AVANT de dire que c'est fini** - Capture headless à 375px avec `node /tmp/screenshot.js <url> <out>`. Chromium installé sur le serveur.
+29. **TOUJOURS php -l après chaque modification PHP** - Vérifier la syntaxe avant de considérer le travail fini.
+30. **TOUJOURS flush le cache après modif front** - WP Super Cache + Redis object cache. Commande : `wp cache flush --allow-root && find wp-content/cache -type f -delete`. Puis vérifier via `curl -s https://SITE/?nocache=$(date +%s)`.
+31. **Modèle image OBLIGATOIRE : gemini-3-pro-image-preview** - JAMAIS imagen-3, imagen-3.0-generate-002, imagen-4, ou tout autre modèle Imagen. Règle absolue.
 
 ---
 
-## Feedbacks utilisateur (memoire persistante)
+## Feedbacks utilisateur (mémoire persistante)
 
-### Accents francais
-TOUJOURS les accents. L'utilisateur a deja corrige des textes sans accents ("Pret" au lieu de "Pret", "equipe" au lieu de "equipe"). Texte sans accents = site amateur = inacceptable. Si probleme d'encodage SSH, utiliser scp + wp eval-file.
+### Accents français
+TOUJOURS les accents. L'utilisateur a déjà corrigé des textes sans accents ("Pret" au lieu de "Prêt", "equipe" au lieu de "équipe"). Texte sans accents = site amateur = inacceptable. Si problème d'encodage SSH, utiliser scp + wp eval-file.
 
 ### Ne jamais inventer
-JAMAIS de faux avis, faux chiffres ("500+ clients", "98% satisfaction"), fausses donnees. C'est du mensonge, pas professionnel et potentiellement illegal.
-- **Temoignages** : Si pas de vrais avis -> Lorem Ipsum avec noms placeholder evidents.
-- **Chiffres/stats** : Si pas de donnees verifiees -> NE PAS mettre de section numbers.
-- **Contenu texte** : Baser sur infos reelles. Si rien fourni, contenu generique mais honnete sans faits inventes.
+JAMAIS de faux avis, faux chiffres ("500+ clients", "98% satisfaction"), fausses données. C'est du mensonge, pas professionnel et potentiellement illégal.
+- **Témoignages** : Si pas de vrais avis -> Lorem Ipsum avec noms placeholder évidents.
+- **Chiffres/stats** : Si pas de données vérifiées -> NE PAS mettre de section numbers.
+- **Contenu texte** : Baser sur infos réelles. Si rien fourni, contenu générique mais honnête sans faits inventés.
 
 ### Images Gemini
 - API Gemini (gemini-3-pro-image-preview) pour toutes les images placeholder
 - Toujours 2K, toujours "no text, no words, no letters, no logos, no watermarks"
-- Le ratio depend du texte a cote, PAS du type de section
-- Methode : curl en bash, PAS un helper PHP cote serveur
+- Le ratio dépend du texte à côté, PAS du type de section
+- Méthode : curl en bash, PAS un helper PHP côté serveur
 
 ### SCF pas ACF
-L'utilisateur insiste : on utilise SCF (Secure Custom Fields), pas ACF. Toujours ecrire SCF dans les commentaires, la doc, et les descriptions. L'API utilise le prefixe `acf_` pour compatibilite mais c'est bien SCF.
+L'utilisateur insiste : on utilise SCF (Secure Custom Fields), pas ACF. Toujours écrire SCF dans les commentaires, la doc, et les descriptions. L'API utilise le préfixe `acf_` pour compatibilité mais c'est bien SCF.
 
 ### Memory dans CLAUDE.md
-L'utilisateur veut que TOUTES les regles et feedbacks soient aussi dans ce fichier CLAUDE.md (pas seulement dans la memoire locale de Claude Code), pour que toute session future les retrouve automatiquement.
+L'utilisateur veut que TOUTES les règles et feedbacks soient aussi dans ce fichier CLAUDE.md (pas seulement dans la mémoire locale de Claude Code), pour que toute session future les retrouve automatiquement.
+
+### GitHub sync
+TOUJOURS push les modifs du starter vers GitHub après changement. Le webhook auto-pull met à jour demo.youvanna.com instantanément.
+
+### Toujours continuer
+TOUJOURS enchaîner les phases automatiquement. Ne jamais s'arrêter entre les phases. Si bloqué, demander explicitement.
+
+### Telegram updates
+TOUJOURS envoyer des updates Telegram quand une tâche est terminée. L'utilisateur ne voit PAS le transcript. AUCUNE EXCEPTION.
 
 ---
 
@@ -66,8 +81,8 @@ youvanna-starter/
 |-- functions.php          # Helpers, SCF fields, admin UX, GTM/GA, Schema.org, OG meta
 |-- header.php / footer.php
 |-- front-page.php         # Homepage (hero, services, about, testimonials, CTA)
-|-- page.php               # Pages interieures (hero + flexible content)
-|-- page-contact.php       # Contact (hero + CF7 + coordonnees)
+|-- page.php               # Pages intérieures (hero + flexible content)
+|-- page-contact.php       # Contact (hero + CF7 + coordonnées)
 |-- single.php / home.php / archive.php / search.php  # Blog + recherche
 |-- index.php              # Fallback WP requis
 |-- 404.php
@@ -83,28 +98,28 @@ youvanna-starter/
     |-- section-gallery.php
     |-- section-map.php
     |-- section-numbers.php (counter animation)
-    |-- section-text.php (WYSIWYG pleine largeur - mentions legales, CGV, etc.)
+    |-- section-text.php (WYSIWYG pleine largeur - mentions légales, CGV, etc.)
     |-- section-video.php (YouTube/Vimeo/MP4/oEmbed responsive)
-    |-- section-team.php (grille equipe avec photo/nom/role/bio)
+    |-- section-team.php (grille équipe avec photo/nom/rôle/bio)
 ```
 
 ## Helpers PHP
 
 ```php
-yv_option($name, $fallback)              // wp_options avec prefixe yv_
-yv_field($name, $fallback, $post_id)     // Champ SCF (gere 0 et valeurs falsy correctement)
+yv_option($name, $fallback)              // wp_options avec préfixe yv_
+yv_field($name, $fallback, $post_id)     // Champ SCF (gère 0 et valeurs falsy correctement)
 yv_image($name, $size, $post_id)         // URL image SCF (retourne string URL)
 yv_img($name, $size, $post_id, $attrs)   // Image SCF avec wp_get_attachment_image (width/height/srcset auto)
 yv_image_id($name, $post_id)              // Attachment ID from SCF image field (int)
 yv_render_hero($args)                     // Bandeau hero (<img fetchpriority="high"> + overlay)
-yv_section_header($title, $sub, $badge)  // H2 + subtitle + badge pill. $title supporte <mark>
-yv_render_card($args)                     // Carte (image_id > image > icon). link verifie is_array()
+yv_section_header($title, $sub, $badge)  // H2 + subtitle + badge pill. Pas de <mark>.
+yv_render_card($args)                     // Carte (image_id > image > icon). link vérifie is_array()
 yv_render_stats($rows, $class)           // Grille de chiffres (counter animation auto)
 ```
 
 ## Options globales (yv_)
 
-| Cle | Usage |
+| Clé | Usage |
 |-----|-------|
 | `yv_phone` | Header, footer, contact, schema.org |
 | `yv_email` | Footer, contact, schema.org |
@@ -115,23 +130,23 @@ yv_render_stats($rows, $class)           // Grille de chiffres (counter animatio
 | `yv_postal_code` | Schema.org postalCode |
 | `yv_latitude` | Schema.org GeoCoordinates latitude |
 | `yv_longitude` | Schema.org GeoCoordinates longitude |
-| `yv_business_type` | Schema.org @type (Dentist, Restaurant, LegalService... Defaut: LocalBusiness) |
+| `yv_business_type` | Schema.org @type (Dentist, Restaurant, LegalService... Défaut: LocalBusiness) |
 | `yv_footer_description` | Footer |
 | `yv_cta_text` / `yv_cta_link` | Bouton CTA header |
-| `yv_social_facebook/instagram/linkedin/youtube/tiktok` | Footer icones FA + schema.org sameAs |
-| `yv_gtm_id` / `yv_ga_id` | Analytics (charge apres consentement cookies) |
+| `yv_social_facebook/instagram/linkedin/youtube/tiktok` | Footer icônes FA + schema.org sameAs |
+| `yv_gtm_id` / `yv_ga_id` | Analytics (charge après consentement cookies) |
 
 ## Champs SCF par page
 
 **Homepage** : hero_title, hero_subtitle, hero_cta1_text/link, hero_cta2_text/link, hero_image, services_title, services_subtitle, services (repeater: icon, title, description, image, link), about_title, about_text, about_image, about_button (type link), stats (repeater: number, label), testimonials_title, testimonials (repeater: text, name, role, rating, photo), cta_title, cta_text_home, cta_background, cta_button_text/link
 
-**Pages interieures** : page_hero_title, page_hero_subtitle, page_hero_image, sections (flexible content - 11 layouts)
+**Pages intérieures** : page_hero_title, page_hero_subtitle, page_hero_image, sections (flexible content - 11 layouts)
 
 **Page contact** : contact_form_title, contact_form_id, show_map
 
 ## Flexible Content layouts (11)
 
-Dispatching : `page.php` fait `get_template_part('template-parts/section', get_row_layout())` — le layout `cards` charge `template-parts/section-cards.php`.
+Dispatching : `page.php` fait `get_template_part('template-parts/section', get_row_layout())` - le layout `cards` charge `template-parts/section-cards.php`.
 
 Tous les layouts (sauf cta, text_image, map, text, video) ont un champ `badge` optionnel.
 
@@ -145,9 +160,9 @@ Tous les layouts (sauf cta, text_image, map, text, video) ont un champ `badge` o
 | `testimonials` | title (text), badge (text), items (repeater) | items[]: text (textarea), name (text), role (text), photo (image), rating (number 1-5) |
 | `faq` | title (text), badge (text), items (repeater) | items[]: question (text), answer (wysiwyg) |
 | `gallery` | title (text), badge (text), columns (select: 2/3/4), images (gallery) | |
-| `map` | title (text), map_url (url), height (number, defaut 450) | |
+| `map` | title (text), map_url (url), height (number, défaut 450) | |
 | `numbers` | title (text), badge (text), bg_color (select: light/primary/dark), items (repeater) | items[]: number (text), label (text) |
-| `text` | title (text), content (wysiwyg full+media), narrow (true_false, defaut 1) | |
+| `text` | title (text), content (wysiwyg full+media), narrow (true_false, défaut 1) | |
 | `video` | title (text), video_url (url) | |
 | `team` | title (text), subtitle (textarea), badge (text), columns (select: 3/4), members (repeater) | members[]: photo (image), name (text), role (text), bio (textarea) |
 
@@ -176,7 +191,7 @@ Tous les layouts (sauf cta, text_image, map, text, video) ont un champ `badge` o
 | `cta_button_text` + `cta_button_link` | text pair | idem |
 | `about_button` | SCF link | `update_field('about_button', ['url' => '/a-propos', 'title' => 'En savoir plus', 'target' => ''])` |
 | services[].link | SCF link | dans le repeater |
-| flex cards[].cards[].link | SCF link | dans le repeater imbrique |
+| flex cards[].cards[].link | SCF link | dans le repeater imbriqué |
 | flex cta.button | SCF link | `['url' => '...', 'title' => '...', 'target' => '']` |
 | flex text_image.link | SCF link | idem |
 
@@ -185,7 +200,7 @@ Tous les layouts (sauf cta, text_image, map, text, video) ont un champ `badge` o
 ```php
 // Homepage hero
 update_field('hero_title', 'Bienvenue chez Nom Client', $front_id);
-update_field('hero_subtitle', 'Votre artisan a Lorient', $front_id);
+update_field('hero_subtitle', 'Votre artisan à Lorient', $front_id);
 update_field('hero_cta1_text', 'Nos services', $front_id);
 update_field('hero_cta1_link', '/nos-services', $front_id);
 update_field('hero_image', $hero_attachment_id, $front_id); // ID, pas URL !
@@ -196,59 +211,59 @@ update_field('services', [
     ['icon' => '', 'title' => 'Service 2', 'description' => 'Texte...', 'image' => $img_id2, 'link' => ['url' => '/service-2', 'title' => 'En savoir plus', 'target' => '']],
 ], $front_id);
 
-// Page interieure - flexible content
+// Page intérieure - flexible content
 update_field('sections', [
     ['acf_fc_layout' => 'text_image', 'title' => 'Notre histoire', 'text' => '<p>Texte HTML</p>', 'image' => $img_id, 'image_position' => 'right', 'link' => ['url' => '/contact', 'title' => 'Contactez-nous', 'target' => '']],
     ['acf_fc_layout' => 'cards', 'title' => 'Nos services', 'subtitle' => '', 'badge' => 'Services', 'columns' => '3', 'cards' => [
         ['title' => 'Carte 1', 'description' => 'Texte', 'image' => $img_id, 'link' => ['url' => '/s1', 'title' => 'Voir', 'target' => '']],
     ]],
-    ['acf_fc_layout' => 'faq', 'title' => 'Questions frequentes', 'badge' => 'FAQ', 'items' => [
-        ['question' => 'Question 1 ?', 'answer' => '<p>Reponse</p>'],
+    ['acf_fc_layout' => 'faq', 'title' => 'Questions fréquentes', 'badge' => 'FAQ', 'items' => [
+        ['question' => 'Question 1 ?', 'answer' => '<p>Réponse</p>'],
     ]],
     ['acf_fc_layout' => 'gallery', 'title' => 'Galerie', 'badge' => '', 'columns' => '3', 'images' => [$img_id1, $img_id2, $img_id3]],
     ['acf_fc_layout' => 'numbers', 'title' => 'En chiffres', 'badge' => '', 'bg_color' => 'primary', 'items' => [
-        ['number' => '15+', 'label' => 'Annees d\'experience'],
+        ['number' => '15+', 'label' => 'Années d\'expérience'],
     ]],
     ['acf_fc_layout' => 'testimonials', 'title' => 'Avis clients', 'badge' => '', 'items' => [
         ['text' => 'Super service', 'name' => 'Jean Dupont', 'role' => 'Client', 'photo' => $photo_id, 'rating' => 5],
     ]],
-    ['acf_fc_layout' => 'team', 'title' => 'Notre equipe', 'subtitle' => '', 'badge' => 'Equipe', 'columns' => '3', 'members' => [
-        ['photo' => $photo_id, 'name' => 'Jean', 'role' => 'Gerant', 'bio' => 'Bio courte'],
+    ['acf_fc_layout' => 'team', 'title' => 'Notre équipe', 'subtitle' => '', 'badge' => 'Équipe', 'columns' => '3', 'members' => [
+        ['photo' => $photo_id, 'name' => 'Jean', 'role' => 'Gérant', 'bio' => 'Bio courte'],
     ]],
-    ['acf_fc_layout' => 'video', 'title' => 'Presentation', 'video_url' => 'https://www.youtube.com/watch?v=xxx'],
-    ['acf_fc_layout' => 'text', 'title' => 'Mentions legales', 'content' => '<p>Contenu HTML...</p>', 'narrow' => 1],
+    ['acf_fc_layout' => 'video', 'title' => 'Présentation', 'video_url' => 'https://www.youtube.com/watch?v=xxx'],
+    ['acf_fc_layout' => 'text', 'title' => 'Mentions légales', 'content' => '<p>Contenu HTML...</p>', 'narrow' => 1],
     ['acf_fc_layout' => 'map', 'title' => 'Nous trouver', 'map_url' => 'https://www.google.com/maps/embed?pb=...', 'height' => 450],
-    ['acf_fc_layout' => 'cta', 'title' => 'Pret a demarrer ?', 'text' => 'Contactez-nous', 'background' => $bg_id, 'button' => ['url' => '/contact', 'title' => 'Contact', 'target' => '']],
+    ['acf_fc_layout' => 'cta', 'title' => 'Prêt à démarrer ?', 'text' => 'Contactez-nous', 'background' => $bg_id, 'button' => ['url' => '/contact', 'title' => 'Contact', 'target' => '']],
 ], $page_id);
 ```
 
 ### CF7 form ID discovery
 
-Apres clonage du template, trouver l'ID du formulaire Contact Form 7 :
+Après clonage du template, trouver l'ID du formulaire Contact Form 7 :
 ```bash
 wp post list --post_type=wpcf7_contact_form --fields=ID,post_title --allow-root
 ```
-Puis mettre a jour : `update_field('contact_form_id', $form_id, $contact_page_id);`
+Puis mettre à jour : `update_field('contact_form_id', $form_id, $contact_page_id);`
 
 ## CSS Variables (dans :root)
 
 ```css
 --color-primary: #hex;        /* Couleur principale */
---color-primary-rgb: R, G, B; /* MEME couleur en RGB - TOUJOURS sync avec primary ! */
+--color-primary-rgb: R, G, B; /* MÊME couleur en RGB - TOUJOURS sync avec primary ! */
 --color-primary-dark: #hex;   /* Hover */
 --color-accent: #hex;         /* Accent secondaire */
 --color-secondary: #hex;      /* Footer, hero fallback */
---font-heading / --font-body  /* System font stack par defaut, custom via @font-face */
+--font-heading / --font-body  /* System font stack par défaut, custom via @font-face */
 ```
 
-## Dependances
+## Dépendances
 
 - Font Awesome 6.5 subsets (fontawesome + solid + brands, CDN async via preload+onload, ~50KB vs 300KB)
-- SCF (Secure Custom Fields - plugin officiel WordPress, fork gratuit d'ACF avec Repeater + Flex Content integres)
+- SCF (Secure Custom Fields - plugin officiel WordPress, fork gratuit d'ACF avec Repeater + Flex Content intégrés)
 - Contact Form 7
-- Yoast SEO (gere OG meta quand actif, sinon fallback auto dans functions.php)
-- Youvanna Languages (plugin inclus dans plugins/youvanna-languages/ — multilingue i18n)
-- Wordfence (securite — auto-config via `post-clone-setup.php`)
+- Yoast SEO (gère OG meta quand actif, sinon fallback auto dans functions.php)
+- Youvanna Languages (plugin inclus dans plugins/youvanna-languages/ - multilingue i18n)
+- Wordfence (sécurité - auto-config via `post-clone-setup.php`)
 - Redis Object Cache (cache objet persistant)
 - WP Super Cache (cache de page statique)
 - Plugin youvanna-cookies (bandeau RGPD auto)
@@ -256,36 +271,36 @@ Puis mettre a jour : `update_field('contact_form_id', $form_id, $contact_page_id
 ## Performance
 
 - Cache busting automatique via `filemtime()`
-- Font Awesome subsets async (fontawesome + solid + brands, preload + onload swap, ~50KB) + inline `font-display: swap` override (FA CDN uses `block` by default)
+- Font Awesome subsets async (fontawesome + solid + brands, preload + onload swap, ~50KB) + inline `font-display: swap` override
 - Google Fonts TOUJOURS avec `&display=swap` dans l'URL
-- WebP conversion automatique a l'upload (image_editor_output_format filter)
+- WebP conversion automatique à l'upload (image_editor_output_format filter)
 - Compression images 82% (wp_editor_set_quality filter)
-- Big images cappees a 2560px (big_image_size_threshold filter)
-- Cache headers statiques : configures via Nginx (1 an, immutable) — voir SKILL etape 0b2
-- System font stack par defaut (0 requete font). Custom via @font-face + variables CSS
+- Big images cappées à 2560px (big_image_size_threshold filter)
+- Cache headers statiques : configurés via Nginx (1 an, immutable)
+- System font stack par défaut (0 requête font). Custom via @font-face + variables CSS
 - Hero LCP : vrai `<img class="hero-bg-img" fetchpriority="high">` avec `wp_get_attachment_image()` (srcset/sizes auto, pas de background-image)
-- CTA banners : meme pattern `<img class="hero-bg-img">` (lazy loaded)
+- CTA banners : même pattern `<img class="hero-bg-img">` (lazy loaded)
 - Preconnect cdnjs + GTM/GA
 - `wp_get_attachment_image()` partout (width/height/srcset/sizes automatiques, 0 CLS)
-- Lazy loading sur toutes les images below-fold + photos temoignages
+- Lazy loading sur toutes les images below-fold + photos témoignages
 - `<noscript>` fallback pour animations `.reveal` (cards, faq, stats, testimonials, team)
-- `prefers-reduced-motion` respecte : parallax, counter, marquee, stagger
-- Bloat WP supprime (block CSS, emoji, oEmbed, REST link, jquery-migrate)
+- `prefers-reduced-motion` respecté : parallax, counter, marquee, stagger
+- Bloat WP supprimé (block CSS, emoji, oEmbed, REST link, jquery-migrate)
 - `scroll-padding-top` pour offset header fixe sur ancres
 - Nav link underline animation CSS
-- Media queries consolides (1 bloc 960px, 1 bloc 768px)
-- Scroll handlers consolides (1 seul rAF pour header, parallax, back-to-top)
+- Media queries consolidés (1 bloc 960px, 1 bloc 768px)
+- Scroll handlers consolidés (1 seul rAF pour header, parallax, back-to-top)
 - Body scroll lock sur mobile menu (overflow-hidden)
 - Mobile nav max-height + overflow-y auto
-- Focus-visible WCAG 2.1 AA sur tous les elements interactifs
-- Gallery hover overlay avec icone FA search
+- Focus-visible WCAG 2.1 AA sur tous les éléments interactifs
+- Gallery hover overlay avec icône FA search
 
 ## SEO
 
 - `<meta name="description">` + `<link rel="canonical">` automatiques (skip si Yoast/RankMath)
 - `<meta name="robots" content="noindex, follow">` sur 404 et search
 - Open Graph + Twitter Card + `og:locale` automatiques (fallback si Yoast/RankMath absent)
-- OG tags gere correctement archives, categories, search (pas seulement singular)
+- OG tags gère correctement archives, catégories, search (pas seulement singular)
 - WebSite schema avec SearchAction
 - LocalBusiness schema complet (address + addressLocality + postalCode + geo GeoCoordinates + openingHours, sameAs, image, logo)
 - BlogPosting avec wordCount, mainEntityOfPage, image fallback logo
@@ -297,11 +312,11 @@ Puis mettre a jour : `update_field('contact_form_id', $form_id, $contact_page_id
 
 ## Multilingue (Youvanna Languages)
 
-Plugin inclus dans `plugins/youvanna-languages/`. Apres activation :
-- Admin : Langues → Gerer les langues (ajouter/supprimer)
-- Admin : Langues → Traduire (page complete avec tous les champs par langue)
-- Admin : Langues → Exporter/Importer (JSON)
-- URLs : langue par defaut = pas de prefixe, secondaires = `/en/`, `/de/`, etc.
+Plugin inclus dans `plugins/youvanna-languages/`. Après activation :
+- Admin : Langues -> Gérer les langues (ajouter/supprimer)
+- Admin : Langues -> Traduire (page complète avec tous les champs par langue)
+- Admin : Langues -> Exporter/Importer (JSON)
+- URLs : langue par défaut = pas de préfixe, secondaires = `/en/`, `/de/`, etc.
 - hreflang automatique, sitemap par langue, Yoast compatible
 - Traduit : titres, contenus, extraits, slugs, champs SCF, menus, options yv_*, Yoast meta
 - Sélecteur de langue flottant ou shortcode `[yvl_switcher]`
@@ -314,9 +329,9 @@ wp plugin activate youvanna-languages --allow-root
 wp rewrite flush --allow-root
 ```
 
-## Post-clone setup (securite + cache + plugins)
+## Post-clone setup (sécurité + cache + plugins)
 
-Script unique qui configure TOUT apres le clonage : `post-clone-setup.php`
+Script unique qui configure TOUT après le clonage : `post-clone-setup.php`
 ```bash
 wp eval-file wp-content/themes/youvanna-starter/post-clone-setup.php --allow-root
 ```
@@ -325,15 +340,22 @@ Configure automatiquement :
 - Redis Object Cache : install + activation + enable (si Redis dispo sur le serveur)
 - WP Super Cache : install + activation + enable
 - Wordfence : install + WAF bootstrap + Plesk auto_prepend_file + firewall + brute force + scanner + login security + XMLRPC
-- Wordfence Central : deconnexion (sites clones)
-100% automatique, aucune etape manuelle.
+- Wordfence Central : déconnexion (sites clonés)
+100% automatique, aucune étape manuelle.
 
 ## Infos serveur
 
-- **SSH** : root@82.29.173.183 (credentials dans la memoire locale Claude Code)
-- **Demo** : /var/www/vhosts/demo.youvanna.com/httpdocs
+- **SSH** : root@82.29.173.183 (credentials dans la mémoire locale Claude Code)
+- **Démo** : /var/www/vhosts/demo.youvanna.com/httpdocs
 - **PHP** : export PATH=/opt/plesk/php/8.3/bin:$PATH
 - **WP-CLI** : wp --allow-root
 - **GitHub** : agenceyouvanna/youvanna-starter
-- **Gemini** : credentials dans la memoire locale Claude Code
-- **Note** : Les credentials (PAT, API keys, mots de passe) ne sont JAMAIS dans le git. Ils sont dans les fichiers memoire de Claude Code uniquement.
+- **Gemini** : credentials dans la mémoire locale Claude Code
+- **Note** : Les credentials (PAT, API keys, mots de passe) ne sont JAMAIS dans le git. Ils sont dans les fichiers mémoire de Claude Code uniquement.
+
+## Backup .claude/
+
+Le répertoire `.claude/` dans ce repo contient :
+- `skills/youvanna-new-site/SKILL.md` - Pipeline 9 agents pour créer un nouveau site client
+- `memory/` - Fichiers mémoire non-sensibles (feedbacks, règles, contexte projet)
+- Les fichiers contenant des credentials (API keys, PAT, mots de passe) sont exclus du repo et ne sont que sur le serveur dans `/root/.claude/projects/`.
