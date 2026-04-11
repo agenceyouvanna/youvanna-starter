@@ -33,15 +33,42 @@ add_filter('wp_resource_hints', function($hints, $type) {
     return $hints;
 }, 10, 2);
 
-// Make Font Awesome non-render-blocking (preload + swap for all FA subsets)
+// Make non-critical CSS non-render-blocking (fonts + FA + main) — inline critical.css covers above-the-fold
 add_filter('style_loader_tag', function($html, $handle) {
-    if (in_array($handle, ['fa-fontfaces', 'fa-solid', 'fa-brands'], true)) {
+    if (in_array($handle, ['youvanna-fonts', 'fa-fontfaces', 'fa-solid', 'fa-brands', 'youvanna-main'], true)) {
         $noscript_html = $html;
         $html = str_replace("rel='stylesheet'", "rel='preload' as='style' onload=\"this.onload=null;this.rel='stylesheet'\"", $html);
         return $html . '<noscript>' . $noscript_html . '</noscript>';
     }
     return $html;
 }, 10, 2);
+
+// Defer main.js for non-blocking load (no inline/dep scripts depend on it)
+add_filter('script_loader_tag', function($tag, $handle) {
+    if ($handle === 'youvanna-main') {
+        return str_replace(' src=', ' defer src=', $tag);
+    }
+    return $tag;
+}, 10, 2);
+
+// Inline critical CSS at top of <head> — above-the-fold styles (header + hero + btn)
+add_action('wp_head', function() {
+    $critical = get_stylesheet_directory() . '/assets/css/critical.css';
+    if (file_exists($critical)) {
+        echo '<style id="youvanna-critical">' . file_get_contents($critical) . '</style>' . "\n";
+    }
+}, 1);
+
+// Hero LCP image: add fetchpriority=high on auto-generated preload resources
+add_filter('wp_preload_resources', function($resources) {
+    if (!is_array($resources)) return $resources;
+    foreach ($resources as $i => $r) {
+        if (is_array($r) && isset($r['as']) && $r['as'] === 'image') {
+            $resources[$i]['fetchpriority'] = 'high';
+        }
+    }
+    return $resources;
+}, 99);
 
 // ============================================
 // 2. THEME SUPPORT

@@ -53,6 +53,29 @@ if (is_dir($yvl_source)) {
 }
 
 // ============================================
+// 1b. Youvanna Cookies plugin
+// ============================================
+WP_CLI::log('');
+WP_CLI::log('── 1b. Youvanna Cookies ──');
+
+$yvc_source = get_stylesheet_directory() . '/plugins/youvanna-cookies';
+$yvc_dest = WP_PLUGIN_DIR . '/youvanna-cookies';
+
+if (is_dir($yvc_source)) {
+    if (!is_dir($yvc_dest)) {
+        $cmd = 'cp -r ' . escapeshellarg($yvc_source) . ' ' . escapeshellarg($yvc_dest);
+        shell_exec($cmd);
+        WP_CLI::log('Copied youvanna-cookies to plugins/');
+    }
+    if (!is_plugin_active('youvanna-cookies/youvanna-cookies.php')) {
+        WP_CLI::runcommand('plugin activate youvanna-cookies', ['launch' => true]);
+    }
+    WP_CLI::log('Youvanna Cookies: active.');
+} else {
+    WP_CLI::warning('youvanna-cookies not found in theme. Skipping.');
+}
+
+// ============================================
 // 2. Redis Object Cache
 // ============================================
 WP_CLI::log('');
@@ -352,6 +375,7 @@ WP_CLI::log('');
 WP_CLI::success('Post-clone setup complete!');
 WP_CLI::log('');
 WP_CLI::log('  ✓ Youvanna Languages    — active');
+WP_CLI::log('  ✓ Youvanna Cookies      — active');
 WP_CLI::log('  ' . ($redis_available ? '✓' : '✗') . ' Redis Object Cache     — ' . ($redis_available ? 'active' : 'skipped (install Redis first)'));
 WP_CLI::log('  ✓ WP Super Cache        — active');
 WP_CLI::log('  ✓ Wordfence             — active + WAF optimized');
