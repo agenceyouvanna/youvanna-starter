@@ -16,35 +16,156 @@ yv_render_hero([
     'subtitle' => yv_field('hero_subtitle', get_bloginfo('description')),
     'buttons'  => $buttons,
     'class'    => 'hero',
+    'badge'    => yv_field('hero_badge', 'Agence web Le Mans'),
+    'wave'     => false,
 ]);
 ?>
 
-<!-- SERVICES -->
-<?php if (function_exists('have_rows') && have_rows('services')):
-    $services_count = 0;
-    while (have_rows('services')): the_row(); $services_count++; endwhile;
-    $grid_class = 'grid-' . min(max($services_count, 2), 5);
-    $container_class = $services_count >= 5 ? 'container container-wide' : 'container';
-?>
-<section class="section services-section reveal">
-    <div class="<?php echo esc_attr($container_class); ?>">
-        <?php yv_section_header(yv_field('services_title', 'Nos Services'), yv_field('services_subtitle')); ?>
-        <div class="grid <?php echo esc_attr($grid_class); ?> services-grid-tall">
-            <?php while (have_rows('services')): the_row();
-                $img = get_sub_field('image');
-                yv_render_card([
-                    'image_id' => $img ? ($img['ID'] ?? 0) : 0,
-                    'image' => $img ? ($img['sizes']['card'] ?? $img['url']) : '',
-                    'icon'  => get_sub_field('icon'),
-                    'title' => get_sub_field('title'),
-                    'text'  => get_sub_field('description'),
-                    'link'  => get_sub_field('link'),
-                ]);
-            endwhile; ?>
+<!-- TECH / PARTNER LOGO BAND -->
+<section class="tech-band" aria-label="Technologies et outils">
+    <div class="container">
+        <div class="tech-band__track">
+            <div class="tech-band__item">
+                <i class="fa-brands fa-wordpress" aria-hidden="true"></i>
+                <span>WordPress</span>
+            </div>
+            <div class="tech-band__item">
+                <i class="fa-brands fa-react" aria-hidden="true"></i>
+                <span>React</span>
+            </div>
+            <div class="tech-band__item">
+                <i class="fa-brands fa-node-js" aria-hidden="true"></i>
+                <span>Node.js</span>
+            </div>
+            <div class="tech-band__item">
+                <i class="fa-brands fa-laravel" aria-hidden="true"></i>
+                <span>Laravel</span>
+            </div>
+            <div class="tech-band__item">
+                <i class="fa-brands fa-shopify" aria-hidden="true"></i>
+                <span>Shopify</span>
+            </div>
+            <div class="tech-band__item">
+                <i class="fa-brands fa-php" aria-hidden="true"></i>
+                <span>WooCommerce</span>
+            </div>
+            <div class="tech-band__item">
+                <i class="fa-brands fa-figma" aria-hidden="true"></i>
+                <span>Figma</span>
+            </div>
+            <div class="tech-band__item">
+                <i class="fa-brands fa-docker" aria-hidden="true"></i>
+                <span>Docker</span>
+            </div>
         </div>
     </div>
 </section>
+
+<!-- FEATURED SERVICES — Alternating text+image blocks -->
+<?php if (function_exists('have_rows') && have_rows('services')): ?>
+<section class="section featured-services reveal">
+    <div class="container">
+        <?php yv_section_header(yv_field('services_title', 'Nos Services'), yv_field('services_subtitle')); ?>
+    </div>
+    <?php
+    $svc_index = 0;
+    while (have_rows('services')): the_row();
+        $svc_index++;
+        if ($svc_index > 3) break;
+        $img = get_sub_field('image');
+        $link = get_sub_field('link');
+        $link_url = '';
+        if (is_array($link) && !empty($link['url'])) {
+            $link_url = $link['url'];
+        }
+        $reversed = ($svc_index % 2 === 0) ? ' fs-block--reversed' : '';
+    ?>
+    <div class="fs-block<?php echo esc_attr($reversed); ?>">
+        <div class="container">
+            <div class="fs-block__inner">
+                <div class="fs-block__image">
+                    <?php if ($img && !empty($img['ID'])): ?>
+                        <?php echo wp_get_attachment_image($img['ID'], 'large', false, [
+                            'loading' => 'lazy',
+                            'alt' => esc_attr(get_sub_field('title')),
+                        ]); ?>
+                    <?php endif; ?>
+                </div>
+                <div class="fs-block__content">
+                    <span class="fs-block__number"><?php echo esc_html(str_pad($svc_index, 2, '0', STR_PAD_LEFT)); ?></span>
+                    <h3><?php echo esc_html(get_sub_field('title')); ?></h3>
+                    <p><?php echo wp_kses_post(get_sub_field('description')); ?></p>
+                    <?php if ($link_url): ?>
+                        <a href="<?php echo esc_url($link_url); ?>" class="btn btn-outline" aria-label="En savoir plus sur <?php echo esc_attr(get_sub_field('title')); ?>">
+                            <?php echo esc_html(is_array($link) && !empty($link['title']) ? $link['title'] : 'En savoir plus'); ?> <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                        </a>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php endwhile; ?>
+    <div class="fs-cta-wrap">
+        <a href="<?php echo esc_url(home_url('/services/')); ?>" class="btn btn-primary btn-lg">
+            Découvrir tous nos services <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+        </a>
+    </div>
+</section>
 <?php endif; ?>
+
+<!-- MARQUEE BAND -->
+<div class="marquee-band" aria-hidden="true">
+    <div class="marquee-band-track">
+        <?php
+        $marquee_items = ['Sites web', 'Applications', 'ERP', 'CRM', 'Dashboards', 'E-commerce', 'SEO', 'Design', 'Performance', 'WordPress', 'Sur mesure', 'Maintenance'];
+        // Double les items pour le scroll infini
+        $all_items = array_merge($marquee_items, $marquee_items);
+        foreach ($all_items as $item): ?>
+            <span class="marquee-band-item"><?php echo esc_html($item); ?></span>
+        <?php endforeach; ?>
+    </div>
+</div>
+
+<!-- PROCESS / METHODOLOGY -->
+<section class="section process-section reveal">
+    <div class="container">
+        <?php yv_section_header('Notre méthodologie', 'Un processus éprouvé pour des résultats concrets'); ?>
+        <div class="process-steps">
+            <div class="process-step">
+                <div class="process-step__icon">
+                    <i class="fa-solid fa-headset" aria-hidden="true"></i>
+                </div>
+                <span class="process-step__number">01</span>
+                <h3 class="process-step__title">Écoute &amp; Analyse</h3>
+                <p class="process-step__text">Nous analysons vos besoins, votre marché et vos objectifs pour définir la meilleure stratégie digitale.</p>
+            </div>
+            <div class="process-step">
+                <div class="process-step__icon">
+                    <i class="fa-solid fa-pen-ruler" aria-hidden="true"></i>
+                </div>
+                <span class="process-step__number">02</span>
+                <h3 class="process-step__title">Conception &amp; Design</h3>
+                <p class="process-step__text">Maquettes UX/UI sur mesure, validées avec vous avant chaque étape de développement.</p>
+            </div>
+            <div class="process-step">
+                <div class="process-step__icon">
+                    <i class="fa-solid fa-code" aria-hidden="true"></i>
+                </div>
+                <span class="process-step__number">03</span>
+                <h3 class="process-step__title">Développement &amp; Tests</h3>
+                <p class="process-step__text">Code propre, responsive, optimisé pour la performance et testé sur tous les appareils.</p>
+            </div>
+            <div class="process-step">
+                <div class="process-step__icon">
+                    <i class="fa-solid fa-rocket" aria-hidden="true"></i>
+                </div>
+                <span class="process-step__number">04</span>
+                <h3 class="process-step__title">Lancement &amp; Suivi</h3>
+                <p class="process-step__text">Mise en ligne, formation, maintenance continue et suivi des performances.</p>
+            </div>
+        </div>
+    </div>
+</section>
 
 <!-- ABOUT -->
 <?php if (yv_field('about_title') || yv_field('about_text')): ?>
@@ -74,6 +195,58 @@ yv_render_hero([
     </div>
 </section>
 <?php endif; ?>
+
+<!-- PORTFOLIO / RÉALISATIONS PREVIEW -->
+<section class="section portfolio-preview reveal">
+    <div class="container">
+        <?php yv_section_header('Nos réalisations', 'Des projets qui parlent d\'eux-mêmes'); ?>
+        <div class="portfolio-grid">
+            <?php
+            $portfolio_items = [
+                [
+                    'id'       => 137,
+                    'title'    => 'Site e-commerce mode',
+                    'category' => 'E-commerce',
+                ],
+                [
+                    'id'       => 138,
+                    'title'    => 'Dashboard analytique SaaS',
+                    'category' => 'Application web',
+                ],
+                [
+                    'id'       => 139,
+                    'title'    => 'Site vitrine cabinet avocat',
+                    'category' => 'Site vitrine',
+                ],
+            ];
+            foreach ($portfolio_items as $item):
+            ?>
+            <div class="portfolio-card">
+                <a href="<?php echo esc_url(home_url('/realisations/')); ?>" class="portfolio-card__link">
+                    <div class="portfolio-card__image">
+                        <?php echo wp_get_attachment_image($item['id'], 'large', false, [
+                            'loading' => 'lazy',
+                            'alt' => esc_attr($item['title']),
+                        ]); ?>
+                        <div class="portfolio-card__overlay">
+                            <span class="portfolio-card__view">Voir le projet <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
+                        </div>
+                    </div>
+                    <div class="portfolio-card__info">
+                        <span class="portfolio-card__tag"><?php echo esc_html($item['category']); ?></span>
+                        <h3 class="portfolio-card__title"><?php echo esc_html($item['title']); ?></h3>
+                    </div>
+                </a>
+            </div>
+            <?php endforeach; ?>
+        </div>
+        <div class="portfolio-cta-wrap">
+            <a href="<?php echo esc_url(home_url('/realisations/')); ?>" class="btn btn-outline btn-lg">
+                Voir toutes nos réalisations <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+            </a>
+        </div>
+    </div>
+</section>
 
 <!-- FLEXIBLE SECTIONS (home extras — zones, marques, FAQ, etc) -->
 <?php if (function_exists('have_rows') && have_rows('sections')): ?>

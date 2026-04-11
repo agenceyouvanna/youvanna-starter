@@ -41,7 +41,7 @@ if (in_array($layout, ['featured', 'horizontal', 'minimal', 'steps'], true)) {
                             <div class="card-body">
                                 <h3><?php echo esc_html($title); ?></h3>
                                 <?php if ($desc): ?><div class="card-text"><?php echo wp_kses_post(wpautop($desc)); ?></div><?php endif; ?>
-                                <?php if ($has_link): ?><span class="card-link"><?php echo esc_html($link_raw['title'] ?? 'En savoir plus'); ?> &rarr;</span><?php endif; ?>
+                                <?php if ($has_link): ?><span class="card-link"><?php echo esc_html($link_raw['title'] ?? 'En savoir plus'); ?></span><?php endif; ?>
                             </div>
                         <?php echo $has_link ? '</a>' : '</div>'; ?>
                     <?php else: ?>

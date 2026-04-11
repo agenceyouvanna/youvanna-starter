@@ -1,8 +1,8 @@
-<?php if (!have_rows('items')) return; ?>
+<?php $items = get_sub_field('items'); if (!$items || !is_array($items)) return; ?>
 <?php $bg = get_sub_field('bg_color') ?: 'light'; ?>
 <section class="section numbers-section numbers-<?php echo esc_attr($bg); ?> reveal">
     <div class="container">
         <?php yv_section_header(get_sub_field('title'), '', get_sub_field('badge')); ?>
-        <?php yv_render_stats(get_sub_field('items'), 'stats-grid stats-grid-wide'); ?>
+        <?php yv_render_stats($items, 'stats-grid stats-grid-wide'); ?>
     </div>
 </section>
