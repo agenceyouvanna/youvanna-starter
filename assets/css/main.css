@@ -2214,7 +2214,7 @@ a.card-clickable:hover .card-link { gap: 10px; }
 }
 .footer-bottom p {
     font-size: 13px;
-    color: rgba(255,255,255,.4);
+    color: rgba(255,255,255,.75);
 }
 
 /* --- Page hero inner: dramatic agency feel --- */
