@@ -4066,3 +4066,35 @@ a, .btn, .card, .faq-item, .testimonial-card, .stat {
     .cards-section--grid .card .card-icon-badge { transition: none !important; }
     .cards-section--grid .card::before, .cards-section--grid .card::after { transition: none !important; }
 }
+
+/* ============================================
+   VIEW TRANSITIONS API — smooth cross-document page transitions
+   Enabled for same-origin navigations via @view-transition{navigation:auto}
+   in critical.css. Supported: Chrome 126+, Edge 126+, Safari 18.2+ (progressive).
+   Unsupported browsers: fall back to instant navigation (no-op).
+   ============================================ */
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation-duration: .35s;
+    animation-timing-function: cubic-bezier(.4, 0, .2, 1);
+}
+::view-transition-old(root) {
+    animation-name: yv-vt-fade-out;
+}
+::view-transition-new(root) {
+    animation-name: yv-vt-fade-in;
+}
+@keyframes yv-vt-fade-out {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+}
+@keyframes yv-vt-fade-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+        animation: none !important;
+    }
+}
