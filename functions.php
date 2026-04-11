@@ -823,9 +823,11 @@ add_action('wp_head', function() {
 // 9. SCHEMA.ORG JSON-LD — Full SEO optimized
 // ============================================
 
-// WebSite schema
+// WebSite schema — skip si Yoast SEO est actif (il émet déjà un WebSite dans son @graph)
+// Sinon double déclaration → Google Search Console remonte un warning et ça dilue le signal.
 add_action('wp_head', function() {
     if (!is_front_page()) return;
+    if (defined('WPSEO_VERSION')) return; // Yoast présent : il gère WebSite
     echo '<script type="application/ld+json">' . wp_json_encode([
         '@context' => 'https://schema.org',
         '@type' => 'WebSite',
@@ -926,13 +928,17 @@ function yv_parse_opening_hours_to_schema($text) {
 }
 
 // LocalBusiness schema (homepage)
+// @id doit être DIFFÉRENT de celui de Yoast (/#organization) sinon Google voit
+// deux entités avec le même @id et en ignore une — ou pire, les fusionne en un
+// type invalide. On utilise /#localbusiness pour que Yoast Organization et
+// notre LocalBusiness cohabitent proprement dans le knowledge graph.
 add_action('wp_head', function() {
     if (!is_front_page()) return;
     $biz_type = yv_option('business_type', 'LocalBusiness');
     $schema = [
         '@context' => 'https://schema.org',
         '@type' => $biz_type,
-        '@id' => home_url('/#organization'),
+        '@id' => home_url('/#localbusiness'),
         'name' => get_bloginfo('name'),
         'description' => get_bloginfo('description'),
         'url' => home_url('/'),
@@ -943,10 +949,16 @@ add_action('wp_head', function() {
     if ($email) $schema['email'] = $email;
     $address = yv_option('address');
     if ($address) {
-        $postal_address = ['@type' => 'PostalAddress', 'streetAddress' => $address, 'addressCountry' => 'FR'];
         $city = yv_option('city');
-        if ($city) $postal_address['addressLocality'] = $city;
         $postal_code = yv_option('postal_code');
+        // Sécurité : si l'utilisateur a saisi tout dans "address" ("54 Rue X, 72000, Le Mans"),
+        // on retire le postal_code et la ville du streetAddress pour ne pas les dupliquer.
+        $street = $address;
+        if ($postal_code) $street = preg_replace('/[,\s]*' . preg_quote($postal_code, '/') . '\b/u', '', $street);
+        if ($city) $street = preg_replace('/[,\s]*' . preg_quote($city, '/') . '\b/u', '', $street);
+        $street = trim(preg_replace('/\s*,\s*$/', '', trim($street)));
+        $postal_address = ['@type' => 'PostalAddress', 'streetAddress' => $street, 'addressCountry' => 'FR'];
+        if ($city) $postal_address['addressLocality'] = $city;
         if ($postal_code) $postal_address['postalCode'] = $postal_code;
         $schema['address'] = $postal_address;
     }
