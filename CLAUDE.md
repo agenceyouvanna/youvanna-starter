@@ -37,6 +37,14 @@ Ce fichier est lu automatiquement par Claude Code. Il contient toutes les règle
 29. **TOUJOURS php -l après chaque modification PHP** - Vérifier la syntaxe avant de considérer le travail fini.
 30. **TOUJOURS flush le cache après modif front** - WP Super Cache + Redis object cache. Commande : `wp cache flush --allow-root && find wp-content/cache -type f -delete`. Puis vérifier via `curl -s https://SITE/?nocache=$(date +%s)`.
 31. **Modèle image OBLIGATOIRE : gemini-3-pro-image-preview** - JAMAIS imagen-3, imagen-3.0-generate-002, imagen-4, ou tout autre modèle Imagen. Règle absolue.
+32. **JAMAIS `transition: all`** - Toujours lister les propriétés composited (`transform`, `opacity`, `background-color`, `border-color`, `color`, `box-shadow`). `transition: all` applique les transitions à TOUTES les propriétés héritées et casse les animations GPU-composited (Lighthouse "avoid non-composited animations"). Exception : aucune.
+33. **JAMAIS animer `box-shadow` ou `filter` en @keyframes** - Paint-heavy sur chaque frame. Utiliser un pseudo-element `::before` ou `::after` avec `box-shadow` fixe + animer son `opacity`. Pattern dans `main.css` : `.image-stat-badge::after { box-shadow: ...; opacity: 0; animation: badgePulseOpacity 4s... }`.
+34. **TOUJOURS critical CSS inline + main.css non-blocking** - `functions.php` inline `assets/css/critical.css` (4KB, above-the-fold) via `wp_head` priorité 1, ET utilise le filter `style_loader_tag` pour transformer `youvanna-fonts`, `fa-*` et `youvanna-main` en `rel="preload" as="style" onload="this.rel='stylesheet'"`. Ne JAMAIS enlever ce filter — c'est ce qui passe Lighthouse mobile de 85 à 100.
+35. **TOUJOURS réserver l'espace des icônes FA** - `.btn i, .btn svg { width: 1em; height: 1em; flex-shrink: 0 }` dans `critical.css` pour éviter le CLS quand la font FA charge. Sinon les boutons shiftent et le CLS dépasse 0.1.
+36. **TOUJOURS `fetchpriority="high"` sur le hero LCP** - Le filter `wp_preload_resources` ajoute automatiquement `fetchpriority=high` aux images préchargées. Ne pas toucher. Le hero atteint un LCP < 2.0s grâce à ça.
+37. **Header box-shadow via `::before` composited** - `#site-header::before { box-shadow: var(--shadow); opacity: 0; transition: opacity }`. JAMAIS mettre `transition: all` ou transitionner directement `box-shadow` sur le header — cause un repaint full-width à chaque scroll.
+38. **WCAG AAA sur les couleurs** - `--color-primary-dark: #7A2210` (9.18:1 sur bg), `--color-text-light: #595959`. Les `.btn-outline` utilisent `--color-primary-dark`, PAS `--color-primary` (qui est trop clair pour AAA). Cookies plugin idem : `.yv-cb-link { color: var(--color-primary-dark); font-weight: 600 }`.
+39. **Cookies plugin bundlé dans le thème** - `plugins/youvanna-cookies/` est copié automatiquement dans `wp-content/plugins/` par `post-clone-setup.php`. JAMAIS modifier la version serveur sans répercuter dans le thème.
 
 ---
 
