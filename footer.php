@@ -47,6 +47,7 @@
             <?php endif; ?>
         </div>
 
+        <div class="footer-links">
         <?php
         // Footer nav : si aucun menu assigné à la location "footer", fallback sur les pages top-level publiées
         // pour ne jamais afficher une colonne vide (bug sodental 2026-04).
@@ -86,6 +87,7 @@
             <?php $address = yv_option('address'); if ($address): ?>
                 <p><?php echo esc_html($address); ?></p>
             <?php endif; ?>
+        </div>
         </div>
     </div>
 

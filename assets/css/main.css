@@ -523,7 +523,11 @@ a.card-clickable:hover { transform: translateY(-4px); box-shadow: var(--shadow-l
 #site-footer { background: var(--color-secondary); color: rgba(255,255,255,.7); }
 .footer-container {
     max-width: var(--max-width); margin: 0 auto; padding: 0 24px;
-    display: grid; grid-template-columns: 2fr 1fr 1fr;
+    display: grid; grid-template-columns: 1.2fr 1fr;
+    gap: 64px;
+}
+.footer-links {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 48px;
 }
 .footer-brand .footer-logo img,
 .footer-brand .footer-logo .custom-logo { height: 48px; width: auto; max-width: 220px; object-fit: contain; margin-bottom: 16px; }
@@ -742,6 +746,7 @@ a.card-clickable:hover { transform: translateY(-4px); box-shadow: var(--shadow-l
     .card-icon-badge { width: 56px; height: 56px; font-size: 1.4rem; }
     .contact-grid { grid-template-columns: 1fr; }
     .footer-container { grid-template-columns: 1fr; gap: 32px; }
+    .footer-links { gap: 24px; }
     .footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
     .about-section .grid-2 { gap: 24px; }
     .gallery-item img { height: 200px; }
