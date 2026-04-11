@@ -197,44 +197,49 @@ yv_render_hero([
 <?php endif; ?>
 
 <!-- PORTFOLIO / RÉALISATIONS PREVIEW -->
+<?php
+// Query featured realisations from CPT. Fallback to 3 most recent if no featured flag set.
+$featured_realisations = get_posts([
+    'post_type'      => 'realisation',
+    'posts_per_page' => 3,
+    'post_status'    => 'publish',
+    'meta_key'       => 'is_featured',
+    'meta_value'     => '1',
+    'orderby'        => 'menu_order date',
+    'order'          => 'ASC',
+]);
+if (empty($featured_realisations)) {
+    $featured_realisations = get_posts([
+        'post_type'      => 'realisation',
+        'posts_per_page' => 3,
+        'post_status'    => 'publish',
+        'orderby'        => 'menu_order date',
+        'order'          => 'ASC',
+    ]);
+}
+if (!empty($featured_realisations)): ?>
 <section class="section portfolio-preview reveal">
     <div class="container">
         <?php yv_section_header('Nos réalisations', 'Des projets qui parlent d\'eux-mêmes'); ?>
         <div class="portfolio-grid">
-            <?php
-            $portfolio_items = [
-                [
-                    'id'       => 137,
-                    'title'    => 'Site e-commerce mode',
-                    'category' => 'E-commerce',
-                ],
-                [
-                    'id'       => 138,
-                    'title'    => 'Dashboard analytique SaaS',
-                    'category' => 'Application web',
-                ],
-                [
-                    'id'       => 139,
-                    'title'    => 'Site vitrine cabinet avocat',
-                    'category' => 'Site vitrine',
-                ],
-            ];
-            foreach ($portfolio_items as $item):
+            <?php foreach ($featured_realisations as $r):
+                $r_client   = get_post_meta($r->ID, 'client_name', true) ?: get_the_title($r);
+                $r_category = get_post_meta($r->ID, 'category', true) ?: 'Projet';
+                $r_from     = get_post_meta($r->ID, 'gradient_from', true) ?: '#0f172a';
+                $r_to       = get_post_meta($r->ID, 'gradient_to', true) ?: '#1e40af';
+                $r_initials = mb_substr(preg_replace('/[^A-Za-zÀ-ÿ]/u', '', $r_client), 0, 2);
             ?>
             <div class="portfolio-card">
-                <a href="<?php echo esc_url(home_url('/realisations/')); ?>" class="portfolio-card__link">
-                    <div class="portfolio-card__image">
-                        <?php echo wp_get_attachment_image($item['id'], 'large', false, [
-                            'loading' => 'lazy',
-                            'alt' => esc_attr($item['title']),
-                        ]); ?>
+                <a href="<?php echo esc_url(get_permalink($r)); ?>" class="portfolio-card__link" aria-label="Voir la réalisation <?php echo esc_attr($r_client); ?>">
+                    <div class="portfolio-card__image" style="background: linear-gradient(135deg, <?php echo esc_attr($r_from); ?> 0%, <?php echo esc_attr($r_to); ?> 100%);">
+                        <span class="portfolio-card__monogram" aria-hidden="true"><?php echo esc_html(mb_strtoupper($r_initials)); ?></span>
                         <div class="portfolio-card__overlay">
                             <span class="portfolio-card__view">Voir le projet <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
                         </div>
                     </div>
                     <div class="portfolio-card__info">
-                        <span class="portfolio-card__tag"><?php echo esc_html($item['category']); ?></span>
-                        <h3 class="portfolio-card__title"><?php echo esc_html($item['title']); ?></h3>
+                        <span class="portfolio-card__tag"><?php echo esc_html($r_category); ?></span>
+                        <h3 class="portfolio-card__title"><?php echo esc_html($r_client); ?></h3>
                     </div>
                 </a>
             </div>
@@ -247,6 +252,7 @@ yv_render_hero([
         </div>
     </div>
 </section>
+<?php endif; ?>
 
 <!-- FLEXIBLE SECTIONS (home extras — zones, marques, FAQ, etc) -->
 <?php if (function_exists('have_rows') && have_rows('sections')): ?>

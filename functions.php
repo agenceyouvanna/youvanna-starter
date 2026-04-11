@@ -100,6 +100,49 @@ add_filter('nav_menu_link_attributes', function($atts, $item) {
 // Excerpt length for blog cards
 
 // ============================================
+// 2b. CUSTOM POST TYPE — "realisation"
+// ============================================
+// Portfolio / case studies piloté par CPT (pas par SCF flexible sur une page figée).
+// Chaque réalisation a : titre, slug, extrait (short desc), meta (category, year, sector,
+// scope, client, gradient_from, gradient_to, featured). Le hero single utilise un
+// gradient CSS généré depuis les 2 couleurs (user a demandé gradients plutôt que
+// screenshots réels pour le moment).
+add_action('init', function() {
+    register_post_type('realisation', [
+        'labels' => [
+            'name'               => 'Réalisations',
+            'singular_name'      => 'Réalisation',
+            'menu_name'          => 'Réalisations',
+            'add_new'            => 'Ajouter',
+            'add_new_item'       => 'Ajouter une réalisation',
+            'edit_item'          => 'Modifier la réalisation',
+            'new_item'           => 'Nouvelle réalisation',
+            'view_item'          => 'Voir la réalisation',
+            'search_items'       => 'Rechercher',
+            'not_found'          => 'Aucune réalisation trouvée',
+            'not_found_in_trash' => 'Aucune réalisation dans la corbeille',
+        ],
+        'public'              => true,
+        'has_archive'         => false, // on utilise une page WP "Réalisations" (post 49) comme archive custom
+        'show_in_rest'        => true,
+        'menu_position'       => 22,
+        'menu_icon'           => 'dashicons-portfolio',
+        'supports'            => ['title', 'editor', 'excerpt', 'thumbnail', 'page-attributes'],
+        'rewrite'             => ['slug' => 'realisations', 'with_front' => false],
+        'capability_type'     => 'post',
+    ]);
+}, 5);
+
+// Flush rewrite rules one-shot après activation du CPT
+// (sinon /realisations/<slug>/ renvoie 404 au premier chargement)
+add_action('init', function() {
+    if (get_option('yv_realisation_rewrite_flushed') !== '1') {
+        flush_rewrite_rules(false);
+        update_option('yv_realisation_rewrite_flushed', '1');
+    }
+}, 20);
+
+// ============================================
 // 3. SCF — Save JSON locally for version control
 // ============================================
 add_filter('acf/settings/save_json', function() {
@@ -784,6 +827,40 @@ add_action('acf/include_fields', function() {
             ['key' => 'yv_ct_show_map', 'label' => 'Afficher Google Maps', 'name' => 'show_map', 'type' => 'true_false', 'default_value' => 1, 'ui' => 1],
         ],
         'location' => [[['param' => 'page_template', 'operator' => '==', 'value' => 'page-contact.php']]],
+    ]);
+
+    // --- REALISATION CPT ---
+    // Pas de champs "résultats chiffrés" exprès : user ne veut pas qu'on invente de KPI.
+    // Si un jour un client fournit des vrais chiffres, ajouter ici `yv_r_results` en repeater.
+    acf_add_local_field_group([
+        'key' => 'yv_realisation',
+        'title' => 'Détails de la réalisation',
+        'fields' => [
+            ['key' => 'yv_r_client', 'label' => 'Nom du client', 'name' => 'client_name', 'type' => 'text', 'instructions' => 'Nom officiel du client (ex: "Maison Mira", "ADOPS 72"). Affiché en hero.'],
+            ['key' => 'yv_r_category', 'label' => 'Catégorie', 'name' => 'category', 'type' => 'select', 'choices' => [
+                'Site vitrine'      => 'Site vitrine',
+                'E-commerce'        => 'E-commerce',
+                'Application web'   => 'Application web',
+                'Plateforme métier' => 'Plateforme métier',
+                'Refonte'           => 'Refonte',
+                'Institutionnel'    => 'Institutionnel',
+            ], 'default_value' => 'Site vitrine'],
+            ['key' => 'yv_r_sector', 'label' => 'Secteur d\'activité', 'name' => 'sector', 'type' => 'text', 'instructions' => 'Ex: "Joaillerie", "Santé", "Éducation", "Assurance"'],
+            ['key' => 'yv_r_year', 'label' => 'Année du projet', 'name' => 'project_year', 'type' => 'text', 'instructions' => 'Ex: "2025"'],
+            ['key' => 'yv_r_location', 'label' => 'Localisation', 'name' => 'project_location', 'type' => 'text', 'instructions' => 'Ex: "Le Mans", "France", "International". Optionnel.'],
+            ['key' => 'yv_r_context', 'label' => 'Contexte / Problématique', 'name' => 'context', 'type' => 'textarea', 'rows' => 4, 'instructions' => 'Le besoin initial du client, le contexte du projet.'],
+            ['key' => 'yv_r_scope', 'label' => 'Périmètre / Ce que nous avons fait', 'name' => 'scope', 'type' => 'textarea', 'rows' => 4, 'instructions' => 'Ce qui a été livré (conception, dev, SEO, maintenance...).'],
+            ['key' => 'yv_r_services', 'label' => 'Services activés', 'name' => 'services_used', 'type' => 'repeater', 'layout' => 'table', 'button_label' => 'Ajouter un service', 'sub_fields' => [
+                ['key' => 'yv_r_s_ico', 'label' => 'Icône FA', 'name' => 'icon', 'type' => 'text', 'default_value' => 'fa-solid fa-check'],
+                ['key' => 'yv_r_s_lbl', 'label' => 'Libellé', 'name' => 'label', 'type' => 'text'],
+            ]],
+            ['key' => 'yv_r_grad_from', 'label' => 'Gradient — couleur départ', 'name' => 'gradient_from', 'type' => 'text', 'default_value' => '#0f172a', 'instructions' => 'Hex color, ex: #0f172a. Utilisé comme hero visuel tant qu\'il n\'y a pas de screenshot.'],
+            ['key' => 'yv_r_grad_to', 'label' => 'Gradient — couleur arrivée', 'name' => 'gradient_to', 'type' => 'text', 'default_value' => '#1e40af'],
+            ['key' => 'yv_r_featured', 'label' => 'Mettre en avant sur la home', 'name' => 'is_featured', 'type' => 'true_false', 'default_value' => 0, 'ui' => 1, 'instructions' => 'Si coché, apparaîtra dans la section "Nos réalisations" de la page d\'accueil.'],
+            ['key' => 'yv_r_external', 'label' => 'Lien externe (site client)', 'name' => 'external_url', 'type' => 'url', 'instructions' => 'Optionnel. Laisser vide tant que le site client n\'est pas prêt à être lié publiquement.'],
+        ],
+        'location' => [[['param' => 'post_type', 'operator' => '==', 'value' => 'realisation']]],
+        'position' => 'normal',
     ]);
 });
 
