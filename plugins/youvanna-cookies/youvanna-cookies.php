@@ -66,7 +66,7 @@ add_action('wp_head', function() {
     .yv-cb-link{color:var(--color-primary-dark,#7A2210);text-decoration:underline;font-weight:600}
     .yv-cb-actions{display:flex;gap:8px;flex-shrink:0}
     .yv-cb-btn{padding:10px 20px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;border:2px solid transparent;transition:background-color .15s ease,color .15s ease,border-color .15s ease,opacity .15s ease;white-space:nowrap}
-    .yv-cb-btn--accept{background:var(--color-primary,#2563eb);color:#fff;border-color:var(--color-primary,#2563eb)}
+    .yv-cb-btn--accept{background:var(--color-primary-dark,#7A2210);color:#fff;border-color:var(--color-primary-dark,#7A2210)}
     .yv-cb-btn--accept:hover{opacity:.9}
     .yv-cb-btn--reject{background:transparent;color:#475569;border-color:#cbd5e1}
     .yv-cb-btn--reject:hover{background:#f8fafc;border-color:#94a3b8;color:#334155}

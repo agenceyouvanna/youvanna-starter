@@ -27,7 +27,7 @@
     --color-accent-rgb: 255, 107, 71;
     --color-text: #161616;
     --color-text-light: #595959;
-    --color-text-muted: #8a8a8a;
+    --color-text-muted: #5a5a5a;
     --color-bg: #F5F3EF;
     --color-bg-alt: #EDEAE4;
     --color-border: #d4d0c8;
@@ -109,8 +109,8 @@ img { max-width: 100%; height: auto; display: block; }
     transition: top var(--transition);
 }
 .skip-link:focus { top: 0; color: #fff; }
-a { color: var(--color-primary); text-decoration: none; transition: color var(--transition); }
-a:hover { color: var(--color-primary-dark); }
+a { color: var(--color-primary-dark); text-decoration: none; transition: color var(--transition); }
+a:hover { color: var(--color-secondary); }
 h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);
     font-weight: 800;
