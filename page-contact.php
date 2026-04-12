@@ -30,7 +30,7 @@ yv_render_hero([
                 <div class="contact-trust-icon"><i class="fa-solid fa-comments"></i></div>
                 <div class="contact-trust-text">
                     <strong>Premier échange gratuit</strong>
-                    <span>On discute de votre projet, sans engagement</span>
+                    <span>Discutons de votre projet, sans engagement</span>
                 </div>
             </div>
             <div class="contact-trust-item">
@@ -102,18 +102,18 @@ endif;
 
                 <!-- Mini FAQ -->
                 <div class="contact-mini-faq">
-                    <h4>Questions rapides</h4>
+                    <h4>Questions fréquentes</h4>
                     <details class="contact-faq-item">
-                        <summary>Combien coûte un site internet ?</summary>
-                        <p>Chaque projet est unique. Nos sites vitrines démarrent à partir de 1 500 euros, les e-commerce à partir de 3 000 euros. Nous établissons un devis précis après avoir compris vos besoins.</p>
+                        <summary>Quel est le délai pour obtenir un devis ?</summary>
+                        <p>Nous vous envoyons un devis détaillé sous 48 heures après notre premier échange. Chaque proposition est personnalisée selon vos besoins.</p>
                     </details>
                     <details class="contact-faq-item">
-                        <summary>Quel est le délai de réalisation ?</summary>
-                        <p>Un site vitrine prend généralement 3 à 4 semaines. Un e-commerce ou une application web sur mesure : 6 à 12 semaines selon la complexité.</p>
+                        <summary>Comment se déroule un premier échange ?</summary>
+                        <p>Nous organisons un appel téléphonique ou une visio de 20 à 30 minutes pour comprendre votre projet, vos objectifs et vos contraintes. C'est gratuit et sans engagement.</p>
                     </details>
                     <details class="contact-faq-item">
-                        <summary>Travaillez-vous uniquement au Mans ?</summary>
-                        <p>Nous sommes basés au Mans mais travaillons avec des clients partout en France. La plupart de nos échanges se font en visio et par téléphone.</p>
+                        <summary>Intervenez-vous partout en France ?</summary>
+                        <p>Oui, nous travaillons avec des clients dans toute la France. La plupart de nos échanges se font en visio et par téléphone, le tout aussi efficacement qu'en présentiel.</p>
                     </details>
                 </div>
             </div>
