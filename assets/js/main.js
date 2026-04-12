@@ -78,6 +78,8 @@ if (!match) return;
 var prefix = match[1] || '';
 var numStr = match[2].replace(',', '.');
 var target = parseFloat(numStr);
+// Skip zero-padded step numbers like 01, 02, 03 — they are labels, not stats
+if (match[2].length > 1 && match[2].charAt(0) === '0' && target < 100) return;
 var suffix = (match[3] || '') + (match[4] || '');
 var isDecimal = numStr.indexOf('.') !== -1;
 var decimals = isDecimal ? (numStr.split('.')[1] || '').length : 0;
