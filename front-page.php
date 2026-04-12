@@ -22,44 +22,20 @@ yv_render_hero([
 ?>
 
 <!-- TECH / PARTNER LOGO BAND -->
+<?php if (function_exists('have_rows') && have_rows('tech_logos')): ?>
 <section class="tech-band" aria-label="Technologies et outils">
     <div class="container">
         <div class="tech-band__track">
-            <div class="tech-band__item">
-                <i class="fa-brands fa-wordpress" aria-hidden="true"></i>
-                <span>WordPress</span>
-            </div>
-            <div class="tech-band__item">
-                <i class="fa-brands fa-react" aria-hidden="true"></i>
-                <span>React</span>
-            </div>
-            <div class="tech-band__item">
-                <i class="fa-brands fa-node-js" aria-hidden="true"></i>
-                <span>Node.js</span>
-            </div>
-            <div class="tech-band__item">
-                <i class="fa-brands fa-laravel" aria-hidden="true"></i>
-                <span>Laravel</span>
-            </div>
-            <div class="tech-band__item">
-                <i class="fa-brands fa-shopify" aria-hidden="true"></i>
-                <span>Shopify</span>
-            </div>
-            <div class="tech-band__item">
-                <i class="fa-brands fa-php" aria-hidden="true"></i>
-                <span>WooCommerce</span>
-            </div>
-            <div class="tech-band__item">
-                <i class="fa-brands fa-figma" aria-hidden="true"></i>
-                <span>Figma</span>
-            </div>
-            <div class="tech-band__item">
-                <i class="fa-brands fa-docker" aria-hidden="true"></i>
-                <span>Docker</span>
-            </div>
+            <?php while (have_rows('tech_logos')): the_row(); ?>
+                <div class="tech-band__item">
+                    <i class="<?php echo esc_attr(get_sub_field('icon')); ?>" aria-hidden="true"></i>
+                    <span><?php echo esc_html(get_sub_field('label')); ?></span>
+                </div>
+            <?php endwhile; ?>
         </div>
     </div>
 </section>
+<?php endif; ?>
 
 <!-- FEATURED SERVICES — Alternating text+image blocks -->
 <?php if (function_exists('have_rows') && have_rows('services')): ?>
@@ -114,58 +90,42 @@ yv_render_hero([
 <?php endif; ?>
 
 <!-- MARQUEE BAND -->
+<?php if (function_exists('have_rows') && have_rows('marquee_items')): ?>
 <div class="marquee-band" aria-hidden="true">
     <div class="marquee-band-track">
         <?php
-        $marquee_items = ['Sites web', 'Applications', 'ERP', 'CRM', 'Dashboards', 'E-commerce', 'SEO', 'Design', 'Performance', 'WordPress', 'Sur mesure', 'Maintenance'];
-        // Double les items pour le scroll infini
-        $all_items = array_merge($marquee_items, $marquee_items);
-        foreach ($all_items as $item): ?>
+        $marquee_texts = [];
+        while (have_rows('marquee_items')): the_row();
+            $marquee_texts[] = get_sub_field('text');
+        endwhile;
+        // Double pour le scroll infini
+        foreach (array_merge($marquee_texts, $marquee_texts) as $item): ?>
             <span class="marquee-band-item"><?php echo esc_html($item); ?></span>
         <?php endforeach; ?>
     </div>
 </div>
+<?php endif; ?>
 
 <!-- PROCESS / METHODOLOGY -->
+<?php if (function_exists('have_rows') && have_rows('process_steps')): ?>
 <section class="section process-section reveal">
     <div class="container">
-        <?php yv_section_header('Notre méthodologie', 'Un processus éprouvé pour des résultats concrets'); ?>
+        <?php yv_section_header(yv_field('process_title', 'Notre méthodologie'), yv_field('process_subtitle')); ?>
         <div class="process-steps">
-            <div class="process-step">
-                <div class="process-step__icon">
-                    <i class="fa-solid fa-headset" aria-hidden="true"></i>
+            <?php $step_i = 0; while (have_rows('process_steps')): the_row(); $step_i++; ?>
+                <div class="process-step">
+                    <div class="process-step__icon">
+                        <i class="<?php echo esc_attr(get_sub_field('icon') ?: 'fa-solid fa-check'); ?>" aria-hidden="true"></i>
+                    </div>
+                    <span class="process-step__number"><?php echo esc_html(str_pad($step_i, 2, '0', STR_PAD_LEFT)); ?></span>
+                    <h3 class="process-step__title"><?php echo esc_html(get_sub_field('title')); ?></h3>
+                    <p class="process-step__text"><?php echo esc_html(get_sub_field('text')); ?></p>
                 </div>
-                <span class="process-step__number">01</span>
-                <h3 class="process-step__title">Écoute &amp; Analyse</h3>
-                <p class="process-step__text">Nous analysons vos besoins, votre marché et vos objectifs pour définir la meilleure stratégie digitale.</p>
-            </div>
-            <div class="process-step">
-                <div class="process-step__icon">
-                    <i class="fa-solid fa-pen-ruler" aria-hidden="true"></i>
-                </div>
-                <span class="process-step__number">02</span>
-                <h3 class="process-step__title">Conception &amp; Design</h3>
-                <p class="process-step__text">Maquettes UX/UI sur mesure, validées avec vous avant chaque étape de développement.</p>
-            </div>
-            <div class="process-step">
-                <div class="process-step__icon">
-                    <i class="fa-solid fa-code" aria-hidden="true"></i>
-                </div>
-                <span class="process-step__number">03</span>
-                <h3 class="process-step__title">Développement &amp; Tests</h3>
-                <p class="process-step__text">Code propre, responsive, optimisé pour la performance et testé sur tous les appareils.</p>
-            </div>
-            <div class="process-step">
-                <div class="process-step__icon">
-                    <i class="fa-solid fa-rocket" aria-hidden="true"></i>
-                </div>
-                <span class="process-step__number">04</span>
-                <h3 class="process-step__title">Lancement &amp; Suivi</h3>
-                <p class="process-step__text">Mise en ligne, formation, maintenance continue et suivi des performances.</p>
-            </div>
+            <?php endwhile; ?>
         </div>
     </div>
 </section>
+<?php endif; ?>
 
 <!-- ABOUT -->
 <?php if (yv_field('about_title') || yv_field('about_text')): ?>
