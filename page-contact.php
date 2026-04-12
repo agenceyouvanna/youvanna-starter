@@ -22,22 +22,22 @@ yv_render_hero([
             <div class="contact-trust-item">
                 <div class="contact-trust-icon"><i class="fa-solid fa-clock"></i></div>
                 <div class="contact-trust-text">
-                    <strong>Réponse sous 24h</strong>
-                    <span>Chaque demande reçoit une réponse personnalisée</span>
+                    <strong>Lorem ipsum dolor</strong>
+                    <span>Sit amet consectetur adipiscing elit</span>
                 </div>
             </div>
             <div class="contact-trust-item">
                 <div class="contact-trust-icon"><i class="fa-solid fa-comments"></i></div>
                 <div class="contact-trust-text">
-                    <strong>Premier échange gratuit</strong>
-                    <span>Discutons de votre projet, sans engagement</span>
+                    <strong>Sed do eiusmod tempor</strong>
+                    <span>Incididunt ut labore et dolore magna</span>
                 </div>
             </div>
             <div class="contact-trust-item">
                 <div class="contact-trust-icon"><i class="fa-solid fa-file-lines"></i></div>
                 <div class="contact-trust-text">
-                    <strong>Devis détaillé offert</strong>
-                    <span>Proposition claire, transparente, sans surprise</span>
+                    <strong>Ut enim ad minim</strong>
+                    <span>Veniam quis nostrud exercitation</span>
                 </div>
             </div>
         </div>
@@ -57,8 +57,8 @@ endif;
 <section class="section contact-form-section" id="contact-form">
     <div class="container">
         <div class="contact-form-header reveal">
-            <h2 class="section-title">Parlons de votre projet</h2>
-            <p class="section-subtitle">Décrivez-nous votre besoin. Nous vous recontactons avec une proposition adaptée.</p>
+            <h2 class="section-title">Lorem ipsum dolor sit amet</h2>
+            <p class="section-subtitle">Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore.</p>
         </div>
         <div class="contact-grid reveal">
             <div class="contact-form">
@@ -104,16 +104,16 @@ endif;
                 <div class="contact-mini-faq">
                     <h4>Questions fréquentes</h4>
                     <details class="contact-faq-item">
-                        <summary>Quel est le délai pour obtenir un devis ?</summary>
-                        <p>Nous vous envoyons un devis détaillé sous 48 heures après notre premier échange. Chaque proposition est personnalisée selon vos besoins.</p>
+                        <summary>Lorem ipsum dolor sit amet ?</summary>
+                        <p>Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.</p>
                     </details>
                     <details class="contact-faq-item">
-                        <summary>Comment se déroule un premier échange ?</summary>
-                        <p>Nous organisons un appel téléphonique ou une visio de 20 à 30 minutes pour comprendre votre projet, vos objectifs et vos contraintes. C'est gratuit et sans engagement.</p>
+                        <summary>Sed ut perspiciatis unde omnis ?</summary>
+                        <p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos.</p>
                     </details>
                     <details class="contact-faq-item">
-                        <summary>Intervenez-vous partout en France ?</summary>
-                        <p>Oui, nous travaillons avec des clients dans toute la France. La plupart de nos échanges se font en visio et par téléphone, le tout aussi efficacement qu'en présentiel.</p>
+                        <summary>Quis autem vel eum iure ?</summary>
+                        <p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti.</p>
                     </details>
                 </div>
             </div>
@@ -135,8 +135,8 @@ if ($show_map && $map_url): ?>
 <section class="section contact-final-cta reveal">
     <div class="container">
         <div class="contact-final-cta-inner">
-            <h2>Préférez-vous qu'on vous appelle ?</h2>
-            <p>Laissez-nous votre numéro via le formulaire ci-dessus et nous vous rappelons dans les 24 heures.</p>
+            <h2>Lorem ipsum dolor sit amet</h2>
+            <p>Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
             <a href="#contact-form" class="btn btn-primary">Remonter au formulaire</a>
         </div>
     </div>

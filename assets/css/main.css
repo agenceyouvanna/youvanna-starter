@@ -3854,6 +3854,20 @@ a, .btn, .card, .faq-item, .testimonial-card, .stat {
     font-style: italic;
 }
 
+/* Required field stars */
+.contact-form-section .wpcf7 label .required,
+.contact-form-section .form-required-note .required {
+    color: var(--color-primary);
+    font-weight: 700;
+    margin-left: 2px;
+}
+.contact-form-section .form-required-note {
+    font-size: 13px;
+    color: var(--color-text-light);
+    margin-top: 8px;
+    margin-bottom: 0;
+}
+
 /* Contact info card */
 .contact-info-card {
     background: #fff;
