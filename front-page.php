@@ -275,15 +275,19 @@ if (!empty($featured_realisations)): ?>
 
 <!-- CTA BANNER -->
 <?php if (yv_field('cta_title')): ?>
+<?php
+$home_cta_alt_raw = trim(wp_strip_all_tags(yv_field('cta_title', 'Prêt à démarrer ?')));
+$home_cta_alt = $home_cta_alt_raw !== '' ? $home_cta_alt_raw : get_bloginfo('name');
+?>
 <section class="cta-banner reveal">
     <?php $cta_bg_id = yv_image_id('cta_background'); if ($cta_bg_id): ?>
-        <?php echo wp_get_attachment_image($cta_bg_id, 'hero', false, ['class' => 'hero-bg-img', 'loading' => 'lazy', 'alt' => '']); ?>
+        <?php echo wp_get_attachment_image($cta_bg_id, 'hero', false, ['class' => 'hero-bg-img', 'loading' => 'lazy', 'alt' => $home_cta_alt]); ?>
     <?php endif; ?>
     <div class="cta-overlay"></div>
     <div class="cta-content">
         <h2><?php echo yv_format_title(yv_field('cta_title', 'Prêt à démarrer ?')); ?></h2>
         <div class="cta-text"><?php echo wp_kses_post(yv_field('cta_text_home')); ?></div>
-        <a href="<?php echo esc_url(yv_field('cta_button_link', '/contact')); ?>" class="btn btn-primary"><?php echo esc_html(yv_field('cta_button_text', 'Contactez-nous')); ?></a>
+        <a href="<?php echo esc_url(yv_field('cta_button_link', '/contact/')); ?>" class="btn btn-primary"><?php echo esc_html(yv_field('cta_button_text', 'Contactez-nous')); ?></a>
     </div>
 </section>
 <?php endif; ?>

@@ -367,6 +367,10 @@ function yv_render_hero($args = []) {
         'wave' => false,
     ]);
     ?>
+    <?php
+    $hero_alt_raw = trim(wp_strip_all_tags($a['title'] ?: get_bloginfo('name')));
+    $hero_alt = $hero_alt_raw !== '' ? $hero_alt_raw : get_bloginfo('name');
+    ?>
     <section class="<?php echo esc_attr($a['class']); ?>">
         <?php if ($a['image_id']): ?>
             <?php echo wp_get_attachment_image($a['image_id'], 'hero', false, [
@@ -374,10 +378,10 @@ function yv_render_hero($args = []) {
                 'fetchpriority' => 'high',
                 'decoding' => 'async',
                 'loading' => 'eager',
-                'alt' => '',
+                'alt' => $hero_alt,
             ]); ?>
         <?php elseif ($a['image']): ?>
-            <img class="hero-bg-img" src="<?php echo esc_url($a['image']); ?>" alt="" fetchpriority="high" decoding="async" loading="eager">
+            <img class="hero-bg-img" src="<?php echo esc_url($a['image']); ?>" alt="<?php echo esc_attr($hero_alt); ?>" fetchpriority="high" decoding="async" loading="eager">
         <?php endif; ?>
         <div class="hero-overlay"></div>
         <div class="hero-content">
