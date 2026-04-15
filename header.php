@@ -55,7 +55,7 @@
                     </a>
                 <?php endif; ?>
                 <button type="button" class="nav-cart yv-shop-cart-toggle" data-yv-shop-cart-toggle aria-label="<?php esc_attr_e('Ouvrir le panier', 'youvanna-starter'); ?>">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg>
                     <span class="yv-shop-cart-toggle__count is-empty" data-yv-shop-cart-count>0</span>
                 </button>
             </div>
