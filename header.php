@@ -35,12 +35,31 @@
             'fallback_cb'    => function() { echo '<ul class="nav-menu"></ul>'; },
         ]); ?>
 
+        <?php $phone = yv_option('phone'); ?>
         <div class="nav-cta">
-            <?php $phone = yv_option('phone'); if ($phone): ?>
+            <?php if ($phone): ?>
                 <a href="tel:<?php echo esc_attr(preg_replace('/\s/', '', $phone)); ?>" class="nav-phone"><?php echo esc_html($phone); ?></a>
             <?php endif; ?>
             <a href="<?php echo esc_url(yv_option('cta_link', '/contact')); ?>" class="btn btn-primary btn-sm"><?php echo esc_html(yv_option('cta_text', 'Nous contacter')); ?></a>
         </div>
+
+        <?php if (class_exists('\\Youvanna\\Shop\\Plugin')): ?>
+            <div class="nav-actions">
+                <?php if (is_user_logged_in()): ?>
+                    <a href="<?php echo esc_url(admin_url('profile.php')); ?>" class="nav-account" aria-label="<?php esc_attr_e('Mon compte', 'youvanna-starter'); ?>" title="<?php esc_attr_e('Mon compte', 'youvanna-starter'); ?>">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    </a>
+                <?php else: ?>
+                    <a href="<?php echo esc_url(wp_login_url((string) ($_SERVER['REQUEST_URI'] ?? home_url()))); ?>" class="nav-account" aria-label="<?php esc_attr_e('Se connecter', 'youvanna-starter'); ?>" title="<?php esc_attr_e('Se connecter', 'youvanna-starter'); ?>">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    </a>
+                <?php endif; ?>
+                <button type="button" class="nav-cart yv-shop-cart-toggle" data-yv-shop-cart-toggle aria-label="<?php esc_attr_e('Ouvrir le panier', 'youvanna-starter'); ?>">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                    <span class="yv-shop-cart-toggle__count is-empty" data-yv-shop-cart-count>0</span>
+                </button>
+            </div>
+        <?php endif; ?>
 
         <button class="nav-toggle" aria-label="Menu" aria-expanded="false">
             <span></span><span></span><span></span>
