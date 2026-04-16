@@ -143,6 +143,136 @@ add_action('init', function() {
 }, 20);
 
 // ============================================
+// 2c. CUSTOM POST TYPE — "partenaire"
+// ============================================
+// Partenaires technologiques, clients, institutionnels. Chaque partenaire a :
+// titre (nom), extrait (courte présentation), contenu (description longue), image à la une (logo),
+// et peut appartenir à une ou plusieurs catégories (taxonomie categorie_partenaire).
+// Les sections flex "Grille partenaires" et "Partenaires mis en avant" interrogent ce CPT.
+add_action('init', function() {
+    register_post_type('partenaire', [
+        'labels' => [
+            'name'               => 'Partenaires',
+            'singular_name'      => 'Partenaire',
+            'menu_name'          => 'Partenaires',
+            'add_new'            => 'Ajouter',
+            'add_new_item'       => 'Ajouter un partenaire',
+            'edit_item'          => 'Modifier le partenaire',
+            'new_item'           => 'Nouveau partenaire',
+            'view_item'          => 'Voir le partenaire',
+            'search_items'       => 'Rechercher',
+            'not_found'          => 'Aucun partenaire trouvé',
+            'not_found_in_trash' => 'Aucun partenaire dans la corbeille',
+        ],
+        'public'              => true,
+        'has_archive'         => false,
+        'show_in_rest'        => true,
+        'menu_position'       => 23,
+        'menu_icon'           => 'dashicons-networking',
+        'supports'            => ['title', 'editor', 'excerpt', 'thumbnail', 'page-attributes'],
+        'rewrite'             => ['slug' => 'partenaires', 'with_front' => false],
+        'capability_type'     => 'post',
+    ]);
+    register_taxonomy('categorie_partenaire', 'partenaire', [
+        'labels' => [
+            'name'          => 'Catégories partenaires',
+            'singular_name' => 'Catégorie',
+            'menu_name'     => 'Catégories',
+        ],
+        'hierarchical'      => true,
+        'public'            => true,
+        'show_admin_column' => true,
+        'show_in_rest'      => true,
+        'rewrite'           => ['slug' => 'categorie-partenaire'],
+    ]);
+}, 5);
+
+add_action('init', function() {
+    if (get_option('yv_partenaire_rewrite_flushed') !== '1') {
+        flush_rewrite_rules(false);
+        update_option('yv_partenaire_rewrite_flushed', '1');
+    }
+}, 20);
+
+// ============================================
+// 2d. SHORTCODE — [partners_marquee] : carrousel défilé partenaires
+// ============================================
+// Usage : [partners_marquee] dans n'importe quel contenu (page, article).
+// Query le CPT 'partenaire' et rend un marquee HTML qui boucle en CSS (voir main.css : .partners-marquee).
+// Option : [partners_marquee speed="30" logos="1"] (speed en secondes, logos=1 pour afficher images)
+add_shortcode('partners_marquee', function($atts) {
+    if (!post_type_exists('partenaire')) return '';
+    $atts = shortcode_atts([
+        'speed' => '30',
+        'logos' => '0', // par défaut on affiche juste le nom ; à activer si logos uploadés
+    ], $atts);
+    $partners = get_posts([
+        'post_type'      => 'partenaire',
+        'posts_per_page' => -1,
+        'orderby'        => 'menu_order title',
+        'order'          => 'ASC',
+    ]);
+    if (!$partners) return '';
+    // Pour créer l'effet marquee, on duplique la liste (seamless loop)
+    $items_html = '';
+    for ($i = 0; $i < 2; $i++) {
+        foreach ($partners as $p) {
+            $img = get_post_thumbnail_id($p->ID);
+            $items_html .= '<div class="partners-marquee-item" aria-hidden="' . ($i ? 'true' : 'false') . '">';
+            if ($atts['logos'] && $img) {
+                $items_html .= wp_get_attachment_image($img, 'medium', false, [
+                    'loading' => 'lazy', 'alt' => esc_attr($p->post_title),
+                ]);
+            } else {
+                $items_html .= '<span class="partner-name">' . esc_html($p->post_title) . '</span>';
+            }
+            $items_html .= '</div>';
+        }
+    }
+    $speed = intval($atts['speed']);
+    $style = $speed !== 30 ? ' style="animation-duration:' . $speed . 's"' : '';
+    return '<div class="partners-marquee"><div class="partners-marquee-track"' . $style . '>' . $items_html . '</div></div>';
+});
+
+// ============================================
+// 2e. SCHEMA.ORG — JSON-LD FAQPage auto sur pages avec section FAQ
+// ============================================
+// Parse les sections flexibles d'une page et, si un layout 'faq' contient des items,
+// injecte un <script type="application/ld+json"> FAQPage dans le head. Bon pour le SEO.
+add_action('wp_head', function() {
+    if (!is_singular()) return;
+    $pid = get_queried_object_id();
+    if (!$pid) return;
+    if (!function_exists('get_field')) return;
+    $sections = get_field('sections', $pid);
+    if (!$sections || !is_array($sections)) return;
+    $questions = [];
+    foreach ($sections as $sec) {
+        if (!empty($sec['acf_fc_layout']) && $sec['acf_fc_layout'] === 'faq' && !empty($sec['items'])) {
+            foreach ($sec['items'] as $item) {
+                if (!empty($item['question']) && !empty($item['answer'])) {
+                    $questions[] = [
+                        '@type'          => 'Question',
+                        'name'           => wp_strip_all_tags($item['question']),
+                        'acceptedAnswer' => [
+                            '@type' => 'Answer',
+                            'text'  => wp_strip_all_tags($item['answer']),
+                        ],
+                    ];
+                }
+            }
+        }
+    }
+    if (!$questions) return;
+    $schema = [
+        '@context'   => 'https://schema.org',
+        '@type'      => 'FAQPage',
+        'mainEntity' => $questions,
+    ];
+    echo "\n<script type=\"application/ld+json\">" . wp_json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "</script>\n";
+}, 50);
+
+// ============================================
 // 3. SCF — Save JSON locally for version control
 // ============================================
 add_filter('acf/settings/save_json', function() {
@@ -367,10 +497,6 @@ function yv_render_hero($args = []) {
         'wave' => false,
     ]);
     ?>
-    <?php
-    $hero_alt_raw = trim(wp_strip_all_tags($a['title'] ?: get_bloginfo('name')));
-    $hero_alt = $hero_alt_raw !== '' ? $hero_alt_raw : get_bloginfo('name');
-    ?>
     <section class="<?php echo esc_attr($a['class']); ?>">
         <?php if ($a['image_id']): ?>
             <?php echo wp_get_attachment_image($a['image_id'], 'hero', false, [
@@ -378,10 +504,10 @@ function yv_render_hero($args = []) {
                 'fetchpriority' => 'high',
                 'decoding' => 'async',
                 'loading' => 'eager',
-                'alt' => $hero_alt,
+                'alt' => '',
             ]); ?>
         <?php elseif ($a['image']): ?>
-            <img class="hero-bg-img" src="<?php echo esc_url($a['image']); ?>" alt="<?php echo esc_attr($hero_alt); ?>" fetchpriority="high" decoding="async" loading="eager">
+            <img class="hero-bg-img" src="<?php echo esc_url($a['image']); ?>" alt="" fetchpriority="high" decoding="async" loading="eager">
         <?php endif; ?>
         <div class="hero-overlay"></div>
         <div class="hero-content">
@@ -442,6 +568,7 @@ function yv_render_card($args = []) {
         'title' => '',
         'text' => '',
         'link' => null,
+        'partner_logo' => '',
     ]);
     // "#" et chaîne vide ne comptent pas comme un vrai lien — la carte reste un <div>
     $link_url = (is_array($a['link']) && !empty($a['link']['url'])) ? trim($a['link']['url']) : '';
@@ -469,6 +596,9 @@ function yv_render_card($args = []) {
             <?php endif; ?>
             <?php if ($has_link): ?>
                 <span class="card-link"><?php echo esc_html($a['link']['title'] ?? 'En savoir plus'); ?> &rarr;</span>
+            <?php endif; ?>
+            <?php if (!empty($a['partner_logo'])): ?>
+                <div class="card-partner-logo" aria-hidden="true"><?php echo $a['partner_logo']; ?></div>
             <?php endif; ?>
         </div>
     <?php if ($has_link): ?>
@@ -1469,3 +1599,141 @@ add_filter('the_content', 'yv_clean_typography');
 add_filter('the_title', 'yv_clean_typography');
 add_filter('the_excerpt', 'yv_clean_typography');
 add_filter('acf/format_value', 'yv_clean_typography', 20);
+
+// ============================================
+// 12. SF SECURITY — Formulaires candidature + contact (2026-04-15)
+// ============================================
+// Handlers legers, sans dependance CF7, qui envoient via wp_mail() a
+// l'adresse configuree dans option yv_email (fallback admin_email).
+// Securite : nonce + honeypot + sanitize/escape + restriction CV.
+
+if (!function_exists('sf_recipient_email')) {
+    function sf_recipient_email() {
+        $opt = get_option('yv_email');
+        if ($opt && is_email($opt)) return $opt;
+        return get_option('admin_email');
+    }
+}
+
+// ---- Candidature Recrutement ----
+add_action('admin_post_nopriv_sf_candidature', 'sf_handle_candidature');
+add_action('admin_post_sf_candidature',        'sf_handle_candidature');
+
+function sf_handle_candidature() {
+    $referer = wp_get_referer() ?: home_url('/nous-recrutons/');
+
+    if (!isset($_POST['sf_candidature_nonce']) || !wp_verify_nonce($_POST['sf_candidature_nonce'], 'sf_candidature')) {
+        wp_safe_redirect(add_query_arg('sfc', 'err', $referer) . '#form');
+        exit;
+    }
+    // Honeypot : si le champ company est rempli => bot
+    if (!empty($_POST['company'])) {
+        wp_safe_redirect(add_query_arg('sfc', 'ok', $referer) . '#form');
+        exit;
+    }
+
+    $first    = sanitize_text_field($_POST['first_name'] ?? '');
+    $last     = sanitize_text_field($_POST['last_name'] ?? '');
+    $email    = sanitize_email($_POST['email'] ?? '');
+    $phone    = sanitize_text_field($_POST['phone'] ?? '');
+    $poste    = sanitize_text_field($_POST['poste'] ?? '');
+    $dispo    = sanitize_text_field($_POST['dispo'] ?? '');
+    $message  = sanitize_textarea_field($_POST['message'] ?? '');
+
+    if (!$first || !$last || !$email || !is_email($email) || !$phone) {
+        wp_safe_redirect(add_query_arg('sfc', 'err', $referer) . '#form');
+        exit;
+    }
+
+    $attachments = [];
+    if (!empty($_FILES['cv']) && !empty($_FILES['cv']['tmp_name']) && $_FILES['cv']['error'] === UPLOAD_ERR_OK) {
+        $allowed_ext = ['pdf', 'doc', 'docx'];
+        $fname = sanitize_file_name($_FILES['cv']['name']);
+        $ext = strtolower(pathinfo($fname, PATHINFO_EXTENSION));
+        if (in_array($ext, $allowed_ext, true) && $_FILES['cv']['size'] <= 5 * 1024 * 1024) {
+            $tmp_path = wp_tempnam('sf-cv-' . $fname);
+            if ($tmp_path && move_uploaded_file($_FILES['cv']['tmp_name'], $tmp_path)) {
+                // wp_mail requiert un nom de fichier lisible
+                $renamed = dirname($tmp_path) . '/' . $fname;
+                if (@rename($tmp_path, $renamed)) {
+                    $attachments[] = $renamed;
+                } else {
+                    $attachments[] = $tmp_path;
+                }
+            }
+        }
+    }
+
+    $to      = sf_recipient_email();
+    $subject = 'Nouvelle candidature - ' . $first . ' ' . $last;
+    $body    = "Nouvelle candidature recue via sfsecurity.youvanna.com\n\n"
+             . "Nom        : {$first} {$last}\n"
+             . "Email      : {$email}\n"
+             . "Telephone  : {$phone}\n"
+             . "Poste      : {$poste}\n"
+             . "Dispo      : {$dispo}\n"
+             . "\nMessage :\n{$message}\n";
+
+    $headers = [
+        'Content-Type: text/plain; charset=UTF-8',
+        'From: ' . get_bloginfo('name') . ' <noreply@' . parse_url(home_url(), PHP_URL_HOST) . '>',
+        'Reply-To: ' . $first . ' ' . $last . ' <' . $email . '>',
+    ];
+
+    $sent = wp_mail($to, $subject, $body, $headers, $attachments);
+
+    // Cleanup attachments (tmp)
+    foreach ($attachments as $a) { @unlink($a); }
+
+    wp_safe_redirect(add_query_arg('sfc', $sent ? 'ok' : 'err', $referer) . '#form');
+    exit;
+}
+
+// ---- Contact page ----
+add_action('admin_post_nopriv_sf_contact', 'sf_handle_contact');
+add_action('admin_post_sf_contact',        'sf_handle_contact');
+
+function sf_handle_contact() {
+    $referer = wp_get_referer() ?: home_url('/contact/');
+
+    if (!isset($_POST['sf_contact_nonce']) || !wp_verify_nonce($_POST['sf_contact_nonce'], 'sf_contact')) {
+        wp_safe_redirect(add_query_arg('sfct', 'err', $referer) . '#form');
+        exit;
+    }
+    if (!empty($_POST['company'])) {
+        wp_safe_redirect(add_query_arg('sfct', 'ok', $referer) . '#form');
+        exit;
+    }
+
+    $first   = sanitize_text_field($_POST['first_name'] ?? '');
+    $last    = sanitize_text_field($_POST['last_name'] ?? '');
+    $email   = sanitize_email($_POST['email'] ?? '');
+    $phone   = sanitize_text_field($_POST['phone'] ?? '');
+    $subject = sanitize_text_field($_POST['subject'] ?? '');
+    $message = sanitize_textarea_field($_POST['message'] ?? '');
+
+    if (!$first || !$email || !is_email($email) || !$message) {
+        wp_safe_redirect(add_query_arg('sfct', 'err', $referer) . '#form');
+        exit;
+    }
+
+    $to       = sf_recipient_email();
+    $mail_sub = 'Contact site - ' . ($subject ?: 'sans sujet');
+    $body     = "Nouveau message via sfsecurity.youvanna.com\n\n"
+              . "Nom        : {$first} {$last}\n"
+              . "Email      : {$email}\n"
+              . "Telephone  : {$phone}\n"
+              . "Sujet      : {$subject}\n"
+              . "\nMessage :\n{$message}\n";
+
+    $headers = [
+        'Content-Type: text/plain; charset=UTF-8',
+        'From: ' . get_bloginfo('name') . ' <noreply@' . parse_url(home_url(), PHP_URL_HOST) . '>',
+        'Reply-To: ' . $first . ' ' . $last . ' <' . $email . '>',
+    ];
+
+    $sent = wp_mail($to, $mail_sub, $body, $headers);
+
+    wp_safe_redirect(add_query_arg('sfct', $sent ? 'ok' : 'err', $referer) . '#form');
+    exit;
+}
