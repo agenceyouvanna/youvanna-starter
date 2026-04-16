@@ -57,11 +57,18 @@ if ($layout === 'engagements') {
                             <span class="engagement-accent" aria-hidden="true"></span>
                         <?php echo $has_link ? '</a>' : '</div>'; ?>
                     <?php elseif ($layout === 'minimal' || $layout === 'steps'): ?>
+                        <?php
+                        $has_icon = !empty($icon);
+                        $minimal_classes = 'card card-' . esc_attr($layout) . ($has_icon ? ' card-' . esc_attr($layout) . '--with-icon' : '');
+                        ?>
                         <?php if ($has_link): ?>
-                            <a href="<?php echo $link_url; ?>" class="card card-clickable card-<?php echo esc_attr($layout); ?>" data-n="<?php echo esc_attr(str_pad($idx, 2, '0', STR_PAD_LEFT)); ?>"<?php echo $link_target; ?>>
+                            <a href="<?php echo $link_url; ?>" class="<?php echo $minimal_classes; ?> card-clickable" data-n="<?php echo esc_attr(str_pad($idx, 2, '0', STR_PAD_LEFT)); ?>"<?php echo $link_target; ?>>
                         <?php else: ?>
-                            <div class="card card-<?php echo esc_attr($layout); ?>" data-n="<?php echo esc_attr(str_pad($idx, 2, '0', STR_PAD_LEFT)); ?>">
+                            <div class="<?php echo $minimal_classes; ?>" data-n="<?php echo esc_attr(str_pad($idx, 2, '0', STR_PAD_LEFT)); ?>">
                         <?php endif; ?>
+                            <?php if ($has_icon): ?>
+                                <div class="card-icon-gradient" aria-hidden="true"><i class="<?php echo esc_attr($icon); ?>"></i></div>
+                            <?php endif; ?>
                             <div class="card-number" aria-hidden="true"><?php echo esc_html(str_pad($idx, 2, '0', STR_PAD_LEFT)); ?></div>
                             <div class="card-body">
                                 <h3><?php echo esc_html($title); ?></h3>

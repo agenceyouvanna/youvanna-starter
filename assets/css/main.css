@@ -6302,3 +6302,92 @@ a.home-service-card.card-clickable:hover .home-service-card__link i {
     .home-services-grid { grid-template-columns: 1fr; }
     .home-service-card__body { padding: 18px; }
 }
+
+/* ============================================
+   === CARDS MINIMAL AVEC ICÔNE (style Framer) ===
+   Ajoute une icône gradient en haut de la card, le numéro devient
+   plus discret en coin, layout plus élégant et cohérent.
+   ============================================ */
+.cards-layout-minimal .card-minimal--with-icon {
+    padding: 36px 28px 36px 28px;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 4px 18px rgba(15,23,42,.04);
+    transition: transform .35s var(--ease-premium, cubic-bezier(.2,.7,.2,1)), box-shadow .35s ease;
+}
+.cards-layout-minimal a.card-clickable.card-minimal--with-icon:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px rgba(15,23,42,.1);
+}
+.cards-layout-minimal .card-minimal--with-icon::before,
+.cards-layout-minimal .card-minimal--with-icon::after { display: none; }
+
+.cards-layout-minimal .card-minimal--with-icon .card-icon-gradient {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 22px;
+    box-shadow: 0 10px 24px rgba(var(--color-primary-rgb), .28);
+    margin-bottom: 22px;
+    transition: transform .35s var(--ease-premium, cubic-bezier(.2,.7,.2,1));
+}
+.cards-layout-minimal a.card-clickable.card-minimal--with-icon:hover .card-icon-gradient {
+    transform: scale(1.06) rotate(-3deg);
+}
+.cards-layout-minimal .card-minimal--with-icon .card-number {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    left: auto;
+    font-size: 1.25rem;
+    font-weight: 700;
+    opacity: .35;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.cards-layout-minimal .card-minimal--with-icon .card-body {
+    padding: 0;
+}
+.cards-layout-minimal .card-minimal--with-icon h3 {
+    font-size: 1.15rem;
+    margin-bottom: 10px;
+    color: var(--color-secondary);
+}
+.cards-layout-minimal .card-minimal--with-icon .card-text {
+    color: #475569;
+    font-size: .95rem;
+    line-height: 1.55;
+}
+.cards-layout-minimal .card-minimal--with-icon .card-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 14px;
+    font-size: .9rem;
+    font-weight: 600;
+    color: var(--color-primary);
+}
+@media (max-width: 768px) {
+    .cards-layout-minimal .card-minimal--with-icon {
+        padding: 28px 22px !important;
+    }
+    .cards-layout-minimal .card-minimal--with-icon .card-icon-gradient {
+        width: 48px;
+        height: 48px;
+        font-size: 18px;
+        margin-bottom: 18px;
+    }
+    .cards-layout-minimal .card-minimal--with-icon .card-number {
+        top: 16px;
+        right: 18px;
+        left: auto !important;
+        font-size: 1.1rem !important;
+    }
+}
