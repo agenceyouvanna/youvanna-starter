@@ -37,54 +37,63 @@ yv_render_hero([
 </section>
 <?php endif; ?>
 
-<!-- FEATURED SERVICES — Alternating text+image blocks -->
+<!-- FEATURED SERVICES — Grid de cards (photo + icône + titre + description) -->
 <?php if (function_exists('have_rows') && have_rows('services')): ?>
-<section class="section featured-services reveal">
+<section class="section home-services reveal">
     <div class="container">
         <?php yv_section_header(yv_field('services_title', 'Nos Services'), yv_field('services_subtitle')); ?>
-    </div>
-    <?php
-    $svc_index = 0;
-    while (have_rows('services')): the_row();
-        $svc_index++;
-        if ($svc_index > 3) break;
-        $img = get_sub_field('image');
-        $link = get_sub_field('link');
-        $link_url = '';
-        if (is_array($link) && !empty($link['url'])) {
-            $link_url = $link['url'];
-        }
-        $reversed = ($svc_index % 2 === 0) ? ' fs-block--reversed' : '';
-    ?>
-    <div class="fs-block<?php echo esc_attr($reversed); ?>">
-        <div class="container">
-            <div class="fs-block__inner">
-                <div class="fs-block__image">
+        <div class="home-services-grid">
+            <?php
+            $svc_index = 0;
+            while (have_rows('services')): the_row();
+                $svc_index++;
+                $img    = get_sub_field('image');
+                $icon   = get_sub_field('icon');
+                $s_title = get_sub_field('title');
+                $s_desc  = get_sub_field('description');
+                $link   = get_sub_field('link');
+                $link_url = (is_array($link) && !empty($link['url'])) ? $link['url'] : '';
+                $link_target = (is_array($link) && !empty($link['target'])) ? ' target="' . esc_attr($link['target']) . '"' : '';
+                // Map simple icon keywords to Font Awesome classes (fallback if user wrote emoji/keyword)
+                $icon_map = [
+                    'shield' => 'fa-solid fa-shield-halved', 'flame' => 'fa-solid fa-fire-flame-curved',
+                    'calendar' => 'fa-solid fa-calendar-days', 'bell' => 'fa-solid fa-bell',
+                    'clipboard' => 'fa-solid fa-clipboard-list', 'search' => 'fa-solid fa-magnifying-glass',
+                    'user-shield' => 'fa-solid fa-user-shield',
+                ];
+                $icon_class = '';
+                if ($icon) {
+                    $icon_class = isset($icon_map[$icon]) ? $icon_map[$icon] : (strpos($icon, 'fa-') === 0 ? $icon : '');
+                }
+                $card_tag = $link_url ? 'a' : 'div';
+            ?>
+            <<?php echo $card_tag; ?><?php if ($link_url): ?> href="<?php echo esc_url($link_url); ?>"<?php echo $link_target; ?><?php endif; ?> class="home-service-card<?php echo $link_url ? ' card-clickable' : ''; ?>">
+                <div class="home-service-card__media">
                     <?php if ($img && !empty($img['ID'])): ?>
-                        <?php echo wp_get_attachment_image($img['ID'], 'large', false, [
+                        <?php echo wp_get_attachment_image($img['ID'], 'card', false, [
+                            'class' => 'home-service-card__img',
                             'loading' => 'lazy',
-                            'alt' => esc_attr(get_sub_field('title')),
+                            'alt' => esc_attr($s_title),
                         ]); ?>
                     <?php endif; ?>
-                </div>
-                <div class="fs-block__content">
-                    <span class="fs-block__number"><?php echo esc_html(str_pad($svc_index, 2, '0', STR_PAD_LEFT)); ?></span>
-                    <h3><?php echo esc_html(get_sub_field('title')); ?></h3>
-                    <p><?php echo wp_kses_post(get_sub_field('description')); ?></p>
-                    <?php if ($link_url): ?>
-                        <a href="<?php echo esc_url($link_url); ?>" class="btn btn-outline" aria-label="En savoir plus sur <?php echo esc_attr(get_sub_field('title')); ?>">
-                            <?php echo esc_html(is_array($link) && !empty($link['title']) ? $link['title'] : 'En savoir plus'); ?> <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-                        </a>
+                    <?php if ($icon_class): ?>
+                        <span class="home-service-card__icon" aria-hidden="true"><i class="<?php echo esc_attr($icon_class); ?>"></i></span>
                     <?php endif; ?>
+                    <span class="home-service-card__num" aria-hidden="true"><?php echo esc_html(str_pad($svc_index, 2, '0', STR_PAD_LEFT)); ?></span>
                 </div>
-            </div>
+                <div class="home-service-card__body">
+                    <h3 class="home-service-card__title"><?php echo esc_html($s_title); ?></h3>
+                    <?php if ($s_desc): ?><p class="home-service-card__desc"><?php echo wp_kses_post($s_desc); ?></p><?php endif; ?>
+                    <?php if ($link_url): ?><span class="home-service-card__link"><?php echo esc_html(is_array($link) && !empty($link['title']) ? $link['title'] : 'En savoir plus'); ?> <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span><?php endif; ?>
+                </div>
+            </<?php echo $card_tag; ?>>
+            <?php endwhile; ?>
         </div>
-    </div>
-    <?php endwhile; ?>
-    <div class="fs-cta-wrap">
-        <a href="<?php echo esc_url(home_url('/services/')); ?>" class="btn btn-primary btn-lg">
-            Découvrir tous nos services <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-        </a>
+        <div class="home-services-cta">
+            <a href="<?php echo esc_url(home_url('/nos-solutions/')); ?>" class="btn btn-primary btn-lg">
+                Découvrir toutes nos solutions <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+            </a>
+        </div>
     </div>
 </section>
 <?php endif; ?>
@@ -273,21 +282,20 @@ if (!empty($featured_realisations)): ?>
 </section>
 <?php endif; ?>
 
+<!-- GOOGLE REVIEWS MARQUEE (framer-style 2 lignes) -->
+<?php get_template_part('template-parts/section-reviews_marquee'); ?>
+
 <!-- CTA BANNER -->
 <?php if (yv_field('cta_title')): ?>
-<?php
-$home_cta_alt_raw = trim(wp_strip_all_tags(yv_field('cta_title', 'Prêt à démarrer ?')));
-$home_cta_alt = $home_cta_alt_raw !== '' ? $home_cta_alt_raw : get_bloginfo('name');
-?>
 <section class="cta-banner reveal">
     <?php $cta_bg_id = yv_image_id('cta_background'); if ($cta_bg_id): ?>
-        <?php echo wp_get_attachment_image($cta_bg_id, 'hero', false, ['class' => 'hero-bg-img', 'loading' => 'lazy', 'alt' => $home_cta_alt]); ?>
+        <?php echo wp_get_attachment_image($cta_bg_id, 'hero', false, ['class' => 'hero-bg-img', 'loading' => 'lazy', 'alt' => '']); ?>
     <?php endif; ?>
     <div class="cta-overlay"></div>
     <div class="cta-content">
         <h2><?php echo yv_format_title(yv_field('cta_title', 'Prêt à démarrer ?')); ?></h2>
         <div class="cta-text"><?php echo wp_kses_post(yv_field('cta_text_home')); ?></div>
-        <a href="<?php echo esc_url(yv_field('cta_button_link', '/contact/')); ?>" class="btn btn-primary"><?php echo esc_html(yv_field('cta_button_text', 'Contactez-nous')); ?></a>
+        <a href="<?php echo esc_url(yv_field('cta_button_link', '/contact')); ?>" class="btn btn-primary"><?php echo esc_html(yv_field('cta_button_text', 'Contactez-nous')); ?></a>
     </div>
 </section>
 <?php endif; ?>
