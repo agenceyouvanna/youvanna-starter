@@ -325,13 +325,16 @@ a.card-clickable:hover { transform: translateY(-4px); box-shadow: var(--shadow-l
 /* ============================================
    ABOUT / TEXT+IMAGE — Même layout
    ============================================ */
-.about-section .grid-2, .text-image-section .grid-2 { align-items: center; }
+.about-section .grid-2 { align-items: start; }
+.text-image-section .grid-2 { align-items: center; }
 .about-image, .ti-image { overflow: visible; position: relative; }
+.about-image { display: flex; flex-direction: column; gap: 24px; }
 .about-image img, .ti-image img {
     display: block;
     width: 100%;
     border-radius: inherit;
 }
+.about-image .stats-grid { margin-top: 0; }
 .about-content h2, .ti-content h2 { margin-bottom: 16px; }
 .about-content p, .about-content div, .ti-content p, .ti-content div { color: var(--color-text-light); margin-bottom: 24px; }
 .text-image-section.reverse .ti-image { order: -1; }

@@ -152,6 +152,7 @@ yv_render_hero([
                     </div>
                 </div>
             <?php endif; ?>
+            <?php yv_render_stats(function_exists('get_field') ? get_field('stats') : null); ?>
         </div>
         <div class="about-content">
             <h2><?php echo yv_format_title(yv_field('about_title', 'À propos')); ?></h2>
@@ -159,7 +160,6 @@ yv_render_hero([
             <?php $btn = function_exists('get_field') ? get_field('about_button') : null; if (is_array($btn) && !empty($btn['url'])): ?>
                 <a href="<?php echo esc_url($btn['url']); ?>" class="btn btn-primary"><?php echo esc_html($btn['title'] ?? 'En savoir plus'); ?></a>
             <?php endif; ?>
-            <?php yv_render_stats(function_exists('get_field') ? get_field('stats') : null); ?>
         </div>
     </div>
 </section>
