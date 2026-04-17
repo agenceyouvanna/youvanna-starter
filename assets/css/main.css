@@ -483,12 +483,18 @@ a.card-clickable:hover { transform: translateY(-4px); box-shadow: var(--shadow-l
 }
 .cta-overlay {
     position: absolute; inset: 0; z-index: 1;
-    background: linear-gradient(135deg, rgba(var(--color-primary-rgb),.92) 0%, rgba(var(--color-secondary-rgb),.88) 100%);
+    background:
+        radial-gradient(ellipse 80% 60% at 18% 12%, rgba(255,255,255,.09) 0%, transparent 60%),
+        linear-gradient(120deg,
+            rgba(var(--color-primary-rgb), .92) 0%,
+            rgba(var(--color-primary-rgb), .90) 38%,
+            rgba(var(--color-secondary-rgb), .90) 72%,
+            rgba(var(--color-secondary-rgb), .88) 100%);
 }
 .cta-content { position: relative; z-index: 2; max-width: 640px; margin: 0 auto; }
 .cta-content h2 { color: #fff; margin-bottom: 16px; }
 .cta-content p,
-.cta-content .cta-text { color: rgba(255,255,255,.9); margin-bottom: 48px; font-size: 17px; line-height: 1.7; }
+.cta-content .cta-text { color: #fff; margin-bottom: 48px; font-size: 17px; line-height: 1.7; }
 .cta-content .cta-text p { margin-bottom: 0; }
 .cta-banner .btn-primary { background: #fff; color: var(--color-primary); }
 .cta-banner .btn-primary:hover { background: var(--color-bg-alt); }
