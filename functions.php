@@ -548,6 +548,7 @@ function yv_format_title($title) {
  */
 function yv_section_header($title, $subtitle = '', $badge = '') {
     if (!$title) return;
+    echo '<div class="section-header">';
     if ($badge) {
         echo '<span class="section-badge">' . esc_html($badge) . '</span>';
     }
@@ -555,6 +556,7 @@ function yv_section_header($title, $subtitle = '', $badge = '') {
     if ($subtitle) {
         echo '<p class="section-subtitle">' . esc_html($subtitle) . '</p>';
     }
+    echo '</div>';
 }
 
 /**

@@ -318,6 +318,7 @@ a.card-clickable:hover { transform: translateY(-4px); box-shadow: var(--shadow-l
     margin-bottom: 16px;
 }
 .section-badge + .section-title { margin-top: 0; }
+.section-header { text-align: center; }
 .section-title { text-align: center; margin-bottom: 12px; }
 /* NOTE : pas de <mark> dans les titres — rule #17 */
 .section-subtitle { text-align: center; color: var(--color-text-light); max-width: 640px; margin: 0 auto 48px; font-size: 17px; }
