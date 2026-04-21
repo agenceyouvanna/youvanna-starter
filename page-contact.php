@@ -16,28 +16,36 @@ yv_render_hero([
 ?>
 
 <!-- Trust signals -->
+<?php
+$trust_1_t = yv_field('contact_trust_1_title') ?: 'Réponse rapide';
+$trust_1_s = yv_field('contact_trust_1_sub') ?: 'Nous vous répondons en moins de 2 heures en journée';
+$trust_2_t = yv_field('contact_trust_2_title') ?: 'Devis gratuit';
+$trust_2_s = yv_field('contact_trust_2_sub') ?: 'Un tarif clair, sans engagement ni surprise';
+$trust_3_t = yv_field('contact_trust_3_title') ?: 'Disponibles 7j/7';
+$trust_3_s = yv_field('contact_trust_3_sub') ?: 'Service 24h/24 pour tous vos trajets en Sarthe';
+?>
 <section class="section contact-trust-section reveal">
     <div class="container">
         <div class="contact-trust-grid">
             <div class="contact-trust-item">
                 <div class="contact-trust-icon"><i class="fa-solid fa-clock"></i></div>
                 <div class="contact-trust-text">
-                    <strong>Lorem ipsum dolor</strong>
-                    <span>Sit amet consectetur adipiscing elit</span>
+                    <strong><?php echo esc_html($trust_1_t); ?></strong>
+                    <span><?php echo esc_html($trust_1_s); ?></span>
                 </div>
             </div>
             <div class="contact-trust-item">
                 <div class="contact-trust-icon"><i class="fa-solid fa-comments"></i></div>
                 <div class="contact-trust-text">
-                    <strong>Sed do eiusmod tempor</strong>
-                    <span>Incididunt ut labore et dolore magna</span>
+                    <strong><?php echo esc_html($trust_2_t); ?></strong>
+                    <span><?php echo esc_html($trust_2_s); ?></span>
                 </div>
             </div>
             <div class="contact-trust-item">
                 <div class="contact-trust-icon"><i class="fa-solid fa-file-lines"></i></div>
                 <div class="contact-trust-text">
-                    <strong>Ut enim ad minim</strong>
-                    <span>Veniam quis nostrud exercitation</span>
+                    <strong><?php echo esc_html($trust_3_t); ?></strong>
+                    <span><?php echo esc_html($trust_3_s); ?></span>
                 </div>
             </div>
         </div>
@@ -56,9 +64,13 @@ endif;
 <!-- Contact form + info -->
 <section class="section contact-form-section" id="contact-form">
     <div class="container">
+        <?php
+        $form_title = yv_field('contact_form_title') ?: 'Demande de devis gratuit';
+        $form_subtitle = yv_field('contact_form_subtitle') ?: 'Remplissez le formulaire ci-dessous, nous vous répondons dans les meilleurs délais.';
+        ?>
         <div class="contact-form-header reveal">
-            <h2 class="section-title">Lorem ipsum dolor sit amet</h2>
-            <p class="section-subtitle">Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore.</p>
+            <h2 class="section-title"><?php echo esc_html($form_title); ?></h2>
+            <p class="section-subtitle"><?php echo esc_html($form_subtitle); ?></p>
         </div>
         <div class="contact-grid reveal">
             <div class="contact-form">
@@ -101,20 +113,29 @@ endif;
                 </div>
 
                 <!-- Mini FAQ -->
+                <?php
+                $faq_items = [];
+                if (function_exists('have_rows') && have_rows('contact_mini_faq')):
+                    while (have_rows('contact_mini_faq')): the_row();
+                        $faq_items[] = ['q' => get_sub_field('question'), 'a' => get_sub_field('reponse')];
+                    endwhile;
+                endif;
+                if (empty($faq_items)) {
+                    $faq_items = [
+                        ['q' => 'Sous quel délai obtenir une réponse ?', 'a' => 'Nous répondons généralement sous 2 heures en journée. Pour une urgence, appelez directement.'],
+                        ['q' => 'Puis-je réserver pour ce soir ?', 'a' => 'Oui, selon disponibilité. Contactez-nous par téléphone pour les réservations de dernière minute.'],
+                        ['q' => 'Quels modes de paiement acceptez-vous ?', 'a' => 'Espèces, carte bancaire et virement pour les entreprises. Un acompte peut être demandé pour les longs trajets.'],
+                    ];
+                }
+                ?>
                 <div class="contact-mini-faq">
                     <h4>Questions fréquentes</h4>
+                    <?php foreach ($faq_items as $item): ?>
                     <details class="contact-faq-item">
-                        <summary>Lorem ipsum dolor sit amet ?</summary>
-                        <p>Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.</p>
+                        <summary><?php echo esc_html($item['q']); ?></summary>
+                        <p><?php echo wp_kses_post($item['a']); ?></p>
                     </details>
-                    <details class="contact-faq-item">
-                        <summary>Sed ut perspiciatis unde omnis ?</summary>
-                        <p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos.</p>
-                    </details>
-                    <details class="contact-faq-item">
-                        <summary>Quis autem vel eum iure ?</summary>
-                        <p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti.</p>
-                    </details>
+                    <?php endforeach; ?>
                 </div>
             </div>
         </div>
@@ -132,12 +153,17 @@ if ($show_map && $map_url): ?>
 <?php endif; ?>
 
 <!-- Final CTA -->
+<?php
+$final_title = yv_field('contact_final_title') ?: 'Prêt à réserver votre chauffeur ?';
+$final_text = yv_field('contact_final_text') ?: 'Remplissez le formulaire ou appelez-nous directement. Nous sommes disponibles 7j/7 pour tous vos trajets.';
+$final_btn = yv_field('contact_final_btn') ?: 'Remonter au formulaire';
+?>
 <section class="section contact-final-cta reveal">
     <div class="container">
         <div class="contact-final-cta-inner">
-            <h2>Lorem ipsum dolor sit amet</h2>
-            <p>Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-            <a href="#contact-form" class="btn btn-primary">Remonter au formulaire</a>
+            <h2><?php echo esc_html($final_title); ?></h2>
+            <p><?php echo esc_html($final_text); ?></p>
+            <a href="#contact-form" class="btn btn-primary"><?php echo esc_html($final_btn); ?></a>
         </div>
     </div>
 </section>
