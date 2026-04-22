@@ -243,6 +243,23 @@ if (!empty($featured_realisations)): ?>
         ];
     }
     $use_marquee = count($testi_items) > 3;
+    $split_rows = count($testi_items) >= 6;
+    if ($split_rows) {
+        $testi_long = [];
+        $testi_short = [];
+        foreach ($testi_items as $ti) {
+            if (mb_strlen(wp_strip_all_tags((string) $ti['text'])) > 150) {
+                $testi_long[] = $ti;
+            } else {
+                $testi_short[] = $ti;
+            }
+        }
+        if (empty($testi_long) || empty($testi_short)) {
+            $mid = (int) ceil(count($testi_items) / 2);
+            $testi_long = array_slice($testi_items, 0, $mid);
+            $testi_short = array_slice($testi_items, $mid);
+        }
+    }
 ?>
 <section class="section testimonials-section reveal">
     <div class="container">
@@ -250,18 +267,45 @@ if (!empty($featured_realisations)): ?>
     </div>
     <?php if ($use_marquee): ?>
         <div class="testimonials-marquee">
-            <div class="marquee-track" data-direction="left">
-                <?php foreach (array_merge($testi_items, $testi_items) as $t): ?>
-                    <div class="testimonial-card">
-                        <div class="testimonial-stars" aria-label="<?php echo esc_attr($t['rating']); ?> sur 5" role="img"><?php for ($i = 0; $i < $t['rating']; $i++) echo '&#9733;'; ?></div>
-                        <blockquote><?php echo wp_kses_post($t['text']); ?></blockquote>
-                        <div class="testimonial-author">
-                            <?php if ($t['photo'] && !empty($t['photo']['ID'])): ?><?php echo wp_get_attachment_image($t['photo']['ID'], 'thumbnail', false, ['loading' => 'lazy', 'alt' => esc_attr($t['name'])]); ?><?php endif; ?>
-                            <div><strong><?php echo esc_html($t['name']); ?></strong><?php if ($t['role']): ?><span><?php echo esc_html($t['role']); ?></span><?php endif; ?></div>
+            <?php if ($split_rows): ?>
+                <div class="marquee-track" data-direction="left">
+                    <?php foreach (array_merge($testi_long, $testi_long) as $t): ?>
+                        <div class="testimonial-card">
+                            <div class="testimonial-stars" aria-label="<?php echo esc_attr($t['rating']); ?> sur 5" role="img"><?php for ($i = 0; $i < $t['rating']; $i++) echo '&#9733;'; ?></div>
+                            <blockquote><?php echo wp_kses_post($t['text']); ?></blockquote>
+                            <div class="testimonial-author">
+                                <?php if ($t['photo'] && !empty($t['photo']['ID'])): ?><?php echo wp_get_attachment_image($t['photo']['ID'], 'thumbnail', false, ['loading' => 'lazy', 'alt' => esc_attr($t['name'])]); ?><?php endif; ?>
+                                <div><strong><?php echo esc_html($t['name']); ?></strong><?php if ($t['role']): ?><span><?php echo esc_html($t['role']); ?></span><?php endif; ?></div>
+                            </div>
                         </div>
-                    </div>
-                <?php endforeach; ?>
-            </div>
+                    <?php endforeach; ?>
+                </div>
+                <div class="marquee-track" data-direction="right">
+                    <?php foreach (array_merge($testi_short, $testi_short) as $t): ?>
+                        <div class="testimonial-card">
+                            <div class="testimonial-stars" aria-label="<?php echo esc_attr($t['rating']); ?> sur 5" role="img"><?php for ($i = 0; $i < $t['rating']; $i++) echo '&#9733;'; ?></div>
+                            <blockquote><?php echo wp_kses_post($t['text']); ?></blockquote>
+                            <div class="testimonial-author">
+                                <?php if ($t['photo'] && !empty($t['photo']['ID'])): ?><?php echo wp_get_attachment_image($t['photo']['ID'], 'thumbnail', false, ['loading' => 'lazy', 'alt' => esc_attr($t['name'])]); ?><?php endif; ?>
+                                <div><strong><?php echo esc_html($t['name']); ?></strong><?php if ($t['role']): ?><span><?php echo esc_html($t['role']); ?></span><?php endif; ?></div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php else: ?>
+                <div class="marquee-track" data-direction="left">
+                    <?php foreach (array_merge($testi_items, $testi_items) as $t): ?>
+                        <div class="testimonial-card">
+                            <div class="testimonial-stars" aria-label="<?php echo esc_attr($t['rating']); ?> sur 5" role="img"><?php for ($i = 0; $i < $t['rating']; $i++) echo '&#9733;'; ?></div>
+                            <blockquote><?php echo wp_kses_post($t['text']); ?></blockquote>
+                            <div class="testimonial-author">
+                                <?php if ($t['photo'] && !empty($t['photo']['ID'])): ?><?php echo wp_get_attachment_image($t['photo']['ID'], 'thumbnail', false, ['loading' => 'lazy', 'alt' => esc_attr($t['name'])]); ?><?php endif; ?>
+                                <div><strong><?php echo esc_html($t['name']); ?></strong><?php if ($t['role']): ?><span><?php echo esc_html($t['role']); ?></span><?php endif; ?></div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
         </div>
     <?php else: ?>
         <div class="container">
