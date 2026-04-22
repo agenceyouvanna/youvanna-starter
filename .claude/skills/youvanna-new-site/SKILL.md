@@ -1996,8 +1996,8 @@ wp_update_post(['ID' => $form_id, 'post_title' => 'Formulaire de contact']);
 update_post_meta($form_id, '_mail', [
     'active' => true,
     'subject' => '[_site_title] Nouveau message: "[your-subject]"',
-    'sender' => '[_site_title] <wordpress@' . parse_url(get_option('siteurl'), PHP_URL_HOST) . '>',
-    'recipient' => get_option('admin_email'),
+    'sender' => '[_site_title] <contact@youvanna.com>',
+    'recipient' => get_option('yv_mail_to', get_option('admin_email')),
     'body' => "De : [your-name] <[your-email]>\nTéléphone : [your-phone]\nSujet : [your-subject]\n\nMessage :\n[your-message]",
     'additional_headers' => 'Reply-To: [your-email]',
     'attachments' => '', 'use_html' => false, 'exclude_blank' => false,
