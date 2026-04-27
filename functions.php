@@ -7,6 +7,29 @@
 if (!defined('ABSPATH')) exit;
 
 // ============================================
+// 0. WPAUTOP FIX — Pages avec markup riche custom (lst-* / yv-raw)
+// ============================================
+// wpautop insère des </p> orphelins qui cassent les grids CSS quand on a du HTML
+// structuré dans post_content (p.ex. .lst-rich-row avec image+texte). Désactiver
+// wpautop pour les pages dont le contenu commence par <section> avec markup connu.
+// Marqueurs supportés : lst-page-hero, lst-rich-row, lst-features-grid, ou commentaire <!--yv-raw-->.
+add_action('template_redirect', function() {
+    if (!is_singular('page')) return;
+    $id = get_queried_object_id();
+    if (!$id) return;
+    $raw = get_post_field('post_content', $id);
+    if (
+        strpos($raw, 'lst-page-hero') !== false ||
+        strpos($raw, 'lst-rich-row') !== false ||
+        strpos($raw, 'lst-features-grid') !== false ||
+        strpos($raw, '<!--yv-raw-->') !== false
+    ) {
+        remove_filter('the_content', 'wpautop');
+        remove_filter('the_excerpt', 'wpautop');
+    }
+});
+
+// ============================================
 // 1. ASSETS — CSS & JS
 // ============================================
 add_action('wp_enqueue_scripts', function() {
