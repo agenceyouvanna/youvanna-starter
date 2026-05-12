@@ -1380,9 +1380,11 @@ add_action('wp_head', function() {
         . '</style>' . "\n";
 }, 999);
 
-// Preconnect CDN + GTM/GA
+// Preconnect CDN + GTM/GA + Google Fonts
 add_action('wp_head', function() {
     echo '<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>' . "\n";
+    echo '<link rel="preconnect" href="https://fonts.googleapis.com">' . "\n";
+    echo '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' . "\n";
     if (yv_option('gtm_id') || yv_option('ga_id')) {
         echo '<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>' . "\n";
         echo '<link rel="dns-prefetch" href="https://www.googletagmanager.com">' . "\n";
